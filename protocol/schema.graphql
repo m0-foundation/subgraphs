@@ -1,0 +1,219 @@
+type BurnExecuted @entity(immutable: true) {
+  id: Bytes!
+  minter: Bytes! # address
+  amount: BigInt! # uint240
+  payer: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type BurnExecuted1 @entity(immutable: true) {
+  id: Bytes!
+  minter: Bytes! # address
+  principalAmount: BigInt! # uint112
+  amount: BigInt! # uint240
+  payer: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type CollateralUpdated @entity(immutable: true) {
+  id: Bytes!
+  minter: Bytes! # address
+  collateral: BigInt! # uint240
+  totalResolvedCollateralRetrieval: BigInt! # uint240
+  metadataHash: Bytes! # bytes32
+  timestamp: BigInt! # uint40
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type EIP712DomainChanged @entity(immutable: true) {
+  id: Bytes!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type IndexUpdated @entity(immutable: true) {
+  id: Bytes!
+  index: BigInt! # uint128
+  rate: BigInt! # uint32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MintCanceled @entity(immutable: true) {
+  id: Bytes!
+  mintId: BigInt! # uint48
+  minter: Bytes! # address
+  canceller: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MintExecuted @entity(immutable: true) {
+  id: Bytes!
+  mintId: BigInt! # uint48
+  minter: Bytes! # address
+  principalAmount: BigInt! # uint112
+  amount: BigInt! # uint240
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MintProposed @entity(immutable: true) {
+  id: Bytes!
+  mintId: BigInt! # uint48
+  minter: Bytes! # address
+  amount: BigInt! # uint240
+  destination: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MinterActivated @entity(immutable: true) {
+  id: Bytes!
+  minter: Bytes! # address
+  caller: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MinterDeactivated @entity(immutable: true) {
+  id: Bytes!
+  minter: Bytes! # address
+  inactiveOwedM: BigInt! # uint240
+  caller: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MinterFrozen @entity(immutable: true) {
+  id: Bytes!
+  minter: Bytes! # address
+  frozenUntil: BigInt! # uint40
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MissedIntervalsPenaltyImposed @entity(immutable: true) {
+  id: Bytes!
+  minter: Bytes! # address
+  missedIntervals: BigInt! # uint40
+  penaltyAmount: BigInt! # uint240
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RetrievalCreated @entity(immutable: true) {
+  id: Bytes!
+  retrievalId: BigInt! # uint48
+  minter: Bytes! # address
+  amount: BigInt! # uint240
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RetrievalResolved @entity(immutable: true) {
+  id: Bytes!
+  retrievalId: BigInt! # uint48
+  minter: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type UndercollateralizedPenaltyImposed @entity(immutable: true) {
+  id: Bytes!
+  minter: Bytes! # address
+  excessOwedM: BigInt! # uint240
+  timeSpan: BigInt! # uint40
+  penaltyAmount: BigInt! # uint240
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type Approval @entity(immutable: true) {
+  id: Bytes!
+  account: Bytes! # address
+  spender: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type AuthorizationCanceled @entity(immutable: true) {
+  id: Bytes!
+  authorizer: Bytes! # address
+  nonce: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type AuthorizationUsed @entity(immutable: true) {
+  id: Bytes!
+  authorizer: Bytes! # address
+  nonce: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MTokenEIP712DomainChanged @entity(immutable: true) {
+  id: Bytes!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MTokenIndexUpdated @entity(immutable: true) {
+  id: Bytes!
+  index: BigInt! # uint128
+  rate: BigInt! # uint32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type StartedEarning @entity(immutable: true) {
+  id: Bytes!
+  account: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type StoppedEarning @entity(immutable: true) {
+  id: Bytes!
+  account: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Transfer @entity(immutable: true) {
+  id: Bytes!
+  sender: Bytes! # address
+  recipient: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}

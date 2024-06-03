@@ -1,0 +1,18 @@
+
+
+# how to deploy a new version to alchemy
+
+graph deploy <PROJECT> \
+  --version-label v1.0.0 \
+  --node https://subgraphs.alchemy.com/api/subgraphs/deploy \
+  --deploy-key <XXXXXXX>
+
+
+  
+  # Playgound GRAPHQL
+
+  ## TTG
+  https://subgraph.satsuma-prod.com/the-things-team--3422500/ttg/playground
+
+  ## Protocol
+  https://subgraph.satsuma-prod.com/the-things-team--3422500/protocol/playground

@@ -1,0 +1,103 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: MinterGateway
+    network: sepolia
+    source:
+      address: "0x4edfcfb5f9e55962ef1a2eef0b56a8fadbaba289"
+      abi: MinterGateway
+      startBlock: 5783468
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - BurnExecuted
+        - BurnExecuted1
+        - CollateralUpdated
+        - IndexUpdated
+        - MintCanceled
+        - MintExecuted
+        - MintProposed
+        - MinterActivated
+        - MinterDeactivated
+        - MinterFrozen
+        - MissedIntervalsPenaltyImposed
+        - RetrievalCreated
+        - RetrievalResolved
+        - UndercollateralizedPenaltyImposed
+      abis:
+        - name: MinterGateway
+          file: ./abis/MinterGateway.json
+      eventHandlers:
+        - event: BurnExecuted(indexed address,uint240,indexed address)
+          handler: handleBurnExecuted
+        - event: BurnExecuted(indexed address,uint112,uint240,indexed address)
+          handler: handleBurnExecuted1
+        - event: CollateralUpdated(indexed address,uint240,uint240,indexed bytes32,uint40)
+          handler: handleCollateralUpdated
+        - event: IndexUpdated(indexed uint128,indexed uint32)
+          handler: handleIndexUpdated
+        - event: MintCanceled(indexed uint48,indexed address,indexed address)
+          handler: handleMintCanceled
+        - event: MintExecuted(indexed uint48,indexed address,uint112,uint240)
+          handler: handleMintExecuted
+        - event: MintProposed(indexed uint48,indexed address,uint240,indexed address)
+          handler: handleMintProposed
+        - event: MinterActivated(indexed address,indexed address)
+          handler: handleMinterActivated
+        - event: MinterDeactivated(indexed address,uint240,indexed address)
+          handler: handleMinterDeactivated
+        - event: MinterFrozen(indexed address,uint40)
+          handler: handleMinterFrozen
+        - event: MissedIntervalsPenaltyImposed(indexed address,uint40,uint240)
+          handler: handleMissedIntervalsPenaltyImposed
+        - event: RetrievalCreated(indexed uint48,indexed address,uint240)
+          handler: handleRetrievalCreated
+        - event: RetrievalResolved(indexed uint48,indexed address)
+          handler: handleRetrievalResolved
+        - event: UndercollateralizedPenaltyImposed(indexed address,uint240,uint40,uint240)
+          handler: handleUndercollateralizedPenaltyImposed
+      file: ./src/minter-gateway.ts
+  - kind: ethereum
+    name: MToken
+    network: sepolia
+    source:
+      address: "0x0c941ad94ca4a52edaeabf203b61bdd1807ceec0"
+      abi: MToken
+      startBlock: 5783437
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - AuthorizationCanceled
+        - AuthorizationUsed
+        - MTokenIndexUpdated
+        - StartedEarning
+        - StoppedEarning
+        - Transfer
+      abis:
+        - name: MToken
+          file: ./abis/MToken.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: AuthorizationCanceled(indexed address,indexed bytes32)
+          handler: handleAuthorizationCanceled
+        - event: AuthorizationUsed(indexed address,indexed bytes32)
+          handler: handleAuthorizationUsed
+        - event: IndexUpdated(indexed uint128,indexed uint32)
+          handler: handleIndexUpdated
+        - event: StartedEarning(indexed address)
+          handler: handleStartedEarning
+        - event: StoppedEarning(indexed address)
+          handler: handleStoppedEarning
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/m-token.ts
