@@ -1,0 +1,309 @@
+[
+  {
+    "inputs": [
+      { "internalType": "address", "name": "zeroToken_", "type": "address" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "nonce", "type": "uint256" },
+      { "internalType": "uint256", "name": "expectedNonce", "type": "uint256" }
+    ],
+    "name": "InvalidAccountNonce",
+    "type": "error"
+  },
+  { "inputs": [], "name": "InvalidDestinationAddress", "type": "error" },
+  { "inputs": [], "name": "InvalidSignature", "type": "error" },
+  { "inputs": [], "name": "InvalidSignatureLength", "type": "error" },
+  { "inputs": [], "name": "InvalidSignatureS", "type": "error" },
+  { "inputs": [], "name": "InvalidSignatureV", "type": "error" },
+  { "inputs": [], "name": "InvalidZeroTokenAddress", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "timepoint", "type": "uint256" },
+      { "internalType": "uint256", "name": "clock", "type": "uint256" }
+    ],
+    "name": "NotPastTimepoint",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "deadline", "type": "uint256" },
+      { "internalType": "uint256", "name": "timestamp", "type": "uint256" }
+    ],
+    "name": "SignatureExpired",
+    "type": "error"
+  },
+  { "inputs": [], "name": "SignerMismatch", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "startEpoch", "type": "uint256" },
+      { "internalType": "uint256", "name": "endEpoch", "type": "uint256" }
+    ],
+    "name": "StartEpochAfterEndEpoch",
+    "type": "error"
+  },
+  { "inputs": [], "name": "TransferFailed", "type": "error" },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "startEpoch",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "endEpoch",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "Claim",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "epoch",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "Distribution",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "EIP712DomainChanged",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "CLAIM_TYPEHASH",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "CLOCK_MODE",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "DOMAIN_SEPARATOR",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "token_", "type": "address" },
+      { "internalType": "uint256", "name": "startEpoch_", "type": "uint256" },
+      { "internalType": "uint256", "name": "endEpoch_", "type": "uint256" },
+      { "internalType": "address", "name": "destination_", "type": "address" }
+    ],
+    "name": "claim",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account_", "type": "address" },
+      { "internalType": "address", "name": "token_", "type": "address" },
+      { "internalType": "uint256", "name": "startEpoch_", "type": "uint256" },
+      { "internalType": "uint256", "name": "endEpoch_", "type": "uint256" },
+      { "internalType": "address", "name": "destination_", "type": "address" },
+      { "internalType": "uint256", "name": "deadline_", "type": "uint256" },
+      { "internalType": "uint8", "name": "v_", "type": "uint8" },
+      { "internalType": "bytes32", "name": "r_", "type": "bytes32" },
+      { "internalType": "bytes32", "name": "s_", "type": "bytes32" }
+    ],
+    "name": "claimBySig",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account_", "type": "address" },
+      { "internalType": "address", "name": "token_", "type": "address" },
+      { "internalType": "uint256", "name": "startEpoch_", "type": "uint256" },
+      { "internalType": "uint256", "name": "endEpoch_", "type": "uint256" },
+      { "internalType": "address", "name": "destination_", "type": "address" },
+      { "internalType": "uint256", "name": "deadline_", "type": "uint256" },
+      { "internalType": "bytes", "name": "signature_", "type": "bytes" }
+    ],
+    "name": "claimBySig",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "clock",
+    "outputs": [{ "internalType": "uint48", "name": "", "type": "uint48" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "token_", "type": "address" }
+    ],
+    "name": "distribute",
+    "outputs": [
+      { "internalType": "uint256", "name": "amount_", "type": "uint256" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "token", "type": "address" },
+      { "internalType": "uint256", "name": "epoch", "type": "uint256" }
+    ],
+    "name": "distributionOfAt",
+    "outputs": [
+      { "internalType": "uint256", "name": "amount", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "eip712Domain",
+    "outputs": [
+      { "internalType": "bytes1", "name": "fields_", "type": "bytes1" },
+      { "internalType": "string", "name": "name_", "type": "string" },
+      { "internalType": "string", "name": "version_", "type": "string" },
+      { "internalType": "uint256", "name": "chainId_", "type": "uint256" },
+      {
+        "internalType": "address",
+        "name": "verifyingContract_",
+        "type": "address"
+      },
+      { "internalType": "bytes32", "name": "salt_", "type": "bytes32" },
+      {
+        "internalType": "uint256[]",
+        "name": "extensions_",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account_", "type": "address" },
+      { "internalType": "address", "name": "token_", "type": "address" },
+      { "internalType": "uint256", "name": "startEpoch_", "type": "uint256" },
+      { "internalType": "uint256", "name": "endEpoch_", "type": "uint256" },
+      { "internalType": "address", "name": "destination_", "type": "address" },
+      { "internalType": "uint256", "name": "nonce_", "type": "uint256" },
+      { "internalType": "uint256", "name": "deadline_", "type": "uint256" }
+    ],
+    "name": "getClaimDigest",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "token_", "type": "address" },
+      { "internalType": "address", "name": "account_", "type": "address" },
+      { "internalType": "uint256", "name": "startEpoch_", "type": "uint256" },
+      { "internalType": "uint256", "name": "endEpoch_", "type": "uint256" }
+    ],
+    "name": "getClaimable",
+    "outputs": [
+      { "internalType": "uint256", "name": "claimable_", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "token_", "type": "address" }
+    ],
+    "name": "getDistributable",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "token", "type": "address" },
+      { "internalType": "uint256", "name": "epoch", "type": "uint256" },
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "hasClaimed",
+    "outputs": [{ "internalType": "bool", "name": "claimed", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "name",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "nonces",
+    "outputs": [
+      { "internalType": "uint256", "name": "nonce", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "zeroToken",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

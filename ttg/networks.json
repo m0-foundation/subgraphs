@@ -1,0 +1,26 @@
+{
+  "sepolia": {
+    "PowerToken": {
+      "address": "0xe2b5002302ebc524429d319c193366d448a88ff1",
+      "startBlock": 5783339
+    },
+    "ZeroToken": {
+      "address": "0xA60ACdae5d34AE647957A219ffa6D74d4080A01F"
+    },
+    "StandardGovernor": {
+      "address": "0x89C867D0a4B2d4Adc6DFD00d2f153D7794Bf9Fef"
+    },
+    "EmergencyGovernor": {
+      "address": "0x0FeA9F6F610d800d8dd62Ace38663B213b087a13"
+    },
+    "ZeroGovernor": {
+      "address": "0x045bbBc51e7aD1EfF26833E9a8e7df5A53e72B61"
+    },
+    "Registrar": {
+      "address": "0x975Bf5f212367D09CB7f69D3dc4BA8C9B440aD3A"
+    },
+    "DistributionVault": {
+      "address": "0x3dc71Be52d6D687e21FC0d4FFc196F32cacbc26d"
+    }
+  }
+}

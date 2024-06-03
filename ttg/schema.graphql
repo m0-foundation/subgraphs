@@ -1,0 +1,446 @@
+type Approval @entity(immutable: true) {
+  id: Bytes!
+  account: Bytes! # address
+  spender: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type AuthorizationCanceled @entity(immutable: true) {
+  id: Bytes!
+  authorizer: Bytes! # address
+  nonce: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type AuthorizationUsed @entity(immutable: true) {
+  id: Bytes!
+  authorizer: Bytes! # address
+  nonce: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Buy @entity(immutable: true) {
+  id: Bytes!
+  buyer: Bytes! # address
+  amount: BigInt! # uint240
+  cost: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type DelegateChanged @entity(immutable: true) {
+  id: Bytes!
+  delegator: Bytes! # address
+  fromDelegatee: Bytes! # address
+  toDelegatee: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type DelegateVotesChanged @entity(immutable: true) {
+  id: Bytes!
+  delegatee: Bytes! # address
+  previousBalance: BigInt! # uint256
+  newBalance: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type EIP712DomainChanged @entity(immutable: true) {
+  id: Bytes!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type NextCashTokenSet @entity(immutable: true) {
+  id: Bytes!
+  startingEpoch: Int! # uint16
+  nextCashToken: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Sync @entity(immutable: true) {
+  id: Bytes!
+  account: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Tagline @entity(immutable: true) {
+  id: Bytes!
+  tagline: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TargetSupplyInflated @entity(immutable: true) {
+  id: Bytes!
+  targetEpoch: Int! # uint16
+  targetSupply: BigInt! # uint240
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Transfer @entity(immutable: true) {
+  id: Bytes!
+  sender: Bytes! # address
+  recipient: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type ZeroTokenApproval @entity(immutable: true) {
+  id: Bytes!
+  account: Bytes! # address
+  spender: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ZeroTokenAuthorizationCanceled @entity(immutable: true) {
+  id: Bytes!
+  authorizer: Bytes! # address
+  nonce: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ZeroTokenAuthorizationUsed @entity(immutable: true) {
+  id: Bytes!
+  authorizer: Bytes! # address
+  nonce: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ZeroTokenDelegateChanged @entity(immutable: true) {
+  id: Bytes!
+  delegator: Bytes! # address
+  fromDelegatee: Bytes! # address
+  toDelegatee: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ZeroTokenDelegateVotesChanged @entity(immutable: true) {
+  id: Bytes!
+  delegatee: Bytes! # address
+  previousBalance: BigInt! # uint256
+  newBalance: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ZeroTokenEIP712DomainChanged @entity(immutable: true) {
+  id: Bytes!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ZeroTokenTransfer @entity(immutable: true) {
+  id: Bytes!
+  sender: Bytes! # address
+  recipient: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type CashTokenSet @entity(immutable: true) {
+  id: Bytes!
+  cashToken: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type StandardGovernorEIP712DomainChanged @entity(immutable: true) {
+  id: Bytes!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type HasVotedOnAllProposals @entity(immutable: true) {
+  id: Bytes!
+  voter: Bytes! # address
+  currentEpoch: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ProposalCreated @entity(immutable: true) {
+  id: Bytes!
+  proposalId: BigInt! # uint256
+  proposer: Bytes! # address
+  # targets: [Bytes!]! # address[]
+  values: [BigInt!]! # uint256[]
+  signatures: [String!]! # string[]
+  callDatas: [Bytes!]! # bytes[]
+  voteStart: BigInt! # uint256
+  voteEnd: BigInt! # uint256
+  description: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ProposalExecuted @entity(immutable: true) {
+  id: Bytes!
+  proposalId: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ProposalFeeSentToVault @entity(immutable: true) {
+  id: Bytes!
+  proposalId: BigInt! # uint256
+  cashToken: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ProposalFeeSet @entity(immutable: true) {
+  id: Bytes!
+  proposalFee: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type VoteCast @entity(immutable: true) {
+  id: Bytes!
+  voter: Bytes! # address
+  proposalId: BigInt! # uint256
+  support: Int! # uint8
+  weight: BigInt! # uint256
+  reason: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type EmergencyGovernorEIP712DomainChanged @entity(immutable: true) {
+  id: Bytes!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type EmergencyGovernorProposalCreated @entity(immutable: true) {
+  id: Bytes!
+  proposalId: BigInt! # uint256
+  proposer: Bytes! # address
+  # targets: [Bytes!]! # address[]
+  values: [BigInt!]! # uint256[]
+  signatures: [String!]! # string[]
+  callDatas: [Bytes!]! # bytes[]
+  voteStart: BigInt! # uint256
+  voteEnd: BigInt! # uint256
+  description: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type EmergencyGovernorProposalExecuted @entity(immutable: true) {
+  id: Bytes!
+  proposalId: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type QuorumNumeratorUpdated @entity(immutable: true) {
+  id: Bytes!
+  oldQuorumNumerator: BigInt! # uint256
+  newQuorumNumerator: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ThresholdRatioSet @entity(immutable: true) {
+  id: Bytes!
+  thresholdRatio: Int! # uint16
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type EmergencyGovernorVoteCast @entity(immutable: true) {
+  id: Bytes!
+  voter: Bytes! # address
+  proposalId: BigInt! # uint256
+  support: Int! # uint8
+  weight: BigInt! # uint256
+  reason: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type AllowedCashTokensSet @entity(immutable: true) {
+  id: Bytes!
+  allowedCashTokens: [Bytes!]! # address[]
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ZeroGovernorEIP712DomainChanged @entity(immutable: true) {
+  id: Bytes!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ZeroGovernorProposalCreated @entity(immutable: true) {
+  id: Bytes!
+  proposalId: BigInt! # uint256
+  proposer: Bytes! # address
+  # targets: [Bytes!]! # address[]
+  values: [BigInt!]! # uint256[]
+  signatures: [String!]! # string[]
+  callDatas: [Bytes!]! # bytes[]
+  voteStart: BigInt! # uint256
+  voteEnd: BigInt! # uint256
+  description: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ZeroGovernorProposalExecuted @entity(immutable: true) {
+  id: Bytes!
+  proposalId: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ZeroGovernorQuorumNumeratorUpdated @entity(immutable: true) {
+  id: Bytes!
+  oldQuorumNumerator: BigInt! # uint256
+  newQuorumNumerator: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ResetExecuted @entity(immutable: true) {
+  id: Bytes!
+  bootstrapToken: Bytes! # address
+  standardGovernor: Bytes! # address
+  emergencyGovernor: Bytes! # address
+  powerToken: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ZeroGovernorThresholdRatioSet @entity(immutable: true) {
+  id: Bytes!
+  thresholdRatio: Int! # uint16
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ZeroGovernorVoteCast @entity(immutable: true) {
+  id: Bytes!
+  voter: Bytes! # address
+  proposalId: BigInt! # uint256
+  support: Int! # uint8
+  weight: BigInt! # uint256
+  reason: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type AddressAddedToList @entity(immutable: true) {
+  id: Bytes!
+  list: Bytes! # bytes32
+  account: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type AddressRemovedFromList @entity(immutable: true) {
+  id: Bytes!
+  list: Bytes! # bytes32
+  account: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type KeySet @entity(immutable: true) {
+  id: Bytes!
+  key: Bytes! # bytes32
+  value: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type Claim @entity(immutable: true) {
+  id: Bytes!
+  token: Bytes! # address
+  account: Bytes! # address
+  startEpoch: BigInt! # uint256
+  endEpoch: BigInt! # uint256
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Distribution @entity(immutable: true) {
+  id: Bytes!
+  token: Bytes! # address
+  epoch: BigInt! # uint256
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type DistributionVaultEIP712DomainChanged @entity(immutable: true) {
+  id: Bytes!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}

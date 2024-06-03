@@ -1,0 +1,251 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: PowerToken
+    network: sepolia
+    source:
+      address: "0xe2b5002302ebc524429d319c193366d448a88ff1"
+      abi: PowerToken
+      startBlock: 5783339
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - AuthorizationCanceled
+        - AuthorizationUsed
+        - Buy
+        - DelegateChanged
+        - DelegateVotesChanged
+        - EIP712DomainChanged
+        - NextCashTokenSet
+        - Sync
+        - Tagline
+        - TargetSupplyInflated
+        - Transfer
+      abis:
+        - name: PowerToken
+          file: ./abis/PowerToken.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: AuthorizationCanceled(indexed address,indexed bytes32)
+          handler: handleAuthorizationCanceled
+        - event: AuthorizationUsed(indexed address,indexed bytes32)
+          handler: handleAuthorizationUsed
+        - event: Buy(indexed address,uint240,uint256)
+          handler: handleBuy
+        - event: DelegateChanged(indexed address,indexed address,indexed address)
+          handler: handleDelegateChanged
+        - event: DelegateVotesChanged(indexed address,uint256,uint256)
+          handler: handleDelegateVotesChanged
+        - event: EIP712DomainChanged()
+          handler: handleEIP712DomainChanged
+        - event: NextCashTokenSet(indexed uint16,indexed address)
+          handler: handleNextCashTokenSet
+        - event: Sync(indexed address)
+          handler: handleSync
+        - event: Tagline(string)
+          handler: handleTagline
+        - event: TargetSupplyInflated(indexed uint16,indexed uint240)
+          handler: handleTargetSupplyInflated
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/power-token.ts
+  - kind: ethereum
+    name: ZeroToken
+    network: sepolia
+    source:
+      address: "0xA60ACdae5d34AE647957A219ffa6D74d4080A01F"
+      abi: ZeroToken
+      startBlock: 5783371
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ZeroTokenApproval
+        - ZeroTokenAuthorizationCanceled
+        - ZeroTokenAuthorizationUsed
+        - ZeroTokenDelegateChanged
+        - ZeroTokenDelegateVotesChanged
+        - ZeroTokenEIP712DomainChanged
+        - ZeroTokenTransfer
+      abis:
+        - name: ZeroToken
+          file: ./abis/ZeroToken.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: AuthorizationCanceled(indexed address,indexed bytes32)
+          handler: handleAuthorizationCanceled
+        - event: AuthorizationUsed(indexed address,indexed bytes32)
+          handler: handleAuthorizationUsed
+        - event: DelegateChanged(indexed address,indexed address,indexed address)
+          handler: handleDelegateChanged
+        - event: DelegateVotesChanged(indexed address,uint256,uint256)
+          handler: handleDelegateVotesChanged
+        - event: EIP712DomainChanged()
+          handler: handleEIP712DomainChanged
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/zero-token.ts
+  - kind: ethereum
+    name: StandardGovernor
+    network: sepolia
+    source:
+      address: "0x89C867D0a4B2d4Adc6DFD00d2f153D7794Bf9Fef"
+      abi: StandardGovernor
+      startBlock: 5783339
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - CashTokenSet
+        - ProposalCreated
+        - ProposalExecuted
+        - ProposalFeeSet
+        - VoteCast
+      abis:
+        - name: StandardGovernor
+          file: ./abis/StandardGovernor.json
+      eventHandlers:
+        - event: CashTokenSet(indexed address)
+          handler: handleCashTokenSet
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleProposalCreated
+        - event: ProposalExecuted(uint256)
+          handler: handleProposalExecuted
+        - event: ProposalFeeSet(uint256)
+          handler: handleProposalFeeSet
+        - event: VoteCast(indexed address,uint256,uint8,uint256,string)
+          handler: handleVoteCast
+      file: ./src/standard-governor.ts
+  - kind: ethereum
+    name: EmergencyGovernor
+    network: sepolia
+    source:
+      address: "0x0FeA9F6F610d800d8dd62Ace38663B213b087a13"
+      abi: EmergencyGovernor
+      startBlock: 5783339
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - EmergencyGovernorProposalCreated
+        - EmergencyGovernorProposalExecuted
+        - QuorumNumeratorUpdated
+        - ThresholdRatioSet
+        - EmergencyGovernorVoteCast
+      abis:
+        - name: EmergencyGovernor
+          file: ./abis/EmergencyGovernor.json
+      eventHandlers:
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleProposalCreated
+        - event: ProposalExecuted(uint256)
+          handler: handleProposalExecuted
+        - event: QuorumNumeratorUpdated(uint256,uint256)
+          handler: handleQuorumNumeratorUpdated
+        - event: ThresholdRatioSet(uint16)
+          handler: handleThresholdRatioSet
+        - event: VoteCast(indexed address,uint256,uint8,uint256,string)
+          handler: handleVoteCast
+      file: ./src/emergency-governor.ts
+  - kind: ethereum
+    name: ZeroGovernor
+    network: sepolia
+    source:
+      address: "0x045bbBc51e7aD1EfF26833E9a8e7df5A53e72B61"
+      abi: ZeroGovernor
+      startBlock: 5783339
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AllowedCashTokensSet
+        - ZeroGovernorProposalCreated
+        - ZeroGovernorProposalExecuted
+        - ZeroGovernorQuorumNumeratorUpdated
+        - ResetExecuted
+        - ZeroGovernorThresholdRatioSet
+        - ZeroGovernorVoteCast
+      abis:
+        - name: ZeroGovernor
+          file: ./abis/ZeroGovernor.json
+      eventHandlers:
+        - event: AllowedCashTokensSet(address[])
+          handler: handleAllowedCashTokensSet
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleProposalCreated
+        - event: ProposalExecuted(uint256)
+          handler: handleProposalExecuted
+        - event: QuorumNumeratorUpdated(uint256,uint256)
+          handler: handleQuorumNumeratorUpdated
+        - event: ResetExecuted(indexed address,address,address,address)
+          handler: handleResetExecuted
+        - event: ThresholdRatioSet(uint16)
+          handler: handleThresholdRatioSet
+        - event: VoteCast(indexed address,uint256,uint8,uint256,string)
+          handler: handleVoteCast
+      file: ./src/zero-governor.ts
+  - kind: ethereum
+    name: Registrar
+    network: sepolia
+    source:
+      address: "0x975Bf5f212367D09CB7f69D3dc4BA8C9B440aD3A"
+      abi: Registrar
+      startBlock: 5783432
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AddressAddedToList
+        - AddressRemovedFromList
+        - KeySet
+      abis:
+        - name: Registrar
+          file: ./abis/Registrar.json
+      eventHandlers:
+        - event: AddressAddedToList(indexed bytes32,indexed address)
+          handler: handleAddressAddedToList
+        - event: AddressRemovedFromList(indexed bytes32,indexed address)
+          handler: handleAddressRemovedFromList
+        - event: KeySet(indexed bytes32,indexed bytes32)
+          handler: handleKeySet
+      file: ./src/registrar.ts
+  - kind: ethereum
+    name: DistributionVault
+    network: sepolia
+    source:
+      address: "0x3dc71Be52d6D687e21FC0d4FFc196F32cacbc26d"
+      abi: DistributionVault
+      startBlock: 5783401
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Claim
+        - Distribution
+        - DistributionVaultEIP712DomainChanged
+      abis:
+        - name: DistributionVault
+          file: ./abis/DistributionVault.json
+      eventHandlers:
+        - event: Claim(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleClaim
+        - event: Distribution(indexed address,indexed uint256,uint256)
+          handler: handleDistribution
+        - event: EIP712DomainChanged()
+          handler: handleEIP712DomainChanged
+      file: ./src/distribution-vault.ts
