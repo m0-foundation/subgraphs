@@ -17,7 +17,6 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - BurnExecuted
-        - BurnExecuted1
         - CollateralUpdated
         - IndexUpdated
         - MintCanceled
@@ -35,9 +34,9 @@ dataSources:
           file: ./abis/MinterGateway.json
       eventHandlers:
         - event: BurnExecuted(indexed address,uint240,indexed address)
-          handler: handleBurnExecuted
+          handler: handleBurnExecutedActiveOwedM
         - event: BurnExecuted(indexed address,uint112,uint240,indexed address)
-          handler: handleBurnExecuted1
+          handler: handleBurnExecutedInactiveOwedM
         - event: CollateralUpdated(indexed address,uint240,uint240,indexed bytes32,uint40)
           handler: handleCollateralUpdated
         - event: IndexUpdated(indexed uint128,indexed uint32)
@@ -75,13 +74,13 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - Approval
-        - AuthorizationCanceled
-        - AuthorizationUsed
-        - MTokenIndexUpdated
-        - StartedEarning
-        - StoppedEarning
-        - Transfer
+        - MTokenApproval
+        - MTokenAuthorizationCanceled
+        - MTokenAuthorizationUsed
+        - MTokenMTokenIndexUpdated
+        - MTokenStartedEarning
+        - MTokenStoppedEarning
+        - MTokenTransfer
       abis:
         - name: MToken
           file: ./abis/MToken.json

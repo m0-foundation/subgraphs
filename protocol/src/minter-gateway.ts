@@ -16,7 +16,6 @@ import {
 } from "../generated/MinterGateway/MinterGateway"
 import {
   BurnExecuted,
-  BurnExecuted1,
   CollateralUpdated,
   IndexUpdated,
   MintCanceled,
@@ -31,7 +30,7 @@ import {
   UndercollateralizedPenaltyImposed
 } from "../generated/schema"
 
-export function handleBurnExecuted(event: BurnExecutedEvent): void {
+export function handleBurnExecutedActiveOwedM(event: BurnExecutedEvent): void {
   let entity = new BurnExecuted(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
@@ -46,14 +45,14 @@ export function handleBurnExecuted(event: BurnExecutedEvent): void {
   entity.save()
 }
 
-export function handleBurnExecuted1(event: BurnExecuted1Event): void {
-  let entity = new BurnExecuted1(
+export function handleBurnExecutedInactiveOwedM(event: BurnExecuted1Event): void {
+  let entity = new BurnExecuted(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.minter = event.params.minter
-  entity.principalAmount = event.params.principalAmount
   entity.amount = event.params.amount
   entity.payer = event.params.payer
+  entity.principalAmount = event.params.principalAmount
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp

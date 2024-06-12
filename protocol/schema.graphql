@@ -1,17 +1,9 @@
+
+
 type BurnExecuted @entity(immutable: true) {
   id: Bytes!
   minter: Bytes! # address
-  amount: BigInt! # uint240
-  payer: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type BurnExecuted1 @entity(immutable: true) {
-  id: Bytes!
-  minter: Bytes! # address
-  principalAmount: BigInt! # uint112
+  principalAmount: BigInt # uint112
   amount: BigInt! # uint240
   payer: Bytes! # address
   blockNumber: BigInt!
