@@ -4,7 +4,8 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ mzero-labs/protocol",
+    "deploy:mainnet": "graph deploy protocol-mainnet --network mainnet --version-label $(grep VERSION_LABEL .env | cut -d '=' -f2) --node https://subgraphs.alchemy.com/api/subgraphs/deploy --deploy-key $(grep DEPLOY_KEY .env | cut -d '=' -f2)",
+    "deploy:sepolia": "graph deploy protocol-sepolia --network sepolia --version-label $(grep VERSION_LABEL .env | cut -d '=' -f2) --node https://subgraphs.alchemy.com/api/subgraphs/deploy --deploy-key $(grep DEPLOY_KEY .env | cut -d '=' -f2)",
     "create-local": "graph create --node http://localhost:8020/ mzero-labs/protocol",
     "remove-local": "graph remove --node http://localhost:8020/ mzero-labs/protocol",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 mzero-labs/protocol",

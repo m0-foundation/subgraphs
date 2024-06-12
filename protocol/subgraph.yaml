@@ -6,11 +6,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: MinterGateway
-    network: sepolia
+    network: mainnet
     source:
-      address: "0x4edfcfb5f9e55962ef1a2eef0b56a8fadbaba289"
       abi: MinterGateway
-      startBlock: 5783468
+      address: "0xf7f9638cb444D65e5A40bF5ff98ebE4ff319F04E"
+      startBlock: 19818447
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -64,11 +64,11 @@ dataSources:
       file: ./src/minter-gateway.ts
   - kind: ethereum
     name: MToken
-    network: sepolia
+    network: mainnet
     source:
-      address: "0x0c941ad94ca4a52edaeabf203b61bdd1807ceec0"
       abi: MToken
-      startBlock: 5783437
+      address: "0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b"
+      startBlock: 19818438
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
