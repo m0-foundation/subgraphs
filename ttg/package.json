@@ -4,7 +4,8 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ mzero-labs/ttg",
+    "deploy:mainnet": "graph deploy ttg-mainnet --network mainnet --version-label $(grep VERSION_LABEL .env | cut -d '=' -f2) --node https://subgraphs.alchemy.com/api/subgraphs/deploy --deploy-key $(grep DEPLOY_KEY .env | cut -d '=' -f2)",
+    "deploy:sepolia": "graph deploy ttg-sepolia --network sepolia --version-label $(grep VERSION_LABEL .env | cut -d '=' -f2) --node https://subgraphs.alchemy.com/api/subgraphs/deploy --deploy-key $(grep DEPLOY_KEY .env | cut -d '=' -f2)",
     "create-local": "graph create --node http://localhost:8020/ mzero-labs/ttg",
     "remove-local": "graph remove --node http://localhost:8020/ mzero-labs/ttg",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 mzero-labs/ttg",

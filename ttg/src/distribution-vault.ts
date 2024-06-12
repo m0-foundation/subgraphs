@@ -1,9 +1,8 @@
 import {
   Claim as ClaimEvent,
   Distribution as DistributionEvent,
-  EIP712DomainChanged as EIP712DomainChangedEvent,
 } from "../generated/DistributionVault/DistributionVault"
-import { Claim, Distribution, EIP712DomainChanged } from "../generated/schema"
+import { Claim, Distribution } from "../generated/schema"
 
 export function handleClaim(event: ClaimEvent): void {
   let entity = new Claim(
@@ -37,16 +36,3 @@ export function handleDistribution(event: DistributionEvent): void {
   entity.save()
 }
 
-export function handleEIP712DomainChanged(
-  event: EIP712DomainChangedEvent,
-): void {
-  let entity = new EIP712DomainChanged(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
-  )
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}

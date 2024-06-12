@@ -1,6 +1,5 @@
 import {
   CashTokenSet as CashTokenSetEvent,
-  // EIP712DomainChanged as EIP712DomainChangedEvent,
   // HasVotedOnAllProposals as HasVotedOnAllProposalsEvent,
   ProposalCreated as ProposalCreatedEvent,
   ProposalExecuted as ProposalExecutedEvent,
@@ -10,7 +9,6 @@ import {
 } from "../generated/StandardGovernor/StandardGovernor"
 import {
   CashTokenSet,
-  // EIP712DomainChanged,
   // HasVotedOnAllProposals,
   ProposalCreated,
   ProposalExecuted,
@@ -32,19 +30,7 @@ export function handleCashTokenSet(event: CashTokenSetEvent): void {
   entity.save()
 }
 
-// export function handleEIP712DomainChanged(
-//   event: EIP712DomainChangedEvent,
-// ): void {
-//   let entity = new EIP712DomainChanged(
-//     event.transaction.hash.concatI32(event.logIndex.toI32()),
-//   )
 
-//   entity.blockNumber = event.block.number
-//   entity.blockTimestamp = event.block.timestamp
-//   entity.transactionHash = event.transaction.hash
-
-//   entity.save()
-// }
 
 // export function handleHasVotedOnAllProposals(
 //   event: HasVotedOnAllProposalsEvent,

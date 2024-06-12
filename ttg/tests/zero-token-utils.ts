@@ -6,7 +6,6 @@ import {
   AuthorizationUsed,
   DelegateChanged,
   DelegateVotesChanged,
-  EIP712DomainChanged,
   Transfer
 } from "../generated/ZeroToken/ZeroToken"
 
@@ -134,13 +133,6 @@ export function createDelegateVotesChangedEvent(
   return delegateVotesChangedEvent
 }
 
-export function createEIP712DomainChangedEvent(): EIP712DomainChanged {
-  let eip712DomainChangedEvent = changetype<EIP712DomainChanged>(newMockEvent())
-
-  eip712DomainChangedEvent.parameters = new Array()
-
-  return eip712DomainChangedEvent
-}
 
 export function createTransferEvent(
   sender: Address,

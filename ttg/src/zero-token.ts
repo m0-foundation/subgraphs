@@ -4,17 +4,15 @@ import {
   AuthorizationUsed as AuthorizationUsedEvent,
   DelegateChanged as DelegateChangedEvent,
   DelegateVotesChanged as DelegateVotesChangedEvent,
-  EIP712DomainChanged as EIP712DomainChangedEvent,
   Transfer as TransferEvent,
 } from "../generated/ZeroToken/ZeroToken"
 import {
-  Approval,
-  AuthorizationCanceled,
-  AuthorizationUsed,
-  DelegateChanged,
-  DelegateVotesChanged,
-  EIP712DomainChanged,
-  Transfer,
+  ZeroTokenApproval as Approval,
+  ZeroTokenAuthorizationCanceled as AuthorizationCanceled,
+  ZeroTokenAuthorizationUsed as AuthorizationUsed,
+  ZeroTokenDelegateChanged  as DelegateChanged,
+  ZeroTokenDelegateVotesChanged as DelegateVotesChanged,
+  ZeroTokenTransfer as Transfer,
 } from "../generated/schema"
 
 export function handleApproval(event: ApprovalEvent): void {
@@ -94,19 +92,6 @@ export function handleDelegateVotesChanged(
   entity.save()
 }
 
-export function handleEIP712DomainChanged(
-  event: EIP712DomainChangedEvent,
-): void {
-  let entity = new EIP712DomainChanged(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
-  )
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
 
 export function handleTransfer(event: TransferEvent): void {
   let entity = new Transfer(

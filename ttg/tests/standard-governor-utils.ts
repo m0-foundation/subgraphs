@@ -2,7 +2,6 @@ import { newMockEvent } from "matchstick-as"
 import { ethereum, Address, BigInt, Bytes } from "@graphprotocol/graph-ts"
 import {
   CashTokenSet,
-  EIP712DomainChanged,
   HasVotedOnAllProposals,
   ProposalCreated,
   ProposalExecuted,
@@ -23,13 +22,7 @@ export function createCashTokenSetEvent(cashToken: Address): CashTokenSet {
   return cashTokenSetEvent
 }
 
-export function createEIP712DomainChangedEvent(): EIP712DomainChanged {
-  let eip712DomainChangedEvent = changetype<EIP712DomainChanged>(newMockEvent())
 
-  eip712DomainChangedEvent.parameters = new Array()
-
-  return eip712DomainChangedEvent
-}
 
 export function createHasVotedOnAllProposalsEvent(
   voter: Address,

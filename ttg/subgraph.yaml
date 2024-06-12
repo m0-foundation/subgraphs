@@ -6,28 +6,25 @@ schema:
 dataSources:
   - kind: ethereum
     name: PowerToken
-    network: sepolia
+    network: mainnet
     source:
-      address: "0xe2b5002302ebc524429d319c193366d448a88ff1"
       abi: PowerToken
-      startBlock: 5783339
+      address: "0x5983B89FA184f14917013B9C3062afD9434C5b03"
+      startBlock: 19818431
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - Approval
-        - AuthorizationCanceled
-        - AuthorizationUsed
-        - Buy
-        - DelegateChanged
-        - DelegateVotesChanged
-        - EIP712DomainChanged
-        - NextCashTokenSet
-        - Sync
-        - Tagline
-        - TargetSupplyInflated
-        - Transfer
+        - PowerTokenApproval
+        - PowerTokenAuthorizationCanceled
+        - PowerTokenAuthorizationUsed
+        - PowerTokenBuy
+        - PowerTokenDelegateChanged
+        - PowerTokenDelegateVotesChanged
+        - PowerTokenNextCashTokenSet
+        - PowerTokenTargetSupplyInflated
+        - PowerTokenTransfer
       abis:
         - name: PowerToken
           file: ./abis/PowerToken.json
@@ -44,14 +41,8 @@ dataSources:
           handler: handleDelegateChanged
         - event: DelegateVotesChanged(indexed address,uint256,uint256)
           handler: handleDelegateVotesChanged
-        - event: EIP712DomainChanged()
-          handler: handleEIP712DomainChanged
         - event: NextCashTokenSet(indexed uint16,indexed address)
           handler: handleNextCashTokenSet
-        - event: Sync(indexed address)
-          handler: handleSync
-        - event: Tagline(string)
-          handler: handleTagline
         - event: TargetSupplyInflated(indexed uint16,indexed uint240)
           handler: handleTargetSupplyInflated
         - event: Transfer(indexed address,indexed address,uint256)
@@ -59,11 +50,11 @@ dataSources:
       file: ./src/power-token.ts
   - kind: ethereum
     name: ZeroToken
-    network: sepolia
+    network: mainnet
     source:
-      address: "0xA60ACdae5d34AE647957A219ffa6D74d4080A01F"
       abi: ZeroToken
-      startBlock: 5783371
+      address: "0x988567FE094570cCE1FFdA29D1f2d842B70492be"
+      startBlock: 19818435
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -74,7 +65,6 @@ dataSources:
         - ZeroTokenAuthorizationUsed
         - ZeroTokenDelegateChanged
         - ZeroTokenDelegateVotesChanged
-        - ZeroTokenEIP712DomainChanged
         - ZeroTokenTransfer
       abis:
         - name: ZeroToken
@@ -90,18 +80,16 @@ dataSources:
           handler: handleDelegateChanged
         - event: DelegateVotesChanged(indexed address,uint256,uint256)
           handler: handleDelegateVotesChanged
-        - event: EIP712DomainChanged()
-          handler: handleEIP712DomainChanged
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
       file: ./src/zero-token.ts
   - kind: ethereum
     name: StandardGovernor
-    network: sepolia
+    network: mainnet
     source:
-      address: "0x89C867D0a4B2d4Adc6DFD00d2f153D7794Bf9Fef"
       abi: StandardGovernor
-      startBlock: 5783339
+      address: "0xB024aC5a7c6bC92fbACc8C3387E628a07e1Da016"
+      startBlock: 19818431
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -129,11 +117,11 @@ dataSources:
       file: ./src/standard-governor.ts
   - kind: ethereum
     name: EmergencyGovernor
-    network: sepolia
+    network: mainnet
     source:
-      address: "0x0FeA9F6F610d800d8dd62Ace38663B213b087a13"
       abi: EmergencyGovernor
-      startBlock: 5783339
+      address: "0x886d405949F709bC3f4451491bDd07ff51Cdf90A"
+      startBlock: 19818431
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -161,11 +149,11 @@ dataSources:
       file: ./src/emergency-governor.ts
   - kind: ethereum
     name: ZeroGovernor
-    network: sepolia
+    network: mainnet
     source:
-      address: "0x045bbBc51e7aD1EfF26833E9a8e7df5A53e72B61"
       abi: ZeroGovernor
-      startBlock: 5783339
+      address: "0xa0DAFaEEA4A1d44534e1b9227e19CAE6358b80FE"
+      startBlock: 19818431
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -199,11 +187,11 @@ dataSources:
       file: ./src/zero-governor.ts
   - kind: ethereum
     name: Registrar
-    network: sepolia
+    network: mainnet
     source:
-      address: "0x975Bf5f212367D09CB7f69D3dc4BA8C9B440aD3A"
       abi: Registrar
-      startBlock: 5783432
+      address: "0x119FbeeDD4F4f4298Fb59B720d5654442b81ae2c"
+      startBlock: 19818437
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -225,11 +213,11 @@ dataSources:
       file: ./src/registrar.ts
   - kind: ethereum
     name: DistributionVault
-    network: sepolia
+    network: mainnet
     source:
-      address: "0x3dc71Be52d6D687e21FC0d4FFc196F32cacbc26d"
       abi: DistributionVault
-      startBlock: 5783401
+      address: "0xd7298f620B0F752Cf41BD818a16C756d9dCAA34f"
+      startBlock: 19818436
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -237,7 +225,6 @@ dataSources:
       entities:
         - Claim
         - Distribution
-        - DistributionVaultEIP712DomainChanged
       abis:
         - name: DistributionVault
           file: ./abis/DistributionVault.json
@@ -246,6 +233,4 @@ dataSources:
           handler: handleClaim
         - event: Distribution(indexed address,indexed uint256,uint256)
           handler: handleDistribution
-        - event: EIP712DomainChanged()
-          handler: handleEIP712DomainChanged
       file: ./src/distribution-vault.ts

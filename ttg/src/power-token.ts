@@ -5,7 +5,6 @@ import {
   Buy as BuyEvent,
   DelegateChanged as DelegateChangedEvent,
   DelegateVotesChanged as DelegateVotesChangedEvent,
-  EIP712DomainChanged as EIP712DomainChangedEvent,
   NextCashTokenSet as NextCashTokenSetEvent,
   Sync as SyncEvent,
   Tagline as TaglineEvent,
@@ -13,18 +12,15 @@ import {
   Transfer as TransferEvent
 } from "../generated/PowerToken/PowerToken"
 import {
-  Approval,
-  AuthorizationCanceled,
-  AuthorizationUsed,
-  Buy,
-  DelegateChanged,
-  DelegateVotesChanged,
-  EIP712DomainChanged,
-  NextCashTokenSet,
-  Sync,
-  Tagline,
-  TargetSupplyInflated,
-  Transfer
+  PowerTokenApproval as Approval,
+  PowerTokenAuthorizationCanceled as AuthorizationCanceled,
+  PowerTokenAuthorizationUsed as AuthorizationUsed,
+  PowerTokenBuy as Buy,
+  PowerTokenDelegateChanged as DelegateChanged,
+  PowerTokenDelegateVotesChanged as DelegateVotesChanged,
+  PowerTokenNextCashTokenSet as NextCashTokenSet,
+  PowerTokenTargetSupplyInflated as TargetSupplyInflated,
+  PowerTokenTransfer as Transfer
 } from "../generated/schema"
 
 export function handleApproval(event: ApprovalEvent): void {
@@ -117,19 +113,6 @@ export function handleDelegateVotesChanged(
   entity.save()
 }
 
-export function handleEIP712DomainChanged(
-  event: EIP712DomainChangedEvent
-): void {
-  let entity = new EIP712DomainChanged(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
 
 export function handleNextCashTokenSet(event: NextCashTokenSetEvent): void {
   let entity = new NextCashTokenSet(
@@ -137,32 +120,6 @@ export function handleNextCashTokenSet(event: NextCashTokenSetEvent): void {
   )
   entity.startingEpoch = event.params.startingEpoch
   entity.nextCashToken = event.params.nextCashToken
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleSync(event: SyncEvent): void {
-  let entity = new Sync(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.account = event.params.account
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleTagline(event: TaglineEvent): void {
-  let entity = new Tagline(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.tagline = event.params.tagline
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp

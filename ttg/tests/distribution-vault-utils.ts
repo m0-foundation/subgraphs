@@ -3,7 +3,6 @@ import { ethereum, Address, BigInt } from "@graphprotocol/graph-ts"
 import {
   Claim,
   Distribution,
-  EIP712DomainChanged
 } from "../generated/DistributionVault/DistributionVault"
 
 export function createClaimEvent(
@@ -62,12 +61,4 @@ export function createDistributionEvent(
   )
 
   return distributionEvent
-}
-
-export function createEIP712DomainChangedEvent(): EIP712DomainChanged {
-  let eip712DomainChangedEvent = changetype<EIP712DomainChanged>(newMockEvent())
-
-  eip712DomainChangedEvent.parameters = new Array()
-
-  return eip712DomainChangedEvent
 }

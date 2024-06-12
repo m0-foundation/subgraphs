@@ -7,7 +7,6 @@ import {
   Buy,
   DelegateChanged,
   DelegateVotesChanged,
-  EIP712DomainChanged,
   NextCashTokenSet,
   Sync,
   Tagline,
@@ -159,14 +158,6 @@ export function createDelegateVotesChangedEvent(
   )
 
   return delegateVotesChangedEvent
-}
-
-export function createEIP712DomainChangedEvent(): EIP712DomainChanged {
-  let eip712DomainChangedEvent = changetype<EIP712DomainChanged>(newMockEvent())
-
-  eip712DomainChangedEvent.parameters = new Array()
-
-  return eip712DomainChangedEvent
 }
 
 export function createNextCashTokenSetEvent(
