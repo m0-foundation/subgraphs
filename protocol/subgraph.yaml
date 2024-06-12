@@ -77,7 +77,7 @@ dataSources:
         - MTokenApproval
         - MTokenAuthorizationCanceled
         - MTokenAuthorizationUsed
-        - MTokenMTokenIndexUpdated
+        - MTokenIndexUpdated
         - MTokenStartedEarning
         - MTokenStoppedEarning
         - MTokenTransfer

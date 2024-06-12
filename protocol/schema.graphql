@@ -139,7 +139,7 @@ type UndercollateralizedPenaltyImposed @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
-type Approval @entity(immutable: true) {
+type MTokenApproval @entity(immutable: true) {
   id: Bytes!
   account: Bytes! # address
   spender: Bytes! # address
@@ -149,7 +149,7 @@ type Approval @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type AuthorizationCanceled @entity(immutable: true) {
+type MTokenAuthorizationCanceled @entity(immutable: true) {
   id: Bytes!
   authorizer: Bytes! # address
   nonce: Bytes! # bytes32
@@ -158,7 +158,7 @@ type AuthorizationCanceled @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type AuthorizationUsed @entity(immutable: true) {
+type MTokenAuthorizationUsed @entity(immutable: true) {
   id: Bytes!
   authorizer: Bytes! # address
   nonce: Bytes! # bytes32
@@ -167,13 +167,6 @@ type AuthorizationUsed @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type MTokenEIP712DomainChanged @entity(immutable: true) {
-  id: Bytes!
-
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
 
 type MTokenIndexUpdated @entity(immutable: true) {
   id: Bytes!
@@ -184,7 +177,7 @@ type MTokenIndexUpdated @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type StartedEarning @entity(immutable: true) {
+type MTokenStartedEarning @entity(immutable: true) {
   id: Bytes!
   account: Bytes! # address
   blockNumber: BigInt!
@@ -192,7 +185,7 @@ type StartedEarning @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type StoppedEarning @entity(immutable: true) {
+type MTokenStoppedEarning @entity(immutable: true) {
   id: Bytes!
   account: Bytes! # address
   blockNumber: BigInt!
@@ -200,7 +193,7 @@ type StoppedEarning @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type Transfer @entity(immutable: true) {
+type MTokenTransfer @entity(immutable: true) {
   id: Bytes!
   sender: Bytes! # address
   recipient: Bytes! # address

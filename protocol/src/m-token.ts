@@ -8,13 +8,13 @@ import {
   Transfer as TransferEvent,
 } from "../generated/MToken/MToken"
 import {
-  Approval,
-  AuthorizationCanceled,
-  AuthorizationUsed,
-  IndexUpdated,
-  StartedEarning,
-  StoppedEarning,
-  Transfer,
+  MTokenApproval as Approval,
+  MTokenAuthorizationCanceled as AuthorizationCanceled,
+  MTokenAuthorizationUsed as AuthorizationUsed,
+  MTokenIndexUpdated as IndexUpdated,
+  MTokenStartedEarning as StartedEarning,
+  MTokenStoppedEarning as StoppedEarning,
+  MTokenTransfer as Transfer,
 } from "../generated/schema"
 
 export function handleApproval(event: ApprovalEvent): void {
