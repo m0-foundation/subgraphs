@@ -1,19 +1,28 @@
-type Approval @entity(immutable: true) {
-  id: Bytes!
-  owner: Bytes! # address
-  spender: Bytes! # address
-  value: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+# Token details
+type Token @entity {
+  # id = token address
+  id: ID!
+  name: String!
+  symbol: String!
+  decimals: BigDecimal!
+  holders: [Holder!]! @derivedFrom(field: "token")
+  balances: [TokenBalance!]! @derivedFrom(field: "token")
 }
 
-type Transfer @entity(immutable: true) {
-  id: Bytes!
-  from: Bytes! # address
-  to: Bytes! # address
-  value: BigInt! # uint256
-  blockNumber: BigInt!
+# # token balance details
+type Holder @entity {
+  id: ID!
+  token: Token!
+  address: String!
+  balance: BigDecimal!
+}
+
+# # token balance details
+type TokenBalance @entity {
+  id: ID!
+  token: Token!
+  address: String!
+  balance: BigDecimal!
   blockTimestamp: BigInt!
-  transactionHash: Bytes!
+  blockNumber: BigInt!
 }

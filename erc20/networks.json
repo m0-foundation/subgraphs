@@ -1,8 +1,12 @@
 {
   "mainnet": {
-    "ERC20": {
-      "address": "0x4d224452801ACEd8B2F0aebE155379bb5D594381",
-      "startBlock": 0
+    "ZeroTokenERC20": {
+      "address": "0x988567FE094570cCE1FFdA29D1f2d842B70492be",
+      "startBlock": 19818435
+    },
+    "PowerTokenERC20": {
+      "address": "0x5983B89FA184f14917013B9C3062afD9434C5b03",
+      "startBlock": 19818431
     }
   }
 }
