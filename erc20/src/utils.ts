@@ -1,5 +1,5 @@
 //import smart contract class from generated files
-import { ERC20 } from "../generated/ERC20/ERC20";
+import { ERC20, Transfer } from "../generated/ERC20/ERC20";
 //import entities
 import {  Token } from "../generated/schema";
 //import datatypes
@@ -62,3 +62,13 @@ export function fetchBalance(
   }
   return amount;
 }
+
+
+export function getFromAddress(event: Transfer): string {
+  return event.params.from.toHex();
+}
+export function getToAddress(event: Transfer): string {
+  return event.params.to.toHex();
+}
+
+export let zeroAddress = Address.fromString("0x0000000000000000000000000000000000000000")

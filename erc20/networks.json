@@ -7,6 +7,10 @@
     "PowerTokenERC20": {
       "address": "0x5983B89FA184f14917013B9C3062afD9434C5b03",
       "startBlock": 19818431
+    },
+    "MTokenERC20": {
+      "address": "0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b",
+      "startBlock": 19818438
     }
   }
 }
