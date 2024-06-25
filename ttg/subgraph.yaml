@@ -100,12 +100,15 @@ dataSources:
         - ProposalExecuted
         - ProposalFeeSet
         - VoteCast
+        - HasVotedOnAllProposals
       abis:
         - name: StandardGovernor
           file: ./abis/StandardGovernor.json
       eventHandlers:
         - event: CashTokenSet(indexed address)
           handler: handleCashTokenSet
+        - event: HasVotedOnAllProposals(indexed address,indexed uint256)
+          handler: handleHasVotedOnAllProposals
         - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
           handler: handleProposalCreated
         - event: ProposalExecuted(uint256)
