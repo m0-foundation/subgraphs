@@ -1,8 +1,0 @@
-{
-  "mainnet": {
-    "StandardGovernor": {
-      "address": "0xB024aC5a7c6bC92fbACc8C3387E628a07e1Da016",
-      "startBlock": 19818431
-    }
-  }
-}
