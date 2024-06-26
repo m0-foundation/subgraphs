@@ -96,11 +96,12 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - CashTokenSet
+        - HasVotedOnAllProposal
         - ProposalCreated
         - ProposalExecuted
+        - ProposalFeeSentToVault
         - ProposalFeeSet
         - VoteCast
-        - HasVotedOnAllProposals
       abis:
         - name: StandardGovernor
           file: ./abis/StandardGovernor.json
@@ -113,6 +114,8 @@ dataSources:
           handler: handleProposalCreated
         - event: ProposalExecuted(uint256)
           handler: handleProposalExecuted
+        - event: ProposalFeeSentToVault(indexed uint256,indexed address,uint256)
+          handler: handleProposalFeeSentToVault
         - event: ProposalFeeSet(uint256)
           handler: handleProposalFeeSet
         - event: VoteCast(indexed address,uint256,uint8,uint256,string)

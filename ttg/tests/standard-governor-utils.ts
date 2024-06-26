@@ -2,7 +2,7 @@ import { newMockEvent } from "matchstick-as"
 import { ethereum, Address, BigInt, Bytes } from "@graphprotocol/graph-ts"
 import {
   CashTokenSet,
-  HasVotedOnAllProposals,
+  HasVotedOnAllProposal,
   ProposalCreated,
   ProposalExecuted,
   ProposalFeeSentToVault,
@@ -27,8 +27,8 @@ export function createCashTokenSetEvent(cashToken: Address): CashTokenSet {
 export function createHasVotedOnAllProposalsEvent(
   voter: Address,
   currentEpoch: BigInt
-): HasVotedOnAllProposals {
-  let hasVotedOnAllProposalsEvent = changetype<HasVotedOnAllProposals>(
+): HasVotedOnAllProposal {
+  let hasVotedOnAllProposalsEvent = changetype<HasVotedOnAllProposal>(
     newMockEvent()
   )
 

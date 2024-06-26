@@ -3,16 +3,16 @@ import {
   HasVotedOnAllProposals as HasVotedOnAllProposalsEvent,
   ProposalCreated as ProposalCreatedEvent,
   ProposalExecuted as ProposalExecutedEvent,
-  // ProposalFeeSentToVault as ProposalFeeSentToVaultEvent,
+  ProposalFeeSentToVault as ProposalFeeSentToVaultEvent,
   ProposalFeeSet as ProposalFeeSetEvent,
   VoteCast as VoteCastEvent,
 } from "../generated/StandardGovernor/StandardGovernor"
 import {
   CashTokenSet,
-  HasVotedOnAllProposals,
+  HasVotedOnAllProposal,
   ProposalCreated,
   ProposalExecuted,
-  // ProposalFeeSentToVault,
+  ProposalFeeSentToVault,
   ProposalFeeSet,
   VoteCast,
 } from "../generated/schema"
@@ -33,10 +33,10 @@ export function handleCashTokenSet(event: CashTokenSetEvent): void {
 
 
 export function handleHasVotedOnAllProposals(
-  event: HasVotedOnAllProposalsEvent,
+  event: HasVotedOnAllProposalsEvent
 ): void {
-  let entity = new HasVotedOnAllProposals(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  let entity = new HasVotedOnAllProposal(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.voter = event.params.voter
   entity.currentEpoch = event.params.currentEpoch
@@ -82,22 +82,22 @@ export function handleProposalExecuted(event: ProposalExecutedEvent): void {
   entity.save()
 }
 
-// export function handleProposalFeeSentToVault(
-//   event: ProposalFeeSentToVaultEvent,
-// ): void {
-//   let entity = new ProposalFeeSentToVault(
-//     event.transaction.hash.concatI32(event.logIndex.toI32()),
-//   )
-//   entity.proposalId = event.params.proposalId
-//   entity.cashToken = event.params.cashToken
-//   entity.amount = event.params.amount
+export function handleProposalFeeSentToVault(
+  event: ProposalFeeSentToVaultEvent,
+): void {
+  let entity = new ProposalFeeSentToVault(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.proposalId = event.params.proposalId
+  entity.cashToken = event.params.cashToken
+  entity.amount = event.params.amount
 
-//   entity.blockNumber = event.block.number
-//   entity.blockTimestamp = event.block.timestamp
-//   entity.transactionHash = event.transaction.hash
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
 
-//   entity.save()
-// }
+  entity.save()
+}
 
 export function handleProposalFeeSet(event: ProposalFeeSetEvent): void {
   let entity = new ProposalFeeSet(
