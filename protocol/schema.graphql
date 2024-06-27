@@ -202,3 +202,19 @@ type MTokenTransfer @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+
+type TotalActiveOwedM @entity(immutable: true) {
+  id: Bytes!
+  amount: BigInt! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+}
+
+type ActiveOwedM @entity(immutable: true) {
+  id: String!
+  minter: Bytes! # address
+  amount: BigInt! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+}

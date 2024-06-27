@@ -29,9 +29,16 @@ dataSources:
         - RetrievalCreated
         - RetrievalResolved
         - UndercollateralizedPenaltyImposed
+        - TotalActiveOwedM
+        - ActiveOwedM
       abis:
         - name: MinterGateway
           file: ./abis/MinterGateway.json
+      blockHandlers:
+        - handler: handleNewBlock
+          filter:
+            kind: polling
+            every: 300
       eventHandlers:
         - event: BurnExecuted(indexed address,uint240,indexed address)
           handler: handleBurnExecutedActiveOwedM
