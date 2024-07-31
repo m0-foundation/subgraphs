@@ -1,5 +1,6 @@
-
-
+# 
+# MinterGateway events
+# 
 type BurnExecuted @entity(immutable: true) {
   id: Bytes!
   minter: Bytes! # address
@@ -18,14 +19,6 @@ type CollateralUpdated @entity(immutable: true) {
   totalResolvedCollateralRetrieval: BigInt! # uint240
   metadataHash: Bytes! # bytes32
   timestamp: BigInt! # uint40
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type EIP712DomainChanged @entity(immutable: true) {
-  id: Bytes!
-
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
@@ -139,16 +132,81 @@ type UndercollateralizedPenaltyImposed @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
-type MTokenApproval @entity(immutable: true) {
+# 
+# MinterGateway - NON events entities - timeseries - updated by handleNewBlock
+# 
+type PrincipalOfTotalActiveOwedM @entity(immutable: true) {
   id: Bytes!
-  account: Bytes! # address
-  spender: Bytes! # address
-  amount: BigInt! # uint256
+  amount: BigInt! 
   blockNumber: BigInt!
   blockTimestamp: BigInt!
-  transactionHash: Bytes!
 }
 
+type TotalOwedM @entity(immutable: true) {
+  id: Bytes!
+  amount: BigInt! 
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+}
+
+type TotalActiveOwedM @entity(immutable: true) {
+  id: Bytes!
+  amount: BigInt! 
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+}
+
+type TotalInactiveOwedM @entity(immutable: true) {
+  id: Bytes!
+  amount: BigInt! 
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+}
+
+# The difference between total owed M and M token total supply.
+type TotalExcessOwedM @entity(immutable: true) {
+  id: Bytes!
+  amount: BigInt! 
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+}
+# 
+# Minter Entitites
+# 
+type MinterActiveOwedMOf @entity(immutable: true){
+  id: String!
+  minter: Bytes! # address
+  amount: BigInt! 
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+}
+
+type MinterInactiveOwedMOf @entity(immutable: true){
+  id: String!
+  minter: Bytes! # address
+  amount: BigInt! 
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+}
+
+type MinterPrincipalOfActiveOwedMOf @entity(immutable: true){
+  id: String!
+  minter: Bytes! # address
+  amount: BigInt! 
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+}
+
+type MinterCollateralOf @entity(immutable: true){
+  id: String!
+  minter: Bytes! # address
+  amount: BigInt! 
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+}
+# 
+# M token special events
+# 
 type MTokenAuthorizationCanceled @entity(immutable: true) {
   id: Bytes!
   authorizer: Bytes! # address
@@ -166,7 +224,6 @@ type MTokenAuthorizationUsed @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
-
 
 type MTokenIndexUpdated @entity(immutable: true) {
   id: Bytes!
@@ -191,30 +248,4 @@ type MTokenStoppedEarning @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
-}
-
-type MTokenTransfer @entity(immutable: true) {
-  id: Bytes!
-  sender: Bytes! # address
-  recipient: Bytes! # address
-  amount: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-
-type TotalActiveOwedM @entity(immutable: true) {
-  id: Bytes!
-  amount: BigInt! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-}
-
-type ActiveOwedM @entity(immutable: true) {
-  id: String!
-  minter: Bytes! # address
-  amount: BigInt! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
 }

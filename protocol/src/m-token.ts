@@ -1,36 +1,17 @@
 import {
-  Approval as ApprovalEvent,
   AuthorizationCanceled as AuthorizationCanceledEvent,
   AuthorizationUsed as AuthorizationUsedEvent,
   IndexUpdated as IndexUpdatedEvent,
   StartedEarning as StartedEarningEvent,
   StoppedEarning as StoppedEarningEvent,
-  Transfer as TransferEvent,
 } from "../generated/MToken/MToken"
 import {
-  MTokenApproval as Approval,
   MTokenAuthorizationCanceled as AuthorizationCanceled,
   MTokenAuthorizationUsed as AuthorizationUsed,
   MTokenIndexUpdated as IndexUpdated,
   MTokenStartedEarning as StartedEarning,
   MTokenStoppedEarning as StoppedEarning,
-  MTokenTransfer as Transfer,
 } from "../generated/schema"
-
-export function handleApproval(event: ApprovalEvent): void {
-  let entity = new Approval(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
-  )
-  entity.account = event.params.account
-  entity.spender = event.params.spender
-  entity.amount = event.params.amount
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
 
 export function handleAuthorizationCanceled(
   event: AuthorizationCanceledEvent,
@@ -95,21 +76,6 @@ export function handleStoppedEarning(event: StoppedEarningEvent): void {
     event.transaction.hash.concatI32(event.logIndex.toI32()),
   )
   entity.account = event.params.account
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleTransfer(event: TransferEvent): void {
-  let entity = new Transfer(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
-  )
-  entity.sender = event.params.sender
-  entity.recipient = event.params.recipient
-  entity.amount = event.params.amount
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp

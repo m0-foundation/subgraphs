@@ -3,6 +3,7 @@ import {
   Address,
   BigInt,
   dataSource,
+  Entity,
 } from "@graphprotocol/graph-ts";
 
 import {
@@ -36,8 +37,15 @@ import {
   RetrievalCreated,
   RetrievalResolved,
   UndercollateralizedPenaltyImposed,
+  PrincipalOfTotalActiveOwedM,
+  TotalOwedM,
   TotalActiveOwedM,
-  ActiveOwedM
+  TotalInactiveOwedM,
+  TotalExcessOwedM,
+  MinterActiveOwedMOf,
+  MinterInactiveOwedMOf,
+  MinterPrincipalOfActiveOwedMOf,
+  MinterCollateralOf,
 } from "../generated/schema"
 
 export function handleBurnExecutedActiveOwedM(event: BurnExecutedEvent): void {
@@ -53,6 +61,8 @@ export function handleBurnExecutedActiveOwedM(event: BurnExecutedEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  handleMinterAttributes<BurnExecutedEvent>(event);
 }
 
 export function handleBurnExecutedInactiveOwedM(event: BurnExecuted1Event): void {
@@ -69,6 +79,8 @@ export function handleBurnExecutedInactiveOwedM(event: BurnExecuted1Event): void
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  handleMinterAttributes<BurnExecuted1Event>(event);
 }
 
 export function handleCollateralUpdated(event: CollateralUpdatedEvent): void {
@@ -88,9 +100,8 @@ export function handleCollateralUpdated(event: CollateralUpdatedEvent): void {
 
   entity.save()
 
-  handleActiveOwedM<CollateralUpdatedEvent>(event);
+  handleMinterAttributes<CollateralUpdatedEvent>(event);
 }
-
 
 export function handleIndexUpdated(event: IndexUpdatedEvent): void {
   let entity = new IndexUpdated(
@@ -119,6 +130,8 @@ export function handleMintCanceled(event: MintCanceledEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  handleMinterAttributes<MintCanceledEvent>(event);
 }
 
 export function handleMintExecuted(event: MintExecutedEvent): void {
@@ -135,7 +148,7 @@ export function handleMintExecuted(event: MintExecutedEvent): void {
   entity.transactionHash = event.transaction.hash
   entity.save()
 
-  handleActiveOwedM<MintExecutedEvent>(event);
+  handleMinterAttributes<MintExecutedEvent>(event);
 }
 
 export function handleMintProposed(event: MintProposedEvent): void {
@@ -166,6 +179,8 @@ export function handleMinterActivated(event: MinterActivatedEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  handleMinterAttributes<MinterActivatedEvent>(event);
 }
 
 export function handleMinterDeactivated(event: MinterDeactivatedEvent): void {
@@ -181,6 +196,8 @@ export function handleMinterDeactivated(event: MinterDeactivatedEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  handleMinterAttributes<MinterDeactivatedEvent>(event);
 }
 
 export function handleMinterFrozen(event: MinterFrozenEvent): void {
@@ -195,6 +212,8 @@ export function handleMinterFrozen(event: MinterFrozenEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  handleMinterAttributes<MinterFrozenEvent>(event);
 }
 
 export function handleMissedIntervalsPenaltyImposed(
@@ -212,6 +231,8 @@ export function handleMissedIntervalsPenaltyImposed(
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  handleMinterAttributes<MissedIntervalsPenaltyImposedEvent>(event);
 }
 
 export function handleRetrievalCreated(event: RetrievalCreatedEvent): void {
@@ -227,6 +248,8 @@ export function handleRetrievalCreated(event: RetrievalCreatedEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  handleMinterAttributes<RetrievalCreatedEvent>(event);
 }
 
 export function handleRetrievalResolved(event: RetrievalResolvedEvent): void {
@@ -241,6 +264,8 @@ export function handleRetrievalResolved(event: RetrievalResolvedEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  handleMinterAttributes<RetrievalResolvedEvent>(event);
 }
 
 export function handleUndercollateralizedPenaltyImposed(
@@ -259,19 +284,72 @@ export function handleUndercollateralizedPenaltyImposed(
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  handleMinterAttributes<UndercollateralizedPenaltyImposedEvent>(event);
+}
+//
+// Timeseries entities
+//
+export function handlePrincipalOfTotalActiveOwedM(block: ethereum.Block): void {
+  // Bind the contract to the address that emitted the event
+  let contract = MinterGatewayContract.bind(dataSource.address())
+  let amount = contract.principalOfTotalActiveOwedM()
+  let entity = new PrincipalOfTotalActiveOwedM(block.hash)
+  createTimeseriesEntity<PrincipalOfTotalActiveOwedM>(entity, amount, block)
 }
 
+export function handleTotalOwedM(block: ethereum.Block): void {
+  let contract = MinterGatewayContract.bind(dataSource.address())
+  let amount = contract.totalOwedM()
+  let entity = new TotalOwedM(block.hash)
+  createTimeseriesEntity<TotalOwedM>(entity, amount, block)
+}
 
+export function handleTotalActiveOwedM(block: ethereum.Block): void {
+  let contract = MinterGatewayContract.bind(dataSource.address())
+  let amount = contract.totalActiveOwedM()
+  let entity = new TotalActiveOwedM(block.hash)
+  createTimeseriesEntity<TotalActiveOwedM>(entity, amount, block)
+}
 
+export function handleTotalInactiveOwedM(block: ethereum.Block): void {
+  // Bind the contract to the address that emitted the event
+  let contract = MinterGatewayContract.bind(dataSource.address())
+  let amount = contract.totalInactiveOwedM()
+  let entity = new TotalInactiveOwedM(block.hash)
+  createTimeseriesEntity<TotalInactiveOwedM>(entity, amount, block)
+}
 
+export function handleTotalExcessOwedM(block: ethereum.Block): void {
+  let contract = MinterGatewayContract.bind(dataSource.address())
+  let amount = contract.excessOwedM()
+  let entity = new TotalExcessOwedM(block.hash)
+  createTimeseriesEntity<TotalExcessOwedM>(entity, amount, block)
+}
 
+function createTimeseriesEntity<E extends TotalOwedM>(entity: E, amount: BigInt, block: ethereum.Block): void{
+  if(amount && amount.gt(BigInt.fromI32(0))) {
+    entity.amount = amount
+    entity.blockNumber = block.number
+    entity.blockTimestamp = block.timestamp
+    entity.save()
+  }
+}
 
+export function handleNewBlock(event: ethereum.Block): void {
+  handlePrincipalOfTotalActiveOwedM(event);
+  handleTotalOwedM(event);
+  handleTotalActiveOwedM(event);
+  handleTotalInactiveOwedM(event);
+  handleTotalExcessOwedM(event);
+}
+// 
+// Minter entities
+// 
+export class HasMinterParams {
+  _event: HasMinterEvent;
 
-
-export class ActiveOwedM__Params {
-  _event: ActiveOwedMEvent;
-
-  constructor(event: ActiveOwedMEvent) {
+  constructor(event: HasMinterEvent) {
     this._event = event;
   }
 
@@ -279,53 +357,62 @@ export class ActiveOwedM__Params {
     return this._event.parameters[1].value.toAddress();
   }
 }
-
-export class ActiveOwedMEvent extends ethereum.Event {
-  get params(): ActiveOwedM__Params {
-    return new ActiveOwedM__Params(this);
+export class HasMinterEvent extends ethereum.Event {
+  get params(): HasMinterParams {
+    return new HasMinterParams(this);
   }
 }
 
-export function handleActiveOwedM<T extends ActiveOwedMEvent>(event: T): void {
-  // Bind the contract to the address that emitted the event
-let contract = MinterGatewayContract.bind(event.address)
-    // Access state variables and functions by calling them
-let activeOwedM = contract.activeOwedMOf(event.params.minter)
-
-let entity = new ActiveOwedM(
-  event.params.minter.toString().concat("-").concat(event.block.number.toString())
-)
-if(activeOwedM) {
-  entity.minter = event.params.minter
-  entity.amount = activeOwedM
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.save()
-}
+export function handleMinterAttributes<T extends HasMinterEvent>(event: T):void{
+  handleMinterActiveOwedMOf<T>(event);
+  handleMinterInactiveOwedMOf<T>(event);
+  handleMinterPrincipalOfActiveOwedMOf<T>(event);
+  handleMinterCollateralOf<T>(event);
 }
 
+export function handleMinterActiveOwedMOf<T extends HasMinterEvent>(event: T): void {
+  let contract = MinterGatewayContract.bind(event.address)
+  let amount = contract.activeOwedMOf(event.params.minter)
+  let entity = new MinterActiveOwedMOf(
+    event.params.minter.toString().concat("-").concat(event.block.number.toString())
+  )
+  createMinterAttributeEntity<MinterActiveOwedMOf, T>(entity, amount, event)
+}
 
+export function handleMinterInactiveOwedMOf<T extends HasMinterEvent>(event: T): void {
+  let contract = MinterGatewayContract.bind(event.address)
+  let amount = contract.inactiveOwedMOf(event.params.minter)
+  let entity = new MinterInactiveOwedMOf(
+    event.params.minter.toString().concat("-").concat(event.block.number.toString())
+  )
+  createMinterAttributeEntity<MinterInactiveOwedMOf, T>(entity, amount, event)
+}
 
+export function handleMinterPrincipalOfActiveOwedMOf<T extends HasMinterEvent>(event: T): void {
+  let contract = MinterGatewayContract.bind(event.address)
+  let amount = contract.principalOfActiveOwedMOf(event.params.minter)
+  let entity = new MinterPrincipalOfActiveOwedMOf(
+    event.params.minter.toString().concat("-").concat(event.block.number.toString())
+  )
+  createMinterAttributeEntity<MinterPrincipalOfActiveOwedMOf, T>(entity, amount, event)
+}
 
-export function handleTotalActiveOwedM(block: ethereum.Block): void {
-  // Bind the contract to the address that emitted the event
-  let contract = MinterGatewayContract.bind(dataSource.address())
-  // Access state variables and functions by calling them
-  let totalActiveOwedM = contract.totalActiveOwedM()
-
-  let entity = new TotalActiveOwedM(block.hash)
-  // totalActiveOwedM > 0 then save
-  if(totalActiveOwedM && totalActiveOwedM.gt(BigInt.fromI32(0))) {
-    entity.amount = totalActiveOwedM
-    entity.blockNumber = block.number
-    entity.blockTimestamp = block.timestamp
+export function handleMinterCollateralOf<T extends HasMinterEvent>(event: T): void {
+  let contract = MinterGatewayContract.bind(event.address)
+  let amount = contract.collateralOf(event.params.minter)
+  let entity = new MinterCollateralOf(
+    event.params.minter.toString().concat("-").concat(event.block.number.toString())
+  )
+  createMinterAttributeEntity<MinterCollateralOf, T>(entity, amount, event)
+}
+// assemblescript does not support union type then can be achieved by using generic type
+// https://www.assemblyscript.org/concepts.html
+function createMinterAttributeEntity<E extends MinterActiveOwedMOf, T extends HasMinterEvent>(entity: E, amount: BigInt, event: T):void {
+  if(amount) {
+    entity.amount = amount
+    entity.minter = event.params.minter
+    entity.blockNumber = event.block.number
+    entity.blockTimestamp = event.block.timestamp
     entity.save()
   }
-}
-
-
-
-export function handleNewBlock(event: ethereum.Block): void {
-
-  handleTotalActiveOwedM(event);
 }

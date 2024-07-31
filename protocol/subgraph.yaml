@@ -29,8 +29,15 @@ dataSources:
         - RetrievalCreated
         - RetrievalResolved
         - UndercollateralizedPenaltyImposed
+        - PrincipalOfTotalActiveOwedM
+        - TotalOwedM
         - TotalActiveOwedM
-        - ActiveOwedM
+        - TotalInactiveOwedM
+        - TotalExcessOwedM
+        - MinterActiveOwedMOf
+        - MinterInactiveOwedMOf
+        - MinterPrincipalOfActiveOwedMOf
+        - MinterCollateralOf
       abis:
         - name: MinterGateway
           file: ./abis/MinterGateway.json
@@ -81,19 +88,15 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - MTokenApproval
         - MTokenAuthorizationCanceled
         - MTokenAuthorizationUsed
         - MTokenIndexUpdated
         - MTokenStartedEarning
         - MTokenStoppedEarning
-        - MTokenTransfer
       abis:
         - name: MToken
           file: ./abis/MToken.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
         - event: AuthorizationCanceled(indexed address,indexed bytes32)
           handler: handleAuthorizationCanceled
         - event: AuthorizationUsed(indexed address,indexed bytes32)
@@ -104,6 +107,4 @@ dataSources:
           handler: handleStartedEarning
         - event: StoppedEarning(indexed address)
           handler: handleStoppedEarning
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
       file: ./src/m-token.ts
