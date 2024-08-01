@@ -1,13 +1,3 @@
-type PowerTokenApproval @entity(immutable: true) {
-  id: Bytes!
-  account: Bytes! # address
-  spender: Bytes! # address
-  amount: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
 type PowerTokenAuthorizationCanceled @entity(immutable: true) {
   id: Bytes!
   authorizer: Bytes! # address
@@ -77,25 +67,6 @@ type PowerTokenTargetSupplyInflated @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type PowerTokenTransfer @entity(immutable: true) {
-  id: Bytes!
-  sender: Bytes! # address
-  recipient: Bytes! # address
-  amount: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-type ZeroTokenApproval @entity(immutable: true) {
-  id: Bytes!
-  account: Bytes! # address
-  spender: Bytes! # address
-  amount: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
 type ZeroTokenAuthorizationCanceled @entity(immutable: true) {
   id: Bytes!
   authorizer: Bytes! # address
@@ -134,16 +105,6 @@ type ZeroTokenDelegateVotesChanged @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-
-type ZeroTokenTransfer @entity(immutable: true) {
-  id: Bytes!
-  sender: Bytes! # address
-  recipient: Bytes! # address
-  amount: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
 type CashTokenSet @entity(immutable: true) {
   id: Bytes!
   cashToken: Bytes! # address

@@ -1,5 +1,15 @@
-import {Transfer, ERC20} from "../generated/ERC20/ERC20"
-import {Holder, TokenBalance, TotalSupply} from "../generated/schema"
+import {
+  Approval as ApprovalEvent,
+  Transfer as TransferEvent,
+  ERC20
+} from "../generated/ERC20/ERC20"
+import {
+  Holder, 
+  TokenBalance, 
+  TokenTotalSupply, 
+  TokenTransfer, 
+  TokenApproval
+} from "../generated/schema"
 import {
   fetchTokenDetails,
   fetchBalance,
@@ -9,18 +19,56 @@ import {
 } from "./utils"
 import { BigDecimal} from "@graphprotocol/graph-ts";
 
-export function handleTransfer(event: Transfer): void {
-    // saves the balance on every transfer event
-    handleTokenBalance(event);
+export function handleApproval(event: ApprovalEvent): void {
+  let token = fetchTokenDetails(event);
+  if (!token) { //if token == null
+    return
+  }
+  let entity = new TokenApproval(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  )
+  entity.token = token.id;
+  entity.owner = event.params.owner
+  entity.spender = event.params.spender
+  entity.value = event.params.value
 
-    // update the balance of a holder on every transfer event
-    handleHolderBalance(event);
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
 
-    // saves the total supply on every transfer event
-    handleTotalSupply(event);
+  entity.save()
 }
 
-function handleTokenBalance(event: Transfer): void {
+export function handleTransfer(event: TransferEvent): void {
+  let token = fetchTokenDetails(event);
+  if (!token) { //if token == null
+    return
+  }
+  let entity = new TokenTransfer(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  )
+  entity.token = token.id;
+  entity.from = event.params.from
+  entity.to = event.params.to
+  entity.value = event.params.value
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+
+  // saves the balance on every transfer event
+  handleTokenBalance(event);
+
+  // update the balance of a holder on every transfer event
+  handleHolderBalance(event);
+
+  // saves the total supply on every transfer event
+  handleTotalSupply(event);
+}
+
+function handleTokenBalance(event: TransferEvent): void {
   let fromAddress = getFromAddress(event)
   let toAddress = getToAddress(event)
   let token = fetchTokenDetails(event);
@@ -47,7 +95,7 @@ function handleTokenBalance(event: Transfer): void {
   toTokenBalance.save();
 }
 
-function handleHolderBalance(event: Transfer): void {
+function handleHolderBalance(event: TransferEvent): void {
   let token = fetchTokenDetails(event);
   if (!token) { //if token == null
       return
@@ -85,10 +133,10 @@ function handleHolderBalance(event: Transfer): void {
   }
 }
 
-function handleTotalSupply(event: Transfer): void {
+function handleTotalSupply(event: TransferEvent): void {
   // supply is updated only when the transfer is mint or burn
   if (event.params.from.equals(zeroAddress) || event.params.to.equals(zeroAddress)) {
-    let totalSupply = new TotalSupply(event.transaction.hash.concatI32(event.logIndex.toI32()))
+    let totalSupply = new TokenTotalSupply(event.transaction.hash.concatI32(event.logIndex.toI32()))
 
     let token = fetchTokenDetails(event);
     if (!token) { //if token == null

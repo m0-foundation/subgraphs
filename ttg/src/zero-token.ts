@@ -1,34 +1,15 @@
 import {
-  Approval as ApprovalEvent,
   AuthorizationCanceled as AuthorizationCanceledEvent,
   AuthorizationUsed as AuthorizationUsedEvent,
   DelegateChanged as DelegateChangedEvent,
   DelegateVotesChanged as DelegateVotesChangedEvent,
-  Transfer as TransferEvent,
 } from "../generated/ZeroToken/ZeroToken"
 import {
-  ZeroTokenApproval as Approval,
   ZeroTokenAuthorizationCanceled as AuthorizationCanceled,
   ZeroTokenAuthorizationUsed as AuthorizationUsed,
   ZeroTokenDelegateChanged  as DelegateChanged,
   ZeroTokenDelegateVotesChanged as DelegateVotesChanged,
-  ZeroTokenTransfer as Transfer,
 } from "../generated/schema"
-
-export function handleApproval(event: ApprovalEvent): void {
-  let entity = new Approval(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
-  )
-  entity.account = event.params.account
-  entity.spender = event.params.spender
-  entity.amount = event.params.amount
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
 
 export function handleAuthorizationCanceled(
   event: AuthorizationCanceledEvent,
@@ -84,22 +65,6 @@ export function handleDelegateVotesChanged(
   entity.delegatee = event.params.delegatee
   entity.previousBalance = event.params.previousBalance
   entity.newBalance = event.params.newBalance
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-
-export function handleTransfer(event: TransferEvent): void {
-  let entity = new Transfer(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
-  )
-  entity.sender = event.params.sender
-  entity.recipient = event.params.recipient
-  entity.amount = event.params.amount
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp

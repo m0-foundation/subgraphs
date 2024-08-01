@@ -16,7 +16,6 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - PowerTokenApproval
         - PowerTokenAuthorizationCanceled
         - PowerTokenAuthorizationUsed
         - PowerTokenBuy
@@ -24,13 +23,10 @@ dataSources:
         - PowerTokenDelegateVotesChanged
         - PowerTokenNextCashTokenSet
         - PowerTokenTargetSupplyInflated
-        - PowerTokenTransfer
       abis:
         - name: PowerToken
           file: ./abis/PowerToken.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
         - event: AuthorizationCanceled(indexed address,indexed bytes32)
           handler: handleAuthorizationCanceled
         - event: AuthorizationUsed(indexed address,indexed bytes32)
@@ -45,8 +41,6 @@ dataSources:
           handler: handleNextCashTokenSet
         - event: TargetSupplyInflated(indexed uint16,indexed uint240)
           handler: handleTargetSupplyInflated
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
       file: ./src/power-token.ts
   - kind: ethereum
     name: ZeroToken
@@ -60,18 +54,14 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - ZeroTokenApproval
         - ZeroTokenAuthorizationCanceled
         - ZeroTokenAuthorizationUsed
         - ZeroTokenDelegateChanged
         - ZeroTokenDelegateVotesChanged
-        - ZeroTokenTransfer
       abis:
         - name: ZeroToken
           file: ./abis/ZeroToken.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
         - event: AuthorizationCanceled(indexed address,indexed bytes32)
           handler: handleAuthorizationCanceled
         - event: AuthorizationUsed(indexed address,indexed bytes32)
@@ -80,8 +70,6 @@ dataSources:
           handler: handleDelegateChanged
         - event: DelegateVotesChanged(indexed address,uint256,uint256)
           handler: handleDelegateVotesChanged
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
       file: ./src/zero-token.ts
   - kind: ethereum
     name: StandardGovernor

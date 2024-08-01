@@ -7,7 +7,9 @@ type Token @entity {
   decimals: BigDecimal!
   holders: [Holder!]! @derivedFrom(field: "token")
   balances: [TokenBalance!]! @derivedFrom(field: "token")
-  totalSupplys:[TotalSupply!]! @derivedFrom(field: "token")
+  totalSupplys:[TokenTotalSupply!]! @derivedFrom(field: "token")
+  transfers:[TokenTransfer!]! @derivedFrom(field: "token")
+  approvals:[TokenApproval!]! @derivedFrom(field: "token")
 }
 
 # # token balance details
@@ -28,10 +30,32 @@ type TokenBalance @entity {
   blockNumber: BigInt!
 }
 
-type TotalSupply @entity(immutable: true) {
+type TokenTotalSupply @entity(immutable: true) {
   id: Bytes!
   token: Token!
   value: BigInt! 
   blockNumber: BigInt!
   blockTimestamp: BigInt!
+}
+
+type TokenTransfer @entity(immutable: true) {
+  id: Bytes!
+  token: Token!
+  from: Bytes! # address
+  to: Bytes! # address
+  value: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TokenApproval @entity(immutable: true) {
+  id: Bytes!
+  token: Token!
+  owner: Bytes! # address
+  spender: Bytes! # address
+  value: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
 }

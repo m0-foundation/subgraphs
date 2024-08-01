@@ -60,10 +60,14 @@ dataSources:
       entities:
         - Token
         - Holder
+        - TokenTransfer
+        - TokenApproval
       abis:
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
       file: ./src/erc-20.ts

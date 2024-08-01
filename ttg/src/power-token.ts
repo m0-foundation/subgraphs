@@ -1,18 +1,13 @@
 import {
-  Approval as ApprovalEvent,
   AuthorizationCanceled as AuthorizationCanceledEvent,
   AuthorizationUsed as AuthorizationUsedEvent,
   Buy as BuyEvent,
   DelegateChanged as DelegateChangedEvent,
   DelegateVotesChanged as DelegateVotesChangedEvent,
   NextCashTokenSet as NextCashTokenSetEvent,
-  Sync as SyncEvent,
-  Tagline as TaglineEvent,
   TargetSupplyInflated as TargetSupplyInflatedEvent,
-  Transfer as TransferEvent
 } from "../generated/PowerToken/PowerToken"
 import {
-  PowerTokenApproval as Approval,
   PowerTokenAuthorizationCanceled as AuthorizationCanceled,
   PowerTokenAuthorizationUsed as AuthorizationUsed,
   PowerTokenBuy as Buy,
@@ -20,23 +15,7 @@ import {
   PowerTokenDelegateVotesChanged as DelegateVotesChanged,
   PowerTokenNextCashTokenSet as NextCashTokenSet,
   PowerTokenTargetSupplyInflated as TargetSupplyInflated,
-  PowerTokenTransfer as Transfer
 } from "../generated/schema"
-
-export function handleApproval(event: ApprovalEvent): void {
-  let entity = new Approval(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.account = event.params.account
-  entity.spender = event.params.spender
-  entity.amount = event.params.amount
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
 
 export function handleAuthorizationCanceled(
   event: AuthorizationCanceledEvent
@@ -136,21 +115,6 @@ export function handleTargetSupplyInflated(
   )
   entity.targetEpoch = event.params.targetEpoch
   entity.targetSupply = event.params.targetSupply
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleTransfer(event: TransferEvent): void {
-  let entity = new Transfer(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.sender = event.params.sender
-  entity.recipient = event.params.recipient
-  entity.amount = event.params.amount
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
