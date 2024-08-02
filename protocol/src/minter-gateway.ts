@@ -336,12 +336,12 @@ function createTimeseriesEntity<E extends TotalOwedM>(entity: E, amount: BigInt,
   }
 }
 
-export function handleNewBlock(event: ethereum.Block): void {
-  handlePrincipalOfTotalActiveOwedM(event);
-  handleTotalOwedM(event);
-  handleTotalActiveOwedM(event);
-  handleTotalInactiveOwedM(event);
-  handleTotalExcessOwedM(event);
+export function handleNewBlock(block: ethereum.Block): void {
+  handlePrincipalOfTotalActiveOwedM(block);
+  handleTotalOwedM(block);
+  handleTotalActiveOwedM(block);
+  handleTotalInactiveOwedM(block);
+  handleTotalExcessOwedM(block);
 }
 // 
 // Minter entities
@@ -364,7 +364,7 @@ export class HasMinterEvent extends ethereum.Event {
 }
 
 export function handleMinterAttributes<T extends HasMinterEvent>(event: T):void{
-  handleNewBlock(event as unknown as ethereum.Block);
+  handleNewBlock(event.block);
   handleMinterActiveOwedMOf<T>(event);
   handleMinterInactiveOwedMOf<T>(event);
   handleMinterPrincipalOfActiveOwedMOf<T>(event);
