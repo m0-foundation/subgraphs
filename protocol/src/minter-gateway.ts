@@ -364,6 +364,7 @@ export class HasMinterEvent extends ethereum.Event {
 }
 
 export function handleMinterAttributes<T extends HasMinterEvent>(event: T):void{
+  handleNewBlock(event as unknown as ethereum.Block);
   handleMinterActiveOwedMOf<T>(event);
   handleMinterInactiveOwedMOf<T>(event);
   handleMinterPrincipalOfActiveOwedMOf<T>(event);
