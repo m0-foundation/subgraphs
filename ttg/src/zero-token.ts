@@ -9,6 +9,7 @@ import {
   ZeroTokenAuthorizationUsed as AuthorizationUsed,
   ZeroTokenDelegateChanged  as DelegateChanged,
   ZeroTokenDelegateVotesChanged as DelegateVotesChanged,
+  ZeroTokenDelegatee,
 } from "../generated/schema"
 
 export function handleAuthorizationCanceled(
@@ -54,6 +55,15 @@ export function handleDelegateChanged(event: DelegateChangedEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  let delegatee = ZeroTokenDelegatee.load(event.params.toDelegatee);
+  if (!delegatee) { 
+    delegatee = new ZeroTokenDelegatee(event.params.toDelegatee);
+  }
+  delegatee.delegator = event.params.delegator;
+  delegatee.updatedAt = event.block.timestamp;
+  delegatee.transactionHash = event.transaction.hash;
+  delegatee.save();
 }
 
 export function handleDelegateVotesChanged(
@@ -71,4 +81,11 @@ export function handleDelegateVotesChanged(
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  let delegatee = ZeroTokenDelegatee.load(event.params.delegatee);
+  if (delegatee) {
+    delegatee.balance = event.params.newBalance;
+    delegatee.updatedAt = event.block.timestamp;
+    delegatee.save();
+  }
 }

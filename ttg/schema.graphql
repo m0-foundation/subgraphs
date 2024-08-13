@@ -349,3 +349,20 @@ type Distribution @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+# mutable data trigger by event DelegateChanged and DelegateVotesChanged
+type PowerTokenDelegatee @entity {
+  id: Bytes! # address
+  delegator: Bytes!
+  balance: BigInt
+  updatedAt: BigInt!
+  transactionHash: Bytes!
+}
+
+type ZeroTokenDelegatee @entity {
+  id: Bytes! # address
+  delegator: Bytes!
+  balance: BigInt
+  updatedAt: BigInt!
+  transactionHash: Bytes!
+}
