@@ -15,8 +15,11 @@ import {
   PowerTokenDelegateVotesChanged as DelegateVotesChanged,
   PowerTokenNextCashTokenSet as NextCashTokenSet,
   PowerTokenTargetSupplyInflated as TargetSupplyInflated,
-  PowerTokenDelegatee,
+  PowerTokenDelegator,
 } from "../generated/schema"
+import {
+  powerToken_balanceOf,
+} from "./utils"
 
 export function handleAuthorizationCanceled(
   event: AuthorizationCanceledEvent
@@ -76,13 +79,14 @@ export function handleDelegateChanged(event: DelegateChangedEvent): void {
   entity.save()
 
 
-  let delegatee = PowerTokenDelegatee.load(event.params.toDelegatee);
+  let delegatee = PowerTokenDelegator.load(event.params.delegator);
   if (!delegatee) { 
-    delegatee = new PowerTokenDelegatee(event.params.toDelegatee);
+    delegatee = new PowerTokenDelegator(event.params.delegator);
   }
-  delegatee.delegator = event.params.delegator;
+  delegatee.delegatee = event.params.toDelegatee;
   delegatee.updatedAt = event.block.timestamp;
   delegatee.transactionHash = event.transaction.hash;
+  delegatee.balance = powerToken_balanceOf(event.address, event.params.delegator);
   delegatee.save();
 }
 
@@ -101,13 +105,6 @@ export function handleDelegateVotesChanged(
   entity.transactionHash = event.transaction.hash
 
   entity.save()
-
-  let delegatee = PowerTokenDelegatee.load(event.params.delegatee);
-  if (delegatee) {
-    delegatee.balance = event.params.newBalance;
-    delegatee.updatedAt = event.block.timestamp;
-    delegatee.save();
-  }
 }
 
 

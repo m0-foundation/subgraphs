@@ -351,17 +351,17 @@ type Distribution @entity(immutable: true) {
 }
 
 # mutable data trigger by event DelegateChanged and DelegateVotesChanged
-type PowerTokenDelegatee @entity {
+type PowerTokenDelegator @entity {
   id: Bytes! # address
-  delegator: Bytes!
+  delegatee: Bytes!
   balance: BigInt
   updatedAt: BigInt!
   transactionHash: Bytes!
 }
 
-type ZeroTokenDelegatee @entity {
+type ZeroTokenDelegator @entity {
   id: Bytes! # address
-  delegator: Bytes!
+  delegatee: Bytes!
   balance: BigInt
   updatedAt: BigInt!
   transactionHash: Bytes!
