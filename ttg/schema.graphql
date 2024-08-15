@@ -138,6 +138,29 @@ type ProposalCreated @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
+type Proposal @entity(immutable: true) {
+  id: Bytes!
+  proposalId: BigInt! # uint256
+  proposer: Bytes! # address
+  values: [BigInt!]! # uint256[]
+  signatures: [String!]! # string[]
+  callDatas: [Bytes!]! # bytes[]
+  voteStart: BigInt! # uint256
+  voteEnd: BigInt! # uint256
+  description: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  participation: ProposalParticipation!
+}
+
+type ProposalParticipation @entity {
+  id: Bytes!
+  proposalId: BigInt! # uint256
+  yesVotes: BigInt! # uint256
+  noVotes: BigInt! # uint256
+}
+
 type ProposalExecuted @entity(immutable: true) {
   id: Bytes!
   proposalId: BigInt! # uint256

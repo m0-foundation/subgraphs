@@ -1,3 +1,4 @@
+import { BigInt, Bytes } from "@graphprotocol/graph-ts"
 import {
   CashTokenSet as CashTokenSetEvent,
   HasVotedOnAllProposals as HasVotedOnAllProposalsEvent,
@@ -15,6 +16,7 @@ import {
   ProposalFeeSentToVault,
   ProposalFeeSet,
   VoteCast,
+  ProposalParticipation,
 } from "../generated/schema"
 
 export function handleCashTokenSet(event: CashTokenSetEvent): void {
@@ -127,4 +129,24 @@ export function handleVoteCast(event: VoteCastEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+}
+
+export function handleParticipationProposal(event: VoteCastEvent): void {
+  const proposalId = new Bytes(event.params.proposalId.toI32())
+
+  let participation = ProposalParticipation.load(proposalId)
+
+  if (!participation) {
+    participation = new ProposalParticipation(proposalId)
+    participation.yesVotes = new BigInt(0)
+    participation.noVotes = new BigInt(0)
+  }
+
+  if (event.params.support) {
+    participation.yesVotes = participation.yesVotes.plus(event.params.weight)
+  } else {
+    participation.noVotes = participation.noVotes.plus(event.params.weight)
+  }
+
+  participation.save()
 }
