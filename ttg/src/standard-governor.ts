@@ -131,7 +131,7 @@ export function handleVoteCast(event: VoteCastEvent): void {
   entity.save()
 }
 
-export function handleParticipationProposal(event: VoteCastEvent): void {
+export function handleProposalParticipation(event: VoteCastEvent): void {
   const proposalId = new Bytes(event.params.proposalId.toI32())
 
   let participation = ProposalParticipation.load(proposalId)
