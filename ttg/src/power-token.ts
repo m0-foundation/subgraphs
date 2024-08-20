@@ -79,15 +79,15 @@ export function handleDelegateChanged(event: DelegateChangedEvent): void {
   entity.save()
 
 
-  let delegatee = PowerTokenDelegator.load(event.params.delegator);
-  if (!delegatee) { 
-    delegatee = new PowerTokenDelegator(event.params.delegator);
+  let delegation = PowerTokenDelegator.load(event.params.delegator);
+  if (!delegation) { 
+    delegation = new PowerTokenDelegator(event.params.delegator);
   }
-  delegatee.delegatee = event.params.toDelegatee;
-  delegatee.updatedAt = event.block.timestamp;
-  delegatee.transactionHash = event.transaction.hash;
-  delegatee.balance = powerToken_balanceOf(event.address, event.params.delegator);
-  delegatee.save();
+  delegation.delegation = event.params.toDelegatee;
+  delegation.updatedAt = event.block.timestamp;
+  delegation.transactionHash = event.transaction.hash;
+  delegation.balance = powerToken_balanceOf(event.address, event.params.delegator);
+  delegation.save();
 }
 
 export function handleDelegateVotesChanged(

@@ -59,15 +59,15 @@ export function handleDelegateChanged(event: DelegateChangedEvent): void {
 
   entity.save()
 
-  let delegatee = ZeroTokenDelegator.load(event.params.delegator);
-  if (!delegatee) { 
-    delegatee = new ZeroTokenDelegator(event.params.delegator);
+  let delegation = ZeroTokenDelegator.load(event.params.delegator);
+  if (!delegation) { 
+    delegation = new ZeroTokenDelegator(event.params.delegator);
   }
-  delegatee.delegatee = event.params.toDelegatee;
-  delegatee.updatedAt = event.block.timestamp;
-  delegatee.transactionHash = event.transaction.hash;
-  delegatee.balance = zeroToken_balanceOf(event.address, event.params.delegator);
-  delegatee.save();
+  delegation.delegation = event.params.toDelegatee;
+  delegation.updatedAt = event.block.timestamp;
+  delegation.transactionHash = event.transaction.hash;
+  delegation.balance = zeroToken_balanceOf(event.address, event.params.delegator);
+  delegation.save();
 }
 
 export function handleDelegateVotesChanged(
