@@ -63,7 +63,7 @@ export function handleDelegateChanged(event: DelegateChangedEvent): void {
   if (!delegation) { 
     delegation = new ZeroTokenDelegator(event.params.delegator);
   }
-  delegation.delegation = event.params.toDelegatee;
+  delegation.delegatee = event.params.toDelegatee;
   delegation.updatedAt = event.block.timestamp;
   delegation.transactionHash = event.transaction.hash;
   delegation.balance = zeroToken_balanceOf(event.address, event.params.delegator);

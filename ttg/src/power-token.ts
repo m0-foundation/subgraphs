@@ -83,7 +83,7 @@ export function handleDelegateChanged(event: DelegateChangedEvent): void {
   if (!delegation) { 
     delegation = new PowerTokenDelegator(event.params.delegator);
   }
-  delegation.delegation = event.params.toDelegatee;
+  delegation.delegatee = event.params.toDelegatee;
   delegation.updatedAt = event.block.timestamp;
   delegation.transactionHash = event.transaction.hash;
   delegation.balance = powerToken_balanceOf(event.address, event.params.delegator);
