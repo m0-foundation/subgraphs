@@ -151,12 +151,13 @@ type Proposal @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
-  participation: ProposalParticipation! @derivedFrom(field: "proposalId")
+  participation: [ProposalParticipation!]! @derivedFrom(field: "proposal")
 }
 
-type ProposalParticipation @entity(immutable: false) {
+type ProposalParticipation @entity {
   id: Bytes!
-  proposalId: Proposal! # uint256
+  proposal: Proposal!
+  proposalId: BigInt! # uint256
   yesVotes: BigInt! # uint256
   noVotes: BigInt! # uint256
 }

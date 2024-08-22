@@ -17,6 +17,7 @@ import {
   ProposalFeeSet,
   VoteCast,
   ProposalParticipation,
+  Proposal,
 } from "../generated/schema"
 
 export function handleCashTokenSet(event: CashTokenSetEvent): void {
@@ -69,6 +70,8 @@ export function handleProposalCreated(event: ProposalCreatedEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  handleNewProposal(event)
 }
 
 export function handleProposalExecuted(event: ProposalExecutedEvent): void {
@@ -130,9 +133,30 @@ export function handleVoteCast(event: VoteCastEvent): void {
 
   entity.save()
 
-  
-  // Add vote to proposal participation
-  const proposalId = Bytes.fromI32(event.params.proposalId.toI32())
+  handleProposalParticipation(event)
+}
+
+function handleNewProposal(event: ProposalCreatedEvent): void {
+  let entity = new Proposal(event.transaction.hash.concatI32(event.logIndex.toI32()))
+
+  entity.proposalId = event.params.proposalId
+  entity.proposer = event.params.proposer
+  entity.values = event.params.values
+  entity.signatures = event.params.signatures
+  entity.callDatas = event.params.callDatas
+  entity.voteStart = event.params.voteStart
+  entity.voteEnd = event.params.voteEnd
+  entity.description = event.params.description
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+function handleProposalParticipation(event: VoteCastEvent): void {
+  const proposalId = Bytes.fromByteArray(Bytes.fromBigInt(event.params.proposalId))
 
   let participation = ProposalParticipation.load(proposalId)
 
