@@ -17,7 +17,6 @@ import {
   ProposalFeeSet,
   VoteCast,
   ProposalParticipation,
-  Proposal,
 } from "../generated/schema"
 
 export function handleCashTokenSet(event: CashTokenSetEvent): void {
@@ -53,7 +52,7 @@ export function handleHasVotedOnAllProposals(
 
 export function handleProposalCreated(event: ProposalCreatedEvent): void {
   let entity = new ProposalCreated(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.params.proposalId.toString(),
   )
   entity.proposalId = event.params.proposalId
   entity.proposer = event.params.proposer
@@ -64,6 +63,7 @@ export function handleProposalCreated(event: ProposalCreatedEvent): void {
   entity.voteStart = event.params.voteStart
   entity.voteEnd = event.params.voteEnd
   entity.description = event.params.description
+  entity.type = "standard"
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
@@ -71,7 +71,12 @@ export function handleProposalCreated(event: ProposalCreatedEvent): void {
 
   entity.save()
 
-  handleNewProposal(event)
+  const proposalId = event.params.proposalId.toString();
+  const participation = new ProposalParticipation(proposalId)
+  participation.proposal = proposalId
+  participation.yesVotes = new BigInt(0)
+  participation.noVotes = new BigInt(0)
+  participation.save()
 }
 
 export function handleProposalExecuted(event: ProposalExecutedEvent): void {
@@ -136,32 +141,14 @@ export function handleVoteCast(event: VoteCastEvent): void {
   handleProposalParticipation(event)
 }
 
-function handleNewProposal(event: ProposalCreatedEvent): void {
-  let entity = new Proposal(event.transaction.hash.concatI32(event.logIndex.toI32()))
-
-  entity.proposalId = event.params.proposalId
-  entity.proposer = event.params.proposer
-  entity.values = event.params.values
-  entity.signatures = event.params.signatures
-  entity.callDatas = event.params.callDatas
-  entity.voteStart = event.params.voteStart
-  entity.voteEnd = event.params.voteEnd
-  entity.description = event.params.description
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
 function handleProposalParticipation(event: VoteCastEvent): void {
-  const proposalId = Bytes.fromByteArray(Bytes.fromBigInt(event.params.proposalId))
+  const proposalId = event.params.proposalId.toString();
 
   let participation = ProposalParticipation.load(proposalId)
 
   if (!participation) {
     participation = new ProposalParticipation(proposalId)
+    participation.proposal = proposalId
     participation.yesVotes = new BigInt(0)
     participation.noVotes = new BigInt(0)
   }
