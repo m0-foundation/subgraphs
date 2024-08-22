@@ -122,8 +122,9 @@ type HasVotedOnAllProposal @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
+
 type ProposalCreated @entity(immutable: true) {
-  id: Bytes!
+  id: ID!
   proposalId: BigInt! # uint256
   proposer: Bytes! # address
   # targets: [Bytes!]! # address[]
@@ -136,6 +137,15 @@ type ProposalCreated @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  participation: [ProposalParticipation!]! @derivedFrom(field: "proposal")
+  type: String!
+}
+
+type ProposalParticipation @entity {
+  id: ID!
+  proposal: ProposalCreated!
+  yesVotes: BigInt! # uint256
+  noVotes: BigInt! # uint256
 }
 
 type ProposalExecuted @entity(immutable: true) {

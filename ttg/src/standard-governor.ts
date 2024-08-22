@@ -1,3 +1,4 @@
+import { BigInt, Bytes } from "@graphprotocol/graph-ts"
 import {
   CashTokenSet as CashTokenSetEvent,
   HasVotedOnAllProposals as HasVotedOnAllProposalsEvent,
@@ -15,7 +16,9 @@ import {
   ProposalFeeSentToVault,
   ProposalFeeSet,
   VoteCast,
+  ProposalParticipation,
 } from "../generated/schema"
+import { handleProposalParticipation } from "./utils"
 
 export function handleCashTokenSet(event: CashTokenSetEvent): void {
   let entity = new CashTokenSet(
@@ -50,7 +53,7 @@ export function handleHasVotedOnAllProposals(
 
 export function handleProposalCreated(event: ProposalCreatedEvent): void {
   let entity = new ProposalCreated(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.params.proposalId.toString(),
   )
   entity.proposalId = event.params.proposalId
   entity.proposer = event.params.proposer
@@ -61,12 +64,20 @@ export function handleProposalCreated(event: ProposalCreatedEvent): void {
   entity.voteStart = event.params.voteStart
   entity.voteEnd = event.params.voteEnd
   entity.description = event.params.description
+  entity.type = "standard"
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  const proposalId = event.params.proposalId.toString();
+  const participation = new ProposalParticipation(proposalId)
+  participation.proposal = proposalId
+  participation.yesVotes = new BigInt(0)
+  participation.noVotes = new BigInt(0)
+  participation.save()
 }
 
 export function handleProposalExecuted(event: ProposalExecutedEvent): void {
@@ -127,4 +138,6 @@ export function handleVoteCast(event: VoteCastEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  handleProposalParticipation(event)
 }
