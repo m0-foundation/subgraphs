@@ -16,6 +16,7 @@ import {
   ThresholdRatioSet,
   VoteCast,
 } from "../generated/schema"
+import { handleProposalParticipation } from "./utils";
 
 export function handleAllowedCashTokensSet(
   event: AllowedCashTokensSetEvent,
@@ -128,4 +129,6 @@ export function handleVoteCast(event: VoteCastEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  handleProposalParticipation(event)
 }

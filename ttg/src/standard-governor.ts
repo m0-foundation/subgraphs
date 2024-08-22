@@ -18,6 +18,7 @@ import {
   VoteCast,
   ProposalParticipation,
 } from "../generated/schema"
+import { handleProposalParticipation } from "./utils"
 
 export function handleCashTokenSet(event: CashTokenSetEvent): void {
   let entity = new CashTokenSet(
@@ -139,25 +140,4 @@ export function handleVoteCast(event: VoteCastEvent): void {
   entity.save()
 
   handleProposalParticipation(event)
-}
-
-function handleProposalParticipation(event: VoteCastEvent): void {
-  const proposalId = event.params.proposalId.toString();
-
-  let participation = ProposalParticipation.load(proposalId)
-
-  if (!participation) {
-    participation = new ProposalParticipation(proposalId)
-    participation.proposal = proposalId
-    participation.yesVotes = new BigInt(0)
-    participation.noVotes = new BigInt(0)
-  }
-
-  if (event.params.support) {
-    participation.yesVotes = participation.yesVotes.plus(event.params.weight)
-  } else {
-    participation.noVotes = participation.noVotes.plus(event.params.weight)
-  }
-
-  participation.save()
 }
