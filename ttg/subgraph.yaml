@@ -108,8 +108,6 @@ dataSources:
           handler: handleProposalFeeSet
         - event: VoteCast(indexed address,uint256,uint8,uint256,string)
           handler: handleVoteCast
-        - event: VoteCast(indexed address,uint256,uint8,uint256,string)
-          handler: handleProposalParticipation
       file: ./src/standard-governor.ts
   - kind: ethereum
     name: EmergencyGovernor

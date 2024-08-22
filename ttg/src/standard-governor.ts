@@ -129,10 +129,10 @@ export function handleVoteCast(event: VoteCastEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
-}
 
-export function handleProposalParticipation(event: VoteCastEvent): void {
-  const proposalId = new Bytes(event.params.proposalId.toI32())
+  
+  // Add vote to proposal participation
+  const proposalId = Bytes.fromI32(event.params.proposalId.toI32())
 
   let participation = ProposalParticipation.load(proposalId)
 
