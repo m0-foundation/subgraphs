@@ -1,8 +1,9 @@
+import { BigDecimal, store } from "@graphprotocol/graph-ts";
 import {
   Approval as ApprovalEvent,
   Transfer as TransferEvent,
   ERC20
-} from "../generated/ERC20/ERC20"
+} from "../generated/MTokenERC20/ERC20"
 import {
   Holder, 
   TokenBalance, 
@@ -17,7 +18,6 @@ import {
   getToAddress,
   zeroAddress,
 } from "./utils"
-import { BigDecimal} from "@graphprotocol/graph-ts";
 
 export function handleApproval(event: ApprovalEvent): void {
   let token = fetchTokenDetails(event);
@@ -48,9 +48,9 @@ export function handleTransfer(event: TransferEvent): void {
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.token = token.id;
-  entity.from = event.params.from
-  entity.to = event.params.to
-  entity.value = event.params.value
+  entity.from = event.params.sender
+  entity.to = event.params.recipient
+  entity.value = event.params.amount
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
@@ -79,7 +79,7 @@ function handleTokenBalance(event: TransferEvent): void {
   let fromTokenBalance = new TokenBalance(event.block.timestamp.toString() + "-" + fromAddress);
   fromTokenBalance.token = token.id;
   fromTokenBalance.address = fromAddress;
-  fromTokenBalance.balance = fetchBalance(event.address,event.params.from) //balance at the time of the transfer event
+  fromTokenBalance.balance = fetchBalance(event.address,event.params.sender) //balance at the time of the transfer event
   fromTokenBalance.blockNumber = event.block.number;
   fromTokenBalance.blockTimestamp = event.block.timestamp;
   if(fromTokenBalance.address != zeroAddress.toString()){
@@ -89,7 +89,7 @@ function handleTokenBalance(event: TransferEvent): void {
   let toTokenBalance = new TokenBalance(event.block.timestamp.toString() + "-" + toAddress);
   toTokenBalance.token = token.id;
   toTokenBalance.address = toAddress;
-  toTokenBalance.balance = fetchBalance(event.address,event.params.to) //balance at the time of the transfer event
+  toTokenBalance.balance = fetchBalance(event.address,event.params.recipient) //balance at the time of the transfer event
   toTokenBalance.blockNumber = event.block.number;
   toTokenBalance.blockTimestamp = event.block.timestamp;
   toTokenBalance.save();

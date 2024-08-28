@@ -39,19 +39,19 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "from",
+        "name": "sender",
         "type": "address"
       },
       {
         "indexed": true,
         "internalType": "address",
-        "name": "to",
+        "name": "recipient",
         "type": "address"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "value",
+        "name": "amount",
         "type": "uint256"
       }
     ],
