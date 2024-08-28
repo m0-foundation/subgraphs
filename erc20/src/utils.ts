@@ -65,10 +65,10 @@ export function fetchBalance(
 
 
 export function getFromAddress(event: Transfer): string {
-  return event.params.sender.toHex();
+  return event.params.from.toHex();
 }
 export function getToAddress(event: Transfer): string {
-  return event.params.recipient.toHex();
+  return event.params.to.toHex();
 }
 
 export let zeroAddress = Address.fromString("0x0000000000000000000000000000000000000000")

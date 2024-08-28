@@ -48,9 +48,9 @@ export function handleTransfer(event: TransferEvent): void {
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.token = token.id;
-  entity.from = event.params.sender
-  entity.to = event.params.recipient
-  entity.value = event.params.amount
+  entity.from = event.params.from
+  entity.to = event.params.to
+  entity.value = event.params.value
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
@@ -79,7 +79,7 @@ function handleTokenBalance(event: TransferEvent): void {
   let fromTokenBalance = new TokenBalance(event.block.timestamp.toString() + "-" + fromAddress);
   fromTokenBalance.token = token.id;
   fromTokenBalance.address = fromAddress;
-  fromTokenBalance.balance = fetchBalance(event.address,event.params.sender) //balance at the time of the transfer event
+  fromTokenBalance.balance = fetchBalance(event.address,event.params.from) //balance at the time of the transfer event
   fromTokenBalance.blockNumber = event.block.number;
   fromTokenBalance.blockTimestamp = event.block.timestamp;
   if(fromTokenBalance.address != zeroAddress.toString()){
@@ -89,7 +89,7 @@ function handleTokenBalance(event: TransferEvent): void {
   let toTokenBalance = new TokenBalance(event.block.timestamp.toString() + "-" + toAddress);
   toTokenBalance.token = token.id;
   toTokenBalance.address = toAddress;
-  toTokenBalance.balance = fetchBalance(event.address,event.params.recipient) //balance at the time of the transfer event
+  toTokenBalance.balance = fetchBalance(event.address,event.params.to) //balance at the time of the transfer event
   toTokenBalance.blockNumber = event.block.number;
   toTokenBalance.blockTimestamp = event.block.timestamp;
   toTokenBalance.save();
@@ -113,7 +113,7 @@ function handleHolderBalance(event: TransferEvent): void {
         fromHolder.address = fromAddress;
   }
 
-  fromHolder.balance = fetchBalance(event.address,event.params.sender)
+  fromHolder.balance = fetchBalance(event.address,event.params.from)
   //filtering out zero-balance holders
   if(fromHolder.balance == BigDecimal.fromString("0")){
     store.remove('Holder', fromHolder.id)
@@ -129,7 +129,7 @@ function handleHolderBalance(event: TransferEvent): void {
       toHolder.token = token.id;
       toHolder.address = toAddress;
     }
-  toHolder.balance = fetchBalance(event.address,event.params.recipient)
+  toHolder.balance = fetchBalance(event.address,event.params.to)
    //filtering out zero-balance holders
   if(toHolder.balance == BigDecimal.fromString("0")){
     store.remove('Holder', toHolder.id)
@@ -142,7 +142,7 @@ function handleHolderBalance(event: TransferEvent): void {
 
 function handleTotalSupply(event: TransferEvent): void {
   // supply is updated only when the transfer is mint or burn
-  if (event.params.sender.equals(zeroAddress) || event.params.recipient.equals(zeroAddress)) {
+  if (event.params.from.equals(zeroAddress) || event.params.to.equals(zeroAddress)) {
     let totalSupply = new TokenTotalSupply(event.transaction.hash.concatI32(event.logIndex.toI32()))
 
     let token = fetchTokenDetails(event);
