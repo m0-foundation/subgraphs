@@ -1,8 +1,9 @@
+import { BigDecimal, store } from "@graphprotocol/graph-ts";
 import {
   Approval as ApprovalEvent,
   Transfer as TransferEvent,
   ERC20
-} from "../generated/ERC20/ERC20"
+} from "../generated/MTokenERC20/ERC20"
 import {
   Holder, 
   TokenBalance, 
@@ -17,7 +18,6 @@ import {
   getToAddress,
   zeroAddress,
 } from "./utils"
-import { BigDecimal} from "@graphprotocol/graph-ts";
 
 export function handleApproval(event: ApprovalEvent): void {
   let token = fetchTokenDetails(event);
@@ -114,8 +114,11 @@ function handleHolderBalance(event: TransferEvent): void {
   }
 
   fromHolder.balance = fetchBalance(event.address,event.params.from)
-  //filtering out zero-balance tokens - optional
-  if(fromHolder.balance != BigDecimal.fromString("0")){
+  //filtering out zero-balance holders
+  if(fromHolder.balance == BigDecimal.fromString("0")){
+    store.remove('Holder', fromHolder.id)
+  }
+  else{
     fromHolder.save();
   }
   
@@ -127,10 +130,14 @@ function handleHolderBalance(event: TransferEvent): void {
       toHolder.address = toAddress;
     }
   toHolder.balance = fetchBalance(event.address,event.params.to)
-   //filtering out zero-balance tokens - optional
-  if(toHolder.balance != BigDecimal.fromString("0")){
+   //filtering out zero-balance holders
+  if(toHolder.balance == BigDecimal.fromString("0")){
+    store.remove('Holder', toHolder.id)
+  }
+  else{
     toHolder.save();
   }
+  
 }
 
 function handleTotalSupply(event: TransferEvent): void {

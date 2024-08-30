@@ -1,5 +1,5 @@
 //import smart contract class from generated files
-import { ERC20, Transfer } from "../generated/ERC20/ERC20";
+import { ERC20, Transfer } from "../generated/MTokenERC20/ERC20";
 //import entities
 import {  Token } from "../generated/schema";
 //import datatypes
