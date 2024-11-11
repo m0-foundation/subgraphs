@@ -43,7 +43,6 @@ export function handleAuthorizationUsed(event: AuthorizationUsedEvent): void {
   entity.save()
 }
 
-
 export function handleIndexUpdated(event: IndexUpdatedEvent): void {
   let entity = new IndexUpdated(
     event.transaction.hash.concatI32(event.logIndex.toI32()),

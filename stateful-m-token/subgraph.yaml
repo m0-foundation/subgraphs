@@ -1,0 +1,67 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: MToken
+    network: mainnet
+    source:
+      abi: MToken
+      address: "0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b"
+      startBlock: 19818438
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - EarningPrincipalSnapshot
+        - NonEarningBalanceSnapshot
+        - IsEarningSnapshot
+        - ReceivedSnapshot
+        - SentSnapshot
+        - Holder
+        - TotalNonEarningSupplySnapshot
+        - PrincipalOfTotalNonEarningSupplySnapshot
+        - LatestIndexSnapshot
+        - LatestRateSnapshot
+        - LatestUpdateTimestampSnapshot
+        - TotalMintedSnapshot
+        - TotalBurnedSnapshot
+        - MToken
+        - Transfer
+      abis:
+        - name: MToken
+          file: ./abis/MToken.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: StartedEarning(indexed address)
+          handler: handleStartedEarning
+        - event: StoppedEarning(indexed address)
+          handler: handleStoppedEarning
+        - event: IndexUpdated(indexed uint128,indexed uint32)
+          handler: handleIndexUpdated
+      file: ./src/m-token.ts
+  - kind: ethereum
+    name: Registrar
+    network: mainnet
+    source:
+      abi: Registrar
+      address: "0x119FbeeDD4F4f4298Fb59B720d5654442b81ae2c"
+      startBlock: 19818438
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - RateModelSnapshot
+        - MToken
+      abis:
+        - name: Registrar
+          file: ./abis/Registrar.json
+      eventHandlers:
+        - event: KeySet(indexed bytes32,indexed bytes32)
+          handler: handleKeySet
+      file: ./src/m-token.ts
