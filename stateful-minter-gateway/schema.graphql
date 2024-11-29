@@ -1,0 +1,418 @@
+interface SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+}
+
+interface MinterSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    minter: Minter!
+}
+
+interface BigIntSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    value: BigInt!
+}
+
+interface TimestampSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    value: Timestamp!
+}
+
+interface StringSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    value: String!
+}
+
+type CollateralSnapshot implements MinterSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    minter: Minter!
+    value: BigInt!
+}
+
+type SumOfPendingRetrievalsSnapshot implements MinterSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    minter: Minter!
+    value: BigInt!
+}
+
+type UpdateTimestampSnapshot implements TimestampSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    minter: Minter!
+    value: Timestamp!
+}
+
+type PenalizedUntilTimestampSnapshot implements TimestampSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    minter: Minter!
+    value: Timestamp!
+}
+
+type FrozenUntilTimestampSnapshot implements TimestampSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    minter: Minter!
+    value: Timestamp!
+}
+
+type LatestProposedRetrievalTimestampSnapshot implements TimestampSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    minter: Minter!
+    value: Timestamp!
+}
+
+type MintedSnapshot implements MinterSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    minter: Minter!
+    value: BigInt!
+}
+
+type BurnedSnapshot implements MinterSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    minter: Minter!
+    value: BigInt!
+}
+
+type PrincipalOfActiveOwedMSnapshot implements MinterSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    minter: Minter!
+    value: BigInt!
+}
+
+type InactiveOwedMSnapshot implements MinterSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    minter: Minter!
+    value: BigInt!
+}
+
+type SumOfMissedIntervalPenaltiesSnapshot implements MinterSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity
+    @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    minter: Minter!
+    value: BigInt!
+}
+
+type SumOfUndercollateralizedPenaltiesSnapshot implements MinterSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity
+    @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    minter: Minter!
+    value: BigInt!
+}
+
+type CollateralUpdate @entity(immutable: true) {
+    id: ID! @unique
+    minter: Minter!
+    collateral: BigInt!
+    totalResolvedRetrieval: BigInt!
+    metadataHash: String!
+    minTimestamp: Timestamp!
+    timestamp: Timestamp!
+    transactionHash: String!
+    logIndex: BigInt!
+}
+
+type Mint @entity {
+    id: ID! @unique
+    minter: Minter!
+    principalAmount: BigInt
+    amount: BigInt!
+    destination: String!
+    proposedTimestamp: Timestamp!
+    proposedTransactionHash: String!
+    proposedLogIndex: BigInt!
+    cancelledTimestamp: Timestamp
+    cancelledBy: Validator
+    cancelledTransactionHash: String
+    cancelledLogIndex: BigInt
+    executedTimestamp: Timestamp
+    executedTransactionHash: String
+    executedLogIndex: BigInt
+    replacedBy: Mint
+}
+
+type Burn @entity(immutable: true) {
+    id: ID! @unique
+    minter: Minter!
+    principalAmount: BigInt
+    amount: BigInt!
+    payer: String!
+    timestamp: Timestamp!
+    transactionHash: String!
+    logIndex: BigInt!
+}
+
+type Retrieval @entity {
+    id: ID! @unique
+    minter: Minter!
+    amount: BigInt!
+    proposedTimestamp: Timestamp!
+    proposedTransactionHash: String!
+    proposedLogIndex: BigInt!
+    resolvedTimestamp: Timestamp
+    resolvedTransactionHash: String
+    resolvedLogIndex: BigInt
+}
+
+type Freeze @entity(immutable: true) {
+    id: ID! @unique
+    minter: Minter!
+    frozenUntilTimestamp: Timestamp!
+    timestamp: Timestamp!
+    transactionHash: String!
+    logIndex: BigInt!
+}
+
+type MissedIntervalPenalty @entity(immutable: true) {
+    id: ID! @unique
+    minter: Minter!
+    missedIntervals: BigInt!
+    amount: BigInt!
+    timestamp: Timestamp!
+    transactionHash: String!
+    logIndex: BigInt!
+}
+
+type UndercollateralizedPenalty @entity(immutable: true) {
+    id: ID! @unique
+    minter: Minter!
+    excessOwedM: BigInt!
+    timeSpan: BigInt!
+    amount: BigInt!
+    timestamp: Timestamp!
+    transactionHash: String!
+    logIndex: BigInt!
+}
+
+type Minter @entity {
+    id: ID! @unique
+    address: String! @unique
+    isActive: Boolean!
+    activationTimestamp: Timestamp!
+    activationTransactionHash: String!
+    activationLogIndex: BigInt!
+    isDeactivated: Boolean!
+    deactivationTimestamp: Timestamp
+    deactivationTransactionHash: String
+    deactivationLogIndex: BigInt
+    collateral: BigInt!
+    collateralSnapshots: [CollateralSnapshot!] @derivedFrom(field: "minter")
+    sumOfPendingRetrievals: BigInt!
+    sumOfPendingRetrievalsSnapshots: [SumOfPendingRetrievalsSnapshot!] @derivedFrom(field: "minter")
+    collateralUpdates: [CollateralUpdate!] @derivedFrom(field: "minter")
+    updateTimestamp: Timestamp!
+    updateTimestampSnapshots: [UpdateTimestampSnapshot!] @derivedFrom(field: "minter")
+    penalizedUntilTimestamp: Timestamp!
+    penalizedUntilTimestampSnapshots: [PenalizedUntilTimestampSnapshot!] @derivedFrom(field: "minter")
+    frozenUntilTimestamp: Timestamp!
+    frozenUntilTimestampSnapshots: [FrozenUntilTimestampSnapshot!] @derivedFrom(field: "minter")
+    latestProposedRetrievalTimestamp: Timestamp!
+    latestProposedRetrievalTimestampSnapshots: [LatestProposedRetrievalTimestampSnapshot!] @derivedFrom(field: "minter")
+    mints: [Mint!] @derivedFrom(field: "minter")
+    burns: [Burn!] @derivedFrom(field: "minter")
+    minted: BigInt!
+    mintedSnapshots: [MintedSnapshot!] @derivedFrom(field: "minter")
+    burned: BigInt!
+    burnedSnapshots: [BurnedSnapshot!] @derivedFrom(field: "minter")
+    principalOfActiveOwedM: BigInt!
+    principalOfActiveOwedMSnapshots: [PrincipalOfActiveOwedMSnapshot!] @derivedFrom(field: "minter")
+    inactiveOwedM: BigInt!
+    inactiveOwedMSnapshots: [InactiveOwedMSnapshot!] @derivedFrom(field: "minter")
+    retrievals: [Retrieval!] @derivedFrom(field: "minter")
+    freezes: [Freeze!] @derivedFrom(field: "minter")
+    missedIntervalPenalties: [MissedIntervalPenalty!] @derivedFrom(field: "minter")
+    undercollateralizedPenalties: [UndercollateralizedPenalty!] @derivedFrom(field: "minter")
+    sumOfMissedIntervalPenalties: BigInt!
+    sumOfMissedIntervalPenaltiesSnapshots: [SumOfMissedIntervalPenaltiesSnapshot!] @derivedFrom(field: "minter")
+    sumOfUndercollateralizedPenalties: BigInt!
+    sumOfUndercollateralizedPenaltiesSnapshots: [SumOfUndercollateralizedPenaltiesSnapshot!]
+        @derivedFrom(field: "minter")
+    lastUpdate: Timestamp!
+}
+
+type Validator @entity(immutable: true) {
+    id: ID! @unique
+    address: String! @unique
+    canceledMints: [Mint!] @derivedFrom(field: "cancelledBy")
+}
+
+type TotalCollateralSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type TotalPendingRetrievalsSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type TotalInactiveOwedMSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type PrincipalOfTotalActiveOwedMSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type LatestIndexSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type LatestRateSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type LatestUpdateTimestampSnapshot implements TimestampSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: Timestamp!
+}
+
+type TotalMintedSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type TotalBurnedSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type TotalMissedIntervalPenaltiesSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type TotalUndercollateralizedPenaltiesSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type MintDelaySnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type MintRatioSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type MintTTLSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type MinterFreezeTimeSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type PenaltyRateSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type RateModelSnapshot implements StringSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: String!
+}
+
+type UpdateCollateralIntervalSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type UpdateCollateralValidatorThresholdSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type MinterGateway @entity {
+    id: ID! @unique
+    validators: [Validator!]
+    minters: [Minter!]
+    totalCollateral: BigInt!
+    totalCollateralSnapshots: [TotalCollateralSnapshot!]
+    totalPendingRetrievals: BigInt!
+    totalPendingRetrievalsSnapshots: [TotalPendingRetrievalsSnapshot!]
+    totalInactiveOwedM: BigInt!
+    totalInactiveOwedMSnapshots: [TotalInactiveOwedMSnapshot!]
+    principalOfTotalActiveOwedM: BigInt!
+    principalOfTotalActiveOwedMSnapshots: [PrincipalOfTotalActiveOwedMSnapshot!]
+    mintNonce: BigInt!
+    retrievalNonce: BigInt!
+    mints: [Mint!]
+    burns: [Burn!]
+    collateralUpdates: [CollateralUpdate!]
+    retrievals: [Retrieval!]
+    freezes: [Freeze!]
+    latestIndex: BigInt!
+    latestIndexSnapshots: [LatestIndexSnapshot!]
+    latestRate: BigInt!
+    latestRateSnapshots: [LatestRateSnapshot!]
+    latestUpdateTimestamp: Timestamp!
+    latestUpdateTimestampSnapshots: [LatestUpdateTimestampSnapshot!]
+    totalMinted: BigInt!
+    totalMintedSnapshots: [TotalMintedSnapshot!]
+    totalBurned: BigInt!
+    totalBurnedSnapshots: [TotalBurnedSnapshot!]
+    missedIntervalPenalties: [MissedIntervalPenalty!]
+    undercollateralizedPenalties: [UndercollateralizedPenalty!]
+    totalMissedIntervalPenalties: BigInt!
+    totalMissedIntervalPenaltiesSnapshots: [TotalMissedIntervalPenaltiesSnapshot!]
+    totalUndercollateralizedPenalties: BigInt!
+    totalUndercollateralizedPenaltiesSnapshots: [TotalUndercollateralizedPenaltiesSnapshot!]
+    mintDelay: BigInt!
+    mintDelaySnapshots: [MintDelaySnapshot!]
+    mintRatio: BigInt!
+    mintRatioSnapshots: [MintRatioSnapshot!]
+    mintTTL: BigInt!
+    mintTTLSnapshots: [MintTTLSnapshot!]
+    minterFreezeTime: BigInt!
+    minterFreezeTimeSnapshots: [MinterFreezeTimeSnapshot!]
+    penaltyRate: BigInt!
+    penaltyRateSnapshots: [PenaltyRateSnapshot!]
+    rateModel: String!
+    rateModelSnapshots: [RateModelSnapshot!]
+    updateCollateralInterval: BigInt!
+    updateCollateralIntervalSnapshots: [UpdateCollateralIntervalSnapshot!]
+    updateCollateralValidatorThreshold: BigInt!
+    updateCollateralValidatorThresholdSnapshots: [UpdateCollateralValidatorThresholdSnapshot!]
+    lastUpdate: Timestamp!
+}

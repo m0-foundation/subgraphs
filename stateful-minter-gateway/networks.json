@@ -1,0 +1,12 @@
+{
+  "mainnet": {
+    "MinterGateway": {
+      "address": "0xf7f9638cb444D65e5A40bF5ff98ebE4ff319F04E",
+      "startBlock": 19818438
+    },
+    "Registrar": {
+      "address": "0x119FbeeDD4F4f4298Fb59B720d5654442b81ae2c",
+      "startBlock": 19818438
+    }
+  }
+}

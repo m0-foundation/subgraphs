@@ -1,0 +1,113 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: MinterGateway
+    network: mainnet
+    source:
+      abi: MinterGateway
+      address: "0xf7f9638cb444D65e5A40bF5ff98ebE4ff319F04E"
+      startBlock: 19818438
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - CollateralSnapshot
+        - SumOfPendingRetrievalsSnapshot
+        - UpdateTimestampSnapshot
+        - PenalizedUntilTimestampSnapshot
+        - FrozenUntilTimestampSnapshot
+        - LatestProposedRetrievalTimestampSnapshot
+        - MintedSnapshot
+        - BurnedSnapshot
+        - PrincipalOfActiveOwedMSnapshot
+        - InactiveOwedMSnapshot
+        - SumOfMissedIntervalPenaltiesSnapshot
+        - SumOfUndercollateralizedPenaltiesSnapshot
+        - CollateralUpdate
+        - Mint
+        - Burn
+        - Retrieval
+        - Freeze
+        - MissedIntervalPenalty
+        - UndercollateralizedPenalty
+        - Minter
+        - Validator
+        - TotalCollateralSnapshot
+        - TotalPendingRetrievalsSnapshot
+        - TotalInactiveOwedMSnapshot
+        - PrincipalOfTotalActiveOwedMSnapshot
+        - InactiveOwedMSnapshot
+        - LatestIndexSnapshot
+        - LatestRateSnapshot
+        - LatestUpdateTimestampSnapshot
+        - TotalMintedSnapshot
+        - TotalBurnedSnapshot
+        - TotalMissedIntervalPenaltiesSnapshot
+        - TotalUndercollateralizedPenaltiesSnapshot
+        - MinterGateway
+      abis:
+        - name: MinterGateway
+          file: ./abis/MinterGateway.json
+      eventHandlers:
+        - event: CollateralUpdated(indexed address,uint240,uint240,indexed bytes32,uint40)
+          handler: handleCollateralUpdated
+        - event: RetrievalCreated(indexed uint48,indexed address,uint240)
+          handler: handleRetrievalCreated
+        - event: MintProposed(indexed uint48,indexed address,uint240,indexed address)
+          handler: handleMintProposed
+        - event: MintExecuted(indexed uint48,indexed address,uint112,uint240)
+          handler: handleMintExecuted
+        - event: BurnExecuted(indexed address,uint112,uint240,indexed address)
+          handler: handleActiveBurn
+        - event: BurnExecuted(indexed address,uint240,indexed address)
+          handler: handleInactiveBurn
+        - event: MintCanceled(indexed uint48,indexed address,indexed address)
+          handler: handleMintCanceled
+        - event: MinterFrozen(indexed address,uint40)
+          handler: handleMinterFrozen
+        - event: MinterActivated(indexed address,indexed address)
+          handler: handleMinterActivated
+        - event: MinterDeactivated(indexed address,uint240,indexed address)
+          handler: handleMinterDeactivated
+        - event: MissedIntervalsPenaltyImposed(indexed address,uint40,uint240)
+          handler: handleMissedIntervalsPenaltyImposed
+        - event: UndercollateralizedPenaltyImposed(indexed address,uint240,uint40,uint240)
+          handler: handleUndercollateralizedPenaltyImposed
+        - event: RetrievalResolved(indexed uint48,indexed address)
+          handler: handleRetrievalResolved
+        - event: IndexUpdated(indexed uint128,indexed uint32)
+          handler: handleIndexUpdated
+      file: ./src/minter-gateway.ts
+  - kind: ethereum
+    name: Registrar
+    network: mainnet
+    source:
+      abi: Registrar
+      address: "0x119FbeeDD4F4f4298Fb59B720d5654442b81ae2c"
+      startBlock: 19818438
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - MintDelaySnapshot
+        - MintRatioSnapshot
+        - MintTTLSnapshot
+        - MinterFreezeTimeSnapshot
+        - PenaltyRateSnapshot
+        - RateModelSnapshot
+        - UpdateCollateralIntervalSnapshot
+        - UpdateCollateralValidatorThresholdSnapshot
+        - MinterGateway
+      abis:
+        - name: Registrar
+          file: ./abis/Registrar.json
+      eventHandlers:
+        - event: KeySet(indexed bytes32,indexed bytes32)
+          handler: handleKeySet
+      file: ./src/minter-gateway.ts

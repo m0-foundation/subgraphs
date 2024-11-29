@@ -1,0 +1,14 @@
+# Script usage
+
+```bash
+$ node ./scripts/periodic-expenses.js <ADDRESS> <LATEST_EOD_TIMESTAMP> <PERIODS> <SECONDS_PER_PERIOD>
+```
+
+-   `ADDRESS` is a case-insensitive minter address
+-   `LATEST_EOD_TIMESTAMP` is the Unix/block timestamp that demarcates the end of the most recent period
+-   `PERIODS` is the number of recent periods to return incurred expense values for
+-   `SECONDS_PER_PERIOD` defines how long a period is in seconds
+
+# Requirements
+
+An `.env` file is require in the root (in the same directory as `subgraph.yaml`) that defines `API_ENDPOINT` and `API_PATH`.
