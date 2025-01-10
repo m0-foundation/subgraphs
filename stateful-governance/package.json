@@ -1,0 +1,25 @@
+{
+  "name": "stateful-governance",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ mzero/governance",
+    "deploy:mainnet": "graph deploy governance-mainnet --network mainnet --version-label $(grep VERSION_LABEL .env | cut -d '=' -f2) --node https://subgraphs.alchemy.com/api/subgraphs/deploy --deploy-key $(grep DEPLOY_KEY .env | cut -d '=' -f2)",
+    "create-local": "graph create --node http://localhost:8020/ mzero/governance",
+    "remove-local": "graph remove --node http://localhost:8020/ mzero/governance",
+    "deploy-local": "graph deploy --node http://localhost:8020/ mzero/governance",
+    "test": "graph test",
+    "prettier": "prettier --write 'src/**/*.ts' 'scripts/**/*.js'"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.88.0",
+    "@graphprotocol/graph-ts": "^0.35.1",
+    "dotenv": "^16.4.5",
+    "prettier": "^3.3.3"
+  },
+  "engines": {
+    "node": ">=23.2.0"
+  }
+}

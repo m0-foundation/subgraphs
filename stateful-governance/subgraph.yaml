@@ -1,0 +1,265 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Registrar
+    network: mainnet
+    source:
+      abi: Registrar
+      address: "0x119FbeeDD4F4f4298Fb59B720d5654442b81ae2c"
+      startBlock: 19818431
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ValueSnapshot
+        - KeyValuePair
+        - IncludedAddressSnapshot
+        - IncludedAddress
+        - AddressList
+      abis:
+        - name: Registrar
+          file: ./abis/Registrar.json
+      eventHandlers:
+        - event: AddressAddedToList(indexed bytes32,indexed address)
+          handler: handleAddressAddedToList
+        - event: AddressRemovedFromList(indexed bytes32,indexed address)
+          handler: handleAddressRemovedFromList
+        - event: KeySet(indexed bytes32,indexed bytes32)
+          handler: handleKeySet
+      file: ./src/registrar.ts
+  - kind: ethereum
+    name: DistributionVault
+    network: mainnet
+    source:
+      abi: DistributionVault
+      address: "0xd7298f620B0F752Cf41BD818a16C756d9dCAA34f"
+      startBlock: 19818431
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ZeroHolder
+        - Claim
+        - ClaimedEpoch
+        - Claimed
+        - ClaimedSnapshot
+        - Distribution
+        - LastTokenBalance
+        - LastTokenBalanceSnapshot
+        - EpochDistributed
+        - EpochDistributedSnapshot
+        - TotalClaimable
+        - TotalClaimableSnapshot
+        - TotalClaimed
+        - TotalClaimedSnapshot
+        - DistributionVault
+      abis:
+        - name: DistributionVault
+          file: ./abis/DistributionVault.json
+      eventHandlers:
+        - event: Distribution(indexed address,indexed uint256,uint256)
+          handler: handleDistribution
+        - event: Claim(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleClaim
+      file: ./src/vault.ts
+  - kind: ethereum
+    name: EmergencyGovernor
+    network: mainnet
+    source:
+      abi: EmergencyGovernor
+      address: "0x886d405949F709bC3f4451491bDd07ff51Cdf90A"
+      startBlock: 19818431
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - EmergencyNoWeightSnapshot
+        - EmergencyYesWeightSnapshot
+        - EmergencyVote
+        - EmergencyProposal
+        - EmergencyThresholdRatioSnapshot
+        - EmergencyGovernor
+      abis:
+        - name: EmergencyGovernor
+          file: ./abis/EmergencyGovernor.json
+      eventHandlers:
+        - event: ThresholdRatioSet(uint16)
+          handler: handleEmergencyGovernorThresholdRatioSet
+        - event: VoteCast(indexed address,uint256,uint8,uint256,string)
+          handler: handleEmergencyVoteCast
+        - event: ProposalExecuted(uint256)
+          handler: handleEmergencyProposalExecuted
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleEmergencyProposalCreated
+      file: ./src/governors.ts
+  - kind: ethereum
+    name: StandardGovernor
+    network: mainnet
+    source:
+      abi: StandardGovernor
+      address: "0xB024aC5a7c6bC92fbACc8C3387E628a07e1Da016"
+      startBlock: 19818431
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - StandardNoWeightSnapshot
+        - StandardYesWeightSnapshot
+        - StandardVote
+        - StandardProposal
+        - StandardGovernorCashTokenSnapshot
+        - ProposalFeeSnapshot
+        - StandardProposalCount
+        - StandardGovernor
+      abis:
+        - name: StandardGovernor
+          file: ./abis/StandardGovernor.json
+      eventHandlers:
+        - event: ProposalFeeSentToVault(indexed uint256,indexed address,uint256)
+          handler: handleProposalFeeSentToVault
+        - event: HasVotedOnAllProposals(indexed address,indexed uint256)
+          handler: handleHasVotedOnAllProposals
+        - event: CashTokenSet(indexed address)
+          handler: handleCashTokenSet
+        - event: ProposalFeeSet(uint256)
+          handler: handleProposalFeeSet
+        - event: VoteCast(indexed address,uint256,uint8,uint256,string)
+          handler: handleStandardVoteCast
+        - event: ProposalExecuted(uint256)
+          handler: handleStandardProposalExecuted
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleStandardProposalCreated
+      file: ./src/governors.ts
+  - kind: ethereum
+    name: ZeroGovernor
+    network: mainnet
+    source:
+      abi: ZeroGovernor
+      address: "0xa0DAFaEEA4A1d44534e1b9227e19CAE6358b80FE"
+      startBlock: 19818431
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ZeroNoWeightSnapshot
+        - ZeroYesWeightSnapshot
+        - ZeroVote
+        - ZeroProposal
+        - ZeroThresholdRatioSnapshot
+        - ZeroGovernor
+      abis:
+        - name: ZeroGovernor
+          file: ./abis/ZeroGovernor.json
+      eventHandlers:
+        - event: ResetExecuted(indexed address,address,address,address)
+          handler: handleResetExecuted
+        - event: ThresholdRatioSet(uint16)
+          handler: handleZeroGovernorThresholdRatioSet
+        - event: VoteCast(indexed address,uint256,uint8,uint256,string)
+          handler: handleZeroVoteCast
+        - event: ProposalExecuted(uint256)
+          handler: handleZeroProposalExecuted
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleZeroProposalCreated
+      file: ./src/governors.ts
+  - kind: ethereum
+    name: PowerToken
+    network: mainnet
+    source:
+      abi: PowerToken
+      address: "0x5983B89FA184f14917013B9C3062afD9434C5b03"
+      startBlock: 19818431
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - PowerVotingWeightSnapshots
+        - PowerDelegateVotesChanged
+        - PowerDelegatee
+        - PowerBalanceSnapshot
+        - PowerDelegateeSnapshot
+        - PowerTransfer
+        - PowerDelegateChanged
+        - PowerReceivedSnapshot
+        - PowerSentSnapshot
+        - Sync
+        - InflationSyncedSnapshot
+        - PowerHolder
+        - PowerTotalSupplySnapshot
+        - PowerTotalMintedSnapshot
+        - NextCashTokenStartingEpochSnapshot
+        - PowerCashTokenSnapshot
+        - NextCashTokenSnapshot
+        - NextTargetSupplyStartingEpochSnapshot
+        - TargetSupplySnapshot
+        - NextTargetSupplySnapshot
+        - TotalInflationSnapshot
+        - TotalSyncedInflationSnapshot
+        - AuctionBuy
+        - TotalBoughtSnapshot
+        - PowerToken
+      abis:
+        - name: PowerToken
+          file: ./abis/PowerToken.json
+      eventHandlers:
+        - event: Buy(indexed address,uint240,uint256)
+          handler: handleBuy
+        - event: DelegateChanged(indexed address,indexed address,indexed address)
+          handler: handlePowerDelegateChanged
+        - event: DelegateVotesChanged(indexed address,uint256,uint256)
+          handler: handlePowerDelegateVotesChanged
+        - event: NextCashTokenSet(indexed uint16,indexed address)
+          handler: handleNextCashTokenSet
+        - event: Sync(indexed address)
+          handler: handleSync
+        - event: TargetSupplyInflated(indexed uint16,indexed uint240)
+          handler: handleTargetSupplyInflated
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handlePowerTransfer
+      file: ./src/tokens.ts
+  - kind: ethereum
+    name: ZeroToken
+    network: mainnet
+    source:
+      abi: ZeroToken
+      address: "0x988567FE094570cCE1FFdA29D1f2d842B70492be"
+      startBlock: 19818431
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ZeroVotingWeightSnapshots
+        - ZeroDelegateVotesChanged
+        - ZeroDelegatee
+        - ZeroBalanceSnapshot
+        - ZeroDelegateeSnapshot
+        - ZeroTransfer
+        - ZeroDelegateChanged
+        - ZeroReceivedSnapshot
+        - ZeroSentSnapshot
+        - ZeroHolder
+        - ZeroTotalSupplySnapshot
+        - ZeroTotalMintedSnapshot
+        - ZeroToken
+      abis:
+        - name: ZeroToken
+          file: ./abis/ZeroToken.json
+      eventHandlers:
+        - event: DelegateChanged(indexed address,indexed address,indexed address)
+          handler: handleZeroDelegateChanged
+        - event: DelegateVotesChanged(indexed address,uint256,uint256)
+          handler: handleZeroDelegateVotesChanged
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleZeroTransfer
+      file: ./src/tokens.ts

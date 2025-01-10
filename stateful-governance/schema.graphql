@@ -1,0 +1,809 @@
+# Snapshot interfaces
+
+interface SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+}
+
+interface IntSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    value: Int!
+}
+
+interface BigIntSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    value: BigInt!
+}
+
+interface BooleanSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    value: Boolean!
+}
+
+interface TimestampSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    value: Timestamp!
+}
+
+interface StringSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    value: String!
+}
+
+interface ZeroHolderSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    account: ZeroHolder!
+}
+
+interface PowerHolderSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    account: PowerHolder!
+}
+
+interface PowerDelegateeSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    delegatee: PowerDelegatee!
+}
+
+interface ZeroDelegateeSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    delegatee: ZeroDelegatee!
+}
+
+interface EmergencyGovernorSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    governor: EmergencyGovernor!
+}
+
+interface ZeroGovernorSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    governor: ZeroGovernor!
+}
+
+interface StandardGovernorSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    governor: StandardGovernor!
+}
+
+interface ClaimantSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    claimant: ZeroHolder!
+}
+
+# Registrar entities
+
+type ValueSnapshot implements StringSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @uniques
+    timestamp: Timestamp!
+    keyValuePair: KeyValuePair!
+    value: String!
+}
+
+type KeyValuePair @entity {
+    id: ID! @unique
+    key: String! @unique
+    value: String!
+    valueSnapshots: [ValueSnapshot!] @derivedFrom(field: "keyValuePair")
+    lastUpdate: Timestamp!
+}
+
+type IncludedAddressSnapshot implements BooleanSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    includedAddress: IncludedAddress!
+    value: Boolean!
+}
+
+type IncludedAddress @entity {
+    id: ID! @unique
+    address: String!
+    list: AddressList!
+    included: Boolean!
+    includedSnapshots: [IncludedAddressSnapshot!] @derivedFrom(field: "includedAddress")
+    lastUpdate: Timestamp!
+}
+
+type AddressList @entity {
+    id: ID! @unique
+    name: String! @unique
+    addresses: [IncludedAddress!] @derivedFrom(field: "list")
+    lastUpdate: Timestamp!
+}
+
+# Distribution Vault entities
+
+type Claim @entity(immutable: true) {
+    id: ID! @unique
+    token: String!
+    claimant: ZeroHolder!
+    startEpoch: Int!
+    endEpoch: Int!
+    amount: BigInt!
+    timestamp: Timestamp!
+    transactionHash: String!
+    logIndex: BigInt!
+}
+
+type ClaimedEpoch @entity(immutable: true) {
+    id: ID! @unique
+    token: String!
+    epoch: Int!
+    claimant: ZeroHolder!
+    claim: Claim!
+}
+
+type Claimed @entity {
+    id: ID! @unique
+    token: String!
+    claimant: ZeroHolder!
+    amount: BigInt!
+    lastUpdate: Timestamp!
+}
+
+type ClaimedSnapshot implements ClaimantSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    claimant: ZeroHolder!
+    token: String!
+    value: BigInt!
+}
+
+type Distribution @entity(immutable: true) {
+    id: ID! @unique
+    token: String!
+    epoch: Int!
+    amount: BigInt!
+    timestamp: Timestamp!
+    transactionHash: String!
+    logIndex: BigInt!
+}
+
+type LastTokenBalance @entity {
+    id: ID! @unique
+    token: String!
+    balance: BigInt!
+    lastUpdate: Timestamp!
+}
+
+type LastTokenBalanceSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    token: String!
+    value: BigInt!
+}
+
+type EpochDistributed @entity {
+    id: ID! @unique
+    token: String!
+    epoch: Int!
+    amount: BigInt!
+    lastUpdate: Timestamp!
+}
+
+type EpochDistributedSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    token: String!
+    epoch: Int!
+    value: BigInt!
+}
+
+type TotalDistributed @entity {
+    id: ID! @unique
+    token: String!
+    amount: BigInt!
+    lastUpdate: Timestamp!
+}
+
+type TotalDistributedSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    token: String!
+    value: BigInt!
+}
+
+type TotalClaimed @entity {
+    id: ID! @unique
+    token: String!
+    amount: BigInt!
+    lastUpdate: Timestamp!
+}
+
+type TotalClaimedSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    token: String!
+    value: BigInt!
+}
+
+type DistributionVault @entity {
+    id: ID! @unique
+    lastTokenBalance: [LastTokenBalance!]
+    lastTokenBalanceSnapshots: [LastTokenBalanceSnapshot!]
+    distributed: [EpochDistributed!]
+    distributedSnapshots: [EpochDistributedSnapshot!]
+    claimants: [ZeroHolder!]
+    claims: [Claim!]
+    distributions: [Distribution!]
+    totalDistributed: [TotalDistributed!]
+    totalDistributedSnapshots: [TotalDistributedSnapshot!]
+    totalClaimed: [TotalClaimed!]
+    totalClaimedSnapshots: [TotalClaimedSnapshot!]
+    lastUpdate: Timestamp!
+}
+
+# Standard Governor entities
+
+type StandardNoWeightSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    proposal: StandardProposal!
+    value: BigInt!
+}
+
+type StandardYesWeightSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    proposal: StandardProposal!
+    value: BigInt!
+}
+
+type StandardVote @entity(immutable: true) {
+    id: ID! @unique
+    voter: PowerDelegatee!
+    proposal: StandardProposal!
+    support: Boolean!
+    weight: BigInt!
+    reason: String!
+    timestamp: Timestamp!
+    transactionHash: String!
+    logIndex: BigInt!
+}
+
+type StandardProposal @entity {
+    id: ID! @unique
+    proposalId: BigInt!
+    governor: StandardGovernor!
+    proposer: String!
+    voteStart: Int!
+    voteEnd: Int!
+    callData: String!
+    description: String!
+    votes: [StandardVote!] @derivedFrom(field: "proposal")
+    noWeight: BigInt!
+    noWeightSnapshots: [StandardNoWeightSnapshot!] @derivedFrom(field: "proposal")
+    yesWeight: BigInt!
+    yesWeightSnapshots: [StandardYesWeightSnapshot!] @derivedFrom(field: "proposal")
+    cashToken: String!
+    proposalFee: BigInt!
+    createdTimestamp: Timestamp!
+    createdTransactionHash: String!
+    createdLogIndex: BigInt!
+    executedTimestamp: Timestamp
+    executedTransactionHash: String
+    executedLogIndex: BigInt
+    lastUpdate: Timestamp!
+}
+
+type StandardGovernorCashTokenSnapshot implements StandardGovernorSnapshotEntity & StringSnapshotEntity & SnapshotEntity
+    @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    governor: StandardGovernor!
+    value: String!
+}
+
+type ProposalFeeSnapshot implements StandardGovernorSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    governor: StandardGovernor!
+    value: BigInt!
+}
+
+type StandardProposalCount @entity {
+    id: ID! @unique
+    epoch: Int!
+    count: BigInt!
+    lastUpdate: Timestamp!
+}
+
+type StandardGovernor @entity {
+    id: ID! @unique
+    voters: [PowerDelegatee!]
+    proposals: [StandardProposal!]
+    cashToken: String!
+    cashTokenSnapshots: [StandardGovernorCashTokenSnapshot!] @derivedFrom(field: "governor")
+    proposalFee: BigInt!
+    proposalFeeSnapshots: [ProposalFeeSnapshot!] @derivedFrom(field: "governor")
+    epochProposalCounts: [StandardProposalCount!]
+    lastUpdate: Timestamp!
+}
+
+# Emergency Governor entities
+
+type EmergencyNoWeightSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    proposal: EmergencyProposal!
+    value: BigInt!
+}
+
+type EmergencyYesWeightSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    proposal: EmergencyProposal!
+    value: BigInt!
+}
+
+type EmergencyVote @entity(immutable: true) {
+    id: ID! @unique
+    voter: PowerDelegatee!
+    proposal: EmergencyProposal!
+    support: Boolean!
+    weight: BigInt!
+    reason: String!
+    timestamp: Timestamp!
+    transactionHash: String!
+    logIndex: BigInt!
+}
+
+type EmergencyProposal @entity {
+    id: ID! @unique
+    proposalId: BigInt!
+    governor: EmergencyGovernor!
+    proposer: String!
+    voteStart: Int!
+    voteEnd: Int!
+    callData: String!
+    description: String!
+    votes: [EmergencyVote!] @derivedFrom(field: "proposal")
+    noWeight: BigInt!
+    noWeightSnapshots: [EmergencyNoWeightSnapshot!] @derivedFrom(field: "proposal")
+    yesWeight: BigInt!
+    yesWeightSnapshots: [EmergencyYesWeightSnapshot!] @derivedFrom(field: "proposal")
+    thresholdRatio: Int
+    createdTimestamp: Timestamp!
+    createdTransactionHash: String!
+    createdLogIndex: BigInt!
+    executedTimestamp: Timestamp
+    executedTransactionHash: String
+    executedLogIndex: BigInt
+    lastUpdate: Timestamp!
+}
+
+type EmergencyThresholdRatioSnapshot implements EmergencyGovernorSnapshotEntity & IntSnapshotEntity & SnapshotEntity
+    @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    governor: EmergencyGovernor!
+    value: Int!
+}
+
+type EmergencyGovernor @entity {
+    id: ID! @unique
+    voters: [PowerDelegatee!]
+    proposals: [EmergencyProposal!]
+    thresholdRatio: Int!
+    thresholdRatioSnapshots: [EmergencyThresholdRatioSnapshot!] @derivedFrom(field: "governor")
+    lastUpdate: Timestamp!
+}
+
+# Zero Governor entities
+
+type ZeroNoWeightSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    proposal: ZeroProposal!
+    value: BigInt!
+}
+
+type ZeroYesWeightSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    proposal: ZeroProposal!
+    value: BigInt!
+}
+
+type ZeroVote @entity(immutable: true) {
+    id: ID! @unique
+    voter: ZeroDelegatee!
+    proposal: ZeroProposal!
+    support: Boolean!
+    weight: BigInt!
+    reason: String!
+    timestamp: Timestamp!
+    transactionHash: String!
+    logIndex: BigInt!
+}
+
+type ZeroProposal @entity {
+    id: ID! @unique
+    proposalId: BigInt!
+    governor: ZeroGovernor!
+    proposer: String!
+    voteStart: Int!
+    voteEnd: Int!
+    callData: String!
+    description: String!
+    votes: [ZeroVote!] @derivedFrom(field: "proposal")
+    noWeight: BigInt!
+    noWeightSnapshots: [ZeroNoWeightSnapshot!] @derivedFrom(field: "proposal")
+    yesWeight: BigInt!
+    yesWeightSnapshots: [ZeroYesWeightSnapshot!] @derivedFrom(field: "proposal")
+    thresholdRatio: Int
+    createdTimestamp: Timestamp!
+    createdTransactionHash: String!
+    createdLogIndex: BigInt!
+    executedTimestamp: Timestamp
+    executedTransactionHash: String
+    executedLogIndex: BigInt
+    lastUpdate: Timestamp!
+}
+
+type ZeroThresholdRatioSnapshot implements ZeroGovernorSnapshotEntity & IntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    governor: ZeroGovernor!
+    value: Int!
+}
+
+type ZeroGovernor @entity {
+    id: ID! @unique
+    voters: [ZeroDelegatee!]
+    proposals: [ZeroProposal!]
+    thresholdRatio: Int!
+    thresholdRatioSnapshots: [ZeroThresholdRatioSnapshot!] @derivedFrom(field: "governor")
+    lastUpdate: Timestamp!
+}
+
+# Power Token entities
+
+type PowerVotingWeightSnapshots implements PowerDelegateeSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity
+    @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    delegatee: PowerDelegatee!
+    value: BigInt!
+}
+
+type PowerDelegateVotesChanged @entity(immutable: true) {
+    id: ID! @unique
+    delegatee: PowerDelegatee!
+    amount: BigInt!
+    timestamp: Timestamp!
+    transactionHash: String!
+    logIndex: BigInt!
+}
+
+type PowerDelegatee @entity {
+    id: ID! @unique
+    address: String! @unique
+    delegators: [PowerHolder!] @derivedFrom(field: "delegatee")
+    votingWeight: BigInt!
+    votingWeightSnapshots: [PowerVotingWeightSnapshots!] @derivedFrom(field: "delegatee")
+    delegateVotesChanged: [PowerDelegateVotesChanged!] @derivedFrom(field: "delegatee")
+    standardVotes: [StandardVote!] @derivedFrom(field: "voter")
+    emergencyVotes: [EmergencyVote!] @derivedFrom(field: "voter")
+    lastUpdate: Timestamp!
+}
+
+type PowerBalanceSnapshot implements PowerHolderSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    account: PowerHolder!
+    value: BigInt!
+}
+
+type PowerDelegateeSnapshot implements PowerHolderSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    account: PowerHolder!
+    value: PowerDelegatee!
+}
+
+type PowerTransfer @entity(immutable: true) {
+    id: ID! @unique
+    sender: PowerHolder!
+    recipient: PowerHolder!
+    amount: BigInt!
+    timestamp: Timestamp!
+    transactionHash: String!
+    logIndex: BigInt!
+}
+
+type PowerDelegateChanged @entity(immutable: true) {
+    id: ID! @unique
+    delegator: PowerHolder!
+    delegatee: PowerDelegatee!
+    timestamp: Timestamp!
+    transactionHash: String!
+    logIndex: BigInt!
+}
+
+type PowerReceivedSnapshot implements PowerHolderSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    account: PowerHolder!
+    value: BigInt!
+}
+
+type PowerSentSnapshot implements PowerHolderSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    account: PowerHolder!
+    value: BigInt!
+}
+
+type Sync @entity {
+    id: ID! @unique
+    account: PowerHolder!
+    timestamp: Timestamp!
+    transactionHash: String!
+    logIndex: BigInt!
+}
+
+type InflationSyncedSnapshot implements PowerHolderSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    account: PowerHolder!
+    value: BigInt!
+}
+
+type PowerHolder @entity {
+    id: ID! @unique
+    address: String! @unique
+    balance: BigInt!
+    balanceSnapshots: [PowerBalanceSnapshot!] @derivedFrom(field: "account")
+    delegatee: PowerDelegatee!
+    delegateeSnapshots: [PowerDelegateeSnapshot!] @derivedFrom(field: "account")
+    delegateChanged: [PowerDelegateChanged!] @derivedFrom(field: "delegator")
+    transfersTo: [PowerTransfer!] @derivedFrom(field: "recipient")
+    transfersFrom: [PowerTransfer!] @derivedFrom(field: "sender")
+    received: BigInt!
+    receivedSnapshots: [PowerReceivedSnapshot!] @derivedFrom(field: "account")
+    sent: BigInt!
+    sentSnapshots: [PowerSentSnapshot!] @derivedFrom(field: "account")
+    syncs: [Sync!] @derivedFrom(field: "account")
+    inflationSynced: BigInt!
+    inflationSyncedSnapshots: [InflationSyncedSnapshot!] @derivedFrom(field: "account")
+    lastUpdate: Timestamp!
+}
+
+type PowerTotalSupplySnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type PowerTotalMintedSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type NextCashTokenStartingEpochSnapshot implements IntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: Int!
+}
+
+type PowerCashTokenSnapshot implements StringSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: String!
+}
+
+type NextCashTokenSnapshot implements StringSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: String!
+}
+
+type NextTargetSupplyStartingEpochSnapshot implements IntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: Int!
+}
+
+type TargetSupplySnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type NextTargetSupplySnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type TotalInflationSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type TotalSyncedInflationSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type AuctionBuy @entity(immutable: true) {
+    id: ID! @unique
+    buyer: String!
+    amount: BigInt!
+    cost: BigInt!
+    cashToken: String!
+    timestamp: Timestamp!
+    transactionHash: String!
+    logIndex: BigInt!
+}
+
+type TotalBoughtSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type PowerToken @entity {
+    id: ID! @unique
+    holders: [PowerHolder!]
+    delegatees: [PowerDelegatee!]
+    totalSupply: BigInt!
+    totalSupplySnapshots: [PowerTotalSupplySnapshot!]
+    transfers: [PowerTransfer!]
+    totalMinted: BigInt!
+    totalMintedSnapshots: [PowerTotalMintedSnapshot!]
+    nextCashTokenStartingEpoch: Int!
+    nextCashTokenStartingEpochSnapshots: [NextCashTokenStartingEpochSnapshot!]
+    cashToken: String!
+    cashTokenSnapshots: [PowerCashTokenSnapshot!]
+    nextCashToken: String!
+    nextCashTokenSnapshots: [NextCashTokenSnapshot!]
+    nextTargetSupplyStartingEpoch: Int!
+    nextTargetSupplyStartingEpochSnapshots: [NextTargetSupplyStartingEpochSnapshot!]
+    targetSupply: BigInt!
+    targetSupplySnapshots: [TargetSupplySnapshot!]
+    nextTargetSupply: BigInt!
+    nextTargetSupplySnapshots: [NextTargetSupplySnapshot!]
+    totalInflation: BigInt!
+    totalInflationSnapshots: [TotalInflationSnapshot!]
+    totalSyncedInflation: BigInt!
+    totalSyncedInflationSnapshots: [TotalSyncedInflationSnapshot!]
+    auctionBuys: [AuctionBuy!]
+    totalBought: BigInt!
+    totalBoughtSnapshots: [TotalBoughtSnapshot!]
+    lastUpdate: Timestamp!
+}
+
+# Zero Token entities
+
+type ZeroVotingWeightSnapshots implements ZeroDelegateeSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    delegatee: ZeroDelegatee!
+    value: BigInt!
+}
+
+type ZeroDelegateVotesChanged @entity(immutable: true) {
+    id: ID! @unique
+    delegatee: ZeroDelegatee!
+    amount: BigInt!
+    timestamp: Timestamp!
+    transactionHash: String!
+    logIndex: BigInt!
+}
+
+type ZeroDelegatee @entity {
+    id: ID! @unique
+    address: String! @unique
+    delegators: [ZeroHolder!] @derivedFrom(field: "delegatee")
+    votingWeight: BigInt!
+    votingWeightSnapshots: [ZeroVotingWeightSnapshots!] @derivedFrom(field: "delegatee")
+    delegateVotesChanged: [ZeroDelegateVotesChanged!] @derivedFrom(field: "delegatee")
+    zeroVotes: [ZeroVote!] @derivedFrom(field: "voter")
+    lastUpdate: Timestamp!
+}
+
+type ZeroBalanceSnapshot implements ZeroHolderSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    account: ZeroHolder!
+    value: BigInt!
+}
+
+type ZeroDelegateeSnapshot implements ZeroHolderSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    account: ZeroHolder!
+    value: ZeroDelegatee!
+}
+
+type ZeroTransfer @entity(immutable: true) {
+    id: ID! @unique
+    sender: ZeroHolder!
+    recipient: ZeroHolder!
+    amount: BigInt!
+    timestamp: Timestamp!
+    transactionHash: String!
+    logIndex: BigInt!
+}
+
+type ZeroDelegateChanged @entity(immutable: true) {
+    id: ID! @unique
+    delegator: ZeroHolder!
+    delegatee: ZeroDelegatee!
+    timestamp: Timestamp!
+    transactionHash: String!
+    logIndex: BigInt!
+}
+
+type ZeroReceivedSnapshot implements ZeroHolderSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    account: ZeroHolder!
+    value: BigInt!
+}
+
+type ZeroSentSnapshot implements ZeroHolderSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    account: ZeroHolder!
+    value: BigInt!
+}
+
+type ZeroHolder @entity {
+    id: ID! @unique
+    address: String! @unique
+    balance: BigInt!
+    balanceSnapshots: [ZeroBalanceSnapshot!] @derivedFrom(field: "account")
+    delegatee: ZeroDelegatee!
+    delegateeSnapshots: [ZeroDelegateeSnapshot!] @derivedFrom(field: "account")
+    delegateChanged: [ZeroDelegateChanged!] @derivedFrom(field: "delegator")
+    transfersTo: [ZeroTransfer!] @derivedFrom(field: "recipient")
+    transfersFrom: [ZeroTransfer!] @derivedFrom(field: "sender")
+    received: BigInt!
+    receivedSnapshots: [ZeroReceivedSnapshot!] @derivedFrom(field: "account")
+    sent: BigInt!
+    sentSnapshots: [ZeroSentSnapshot!] @derivedFrom(field: "account")
+    claims: [Claim!] @derivedFrom(field: "claimant")
+    claimedEpochs: [ClaimedEpoch!] @derivedFrom(field: "claimant")
+    claimed: [Claimed!] @derivedFrom(field: "claimant")
+    claimedSnapshots: [ClaimedSnapshot!] @derivedFrom(field: "claimant")
+    lastUpdate: Timestamp!
+}
+
+type ZeroTotalSupplySnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type ZeroTotalMintedSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type ZeroToken @entity {
+    id: ID! @unique
+    holders: [ZeroHolder!]
+    delegatees: [ZeroDelegatee!]
+    totalSupply: BigInt!
+    totalSupplySnapshots: [ZeroTotalSupplySnapshot!]
+    transfers: [ZeroTransfer!]
+    totalMinted: BigInt!
+    totalMintedSnapshots: [ZeroTotalMintedSnapshot!]
+    lastUpdate: Timestamp!
+}

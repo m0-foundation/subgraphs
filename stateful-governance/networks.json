@@ -1,0 +1,32 @@
+{
+  "mainnet": {
+    "Registrar": {
+      "address": "0x119FbeeDD4F4f4298Fb59B720d5654442b81ae2c",
+      "startBlock": 19818431
+    },
+    "DistributionVault": {
+      "address": "0xd7298f620B0F752Cf41BD818a16C756d9dCAA34f",
+      "startBlock": 19818431
+    },
+    "EmergencyGovernor": {
+      "address": "0x886d405949F709bC3f4451491bDd07ff51Cdf90A",
+      "startBlock": 19818431
+    },
+    "StandardGovernor": {
+      "address": "0xB024aC5a7c6bC92fbACc8C3387E628a07e1Da016",
+      "startBlock": 19818431
+    },
+    "ZeroGovernor": {
+      "address": "0xa0DAFaEEA4A1d44534e1b9227e19CAE6358b80FE",
+      "startBlock": 19818431
+    },
+    "PowerToken": {
+      "address": "0x5983B89FA184f14917013B9C3062afD9434C5b03",
+      "startBlock": 19818431
+    },
+    "ZeroToken": {
+      "address": "0x988567FE094570cCE1FFdA29D1f2d842B70492be",
+      "startBlock": 19818431
+    }
+  }
+}
