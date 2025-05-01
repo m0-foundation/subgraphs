@@ -57,7 +57,7 @@ export function handleKeySet(event: KeySetEvent): void {
   createProtocolConfig(event)
 }
 
-const protocolUint256Keys = [
+const PROTOCOL_UINT256_KEYS = [
   "update_collateral_interval",
   "update_collateral_threshold",
   "penalty_rate",
@@ -69,7 +69,9 @@ const protocolUint256Keys = [
   "max_earner_rate",
 ]
 
-const protocolAddressKeys = ["minter_rate_model", "earner_rate_model"]
+const PROTOCOL_ADDRESS_KEYS = ["minter_rate_model", "earner_rate_model"]
+
+const PROTOCOL_GUIDANCE_KEY = "guidance"
 
 function createProtocolConfig(event: KeySetEvent): void {
   let entity = new ProtocolConfig(
@@ -77,10 +79,12 @@ function createProtocolConfig(event: KeySetEvent): void {
   )
   entity.key = safeDecodeBytes(event.params.key)
 
-  if (protocolUint256Keys.includes(entity.key)) {
+  if (PROTOCOL_UINT256_KEYS.includes(entity.key)) {
     entity.value = decodeUint256(event.params.value).toString()
-  } else if (protocolAddressKeys.includes(entity.key)) {
+  } else if (PROTOCOL_ADDRESS_KEYS.includes(entity.key)) {
     entity.value = event.params.value.toHexString().slice(26)
+  } else if (entity.key == PROTOCOL_GUIDANCE_KEY) {
+    entity.value = event.params.value.toHexString().slice(2)
   } else {
     entity.value = event.params.value.toHex()
   }
