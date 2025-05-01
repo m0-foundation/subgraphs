@@ -69,6 +69,8 @@ const protocolUint256Keys = [
   "max_earner_rate",
 ]
 
+const protocolAddressKeys = ["minter_rate_model", "earner_rate_model"]
+
 function createProtocolConfig(event: KeySetEvent): void {
   let entity = new ProtocolConfig(
     event.transaction.hash.concatI32(event.logIndex.toI32()),
@@ -77,6 +79,8 @@ function createProtocolConfig(event: KeySetEvent): void {
 
   if (protocolUint256Keys.includes(entity.key)) {
     entity.value = decodeUint256(event.params.value).toString()
+  } else if (protocolAddressKeys.includes(entity.key)) {
+    entity.value = event.params.value.toHexString().slice(26)
   } else {
     entity.value = event.params.value.toHex()
   }
