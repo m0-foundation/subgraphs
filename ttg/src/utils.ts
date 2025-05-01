@@ -58,3 +58,24 @@ export function handleProposalParticipation<T extends VoteCastEvent>(
 export function decodeUint256(value: Bytes): BigInt {
   return ethereum.decode("uint256", value)!.toBigInt()
 }
+
+export function safeDecodeBytes(value: Bytes): string {
+  let str = value.toString()
+
+  // Simple check: is at least 80% of characters printable?
+  let printable = 0
+  for (let i = 0; i < str.length; i++) {
+    let code = str.charCodeAt(i)
+    if (code >= 32 && code <= 126) {
+      printable++
+    }
+  }
+
+  let ratio = (printable * 100) / str.length
+  if (ratio < 80) {
+    // Fallback to hex if it's mostly garbage
+    return value.toHexString()
+  }
+
+  return str
+}

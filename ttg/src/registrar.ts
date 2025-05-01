@@ -9,7 +9,7 @@ import {
   KeySet,
   ProtocolConfig,
 } from "../generated/schema"
-import { decodeUint256 } from "./utils"
+import { decodeUint256, safeDecodeBytes } from "./utils"
 
 export function handleAddressAddedToList(event: AddressAddedToListEvent): void {
   let entity = new AddressAddedToList(
@@ -73,7 +73,7 @@ function createProtocolConfig(event: KeySetEvent): void {
   let entity = new ProtocolConfig(
     event.transaction.hash.concatI32(event.logIndex.toI32()),
   )
-  entity.key = event.params.key.toString()
+  entity.key = safeDecodeBytes(event.params.key)
 
   if (protocolUint256Keys.includes(entity.key)) {
     entity.value = decodeUint256(event.params.value).toString()
