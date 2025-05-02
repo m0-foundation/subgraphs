@@ -62,6 +62,10 @@ export function decodeUint256(value: Bytes): BigInt {
 export function safeDecodeBytes(value: Bytes): string {
   let str = value.toString()
 
+  if (str.length === 0) {
+    return value.toHexString()
+  }
+
   // Simple check: is at least 80% of characters printable?
   let printable = 0
   for (let i = 0; i < str.length; i++) {
