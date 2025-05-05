@@ -46,7 +46,6 @@ type PowerTokenDelegateVotesChanged @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-
 type PowerTokenNextCashTokenSet @entity(immutable: true) {
   id: Bytes!
   startingEpoch: Int! # uint16
@@ -55,8 +54,6 @@ type PowerTokenNextCashTokenSet @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
-
-
 
 type PowerTokenTargetSupplyInflated @entity(immutable: true) {
   id: Bytes!
@@ -122,7 +119,6 @@ type HasVotedOnAllProposal @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-
 type ProposalCreated @entity(immutable: true) {
   id: ID!
   proposalId: BigInt! # uint256
@@ -186,7 +182,6 @@ type VoteCast @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-
 type EmergencyGovernorProposalCreated @entity(immutable: true) {
   id: Bytes!
   proposalId: BigInt! # uint256
@@ -246,8 +241,6 @@ type AllowedCashTokensSet @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
-
-
 
 type ZeroGovernorProposalCreated @entity(immutable: true) {
   id: Bytes!
@@ -338,6 +331,17 @@ type KeySet @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+## ProtocolConfig is used to store protocol configuration with decoded key-value pairs.
+type ProtocolConfig @entity(immutable: true) {
+  id: Bytes!
+  key: String!
+  value: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
 type Claim @entity(immutable: true) {
   id: Bytes!
   token: Bytes! # address
