@@ -12,6 +12,10 @@ interface Token {
   try_balanceOf(account_: Address): ethereum.CallResult<BigInt>
 }
 
+const POWER_ADDRESS = Address.fromString(
+  "0x5983B89FA184f14917013B9C3062afD9434C5b03",
+)
+
 export function powerToken_balanceOf(
   tokenAddress: Address,
   accountAddress: Address,
@@ -20,11 +24,8 @@ export function powerToken_balanceOf(
   return balanceOf<PowerToken>(token, accountAddress)
 }
 
-export function powerToken_pastTotalSupply(
-  tokenAddress: Address,
-  epoch: BigInt,
-): BigInt {
-  let token = PowerToken.bind(tokenAddress) //bind token
+export function powerToken_pastTotalSupply(epoch: BigInt): BigInt {
+  let token = PowerToken.bind(POWER_ADDRESS)
   return token.pastTotalSupply(epoch)
 }
 
