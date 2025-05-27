@@ -93,6 +93,8 @@ dataSources:
       abis:
         - name: StandardGovernor
           file: ./abis/StandardGovernor.json
+        - name: PowerToken
+          file: ./abis/PowerToken.json
       eventHandlers:
         - event: CashTokenSet(indexed address)
           handler: handleCashTokenSet
@@ -129,6 +131,8 @@ dataSources:
       abis:
         - name: EmergencyGovernor
           file: ./abis/EmergencyGovernor.json
+        - name: PowerToken
+          file: ./abis/PowerToken.json
       eventHandlers:
         - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
           handler: handleProposalCreated
@@ -163,6 +167,8 @@ dataSources:
       abis:
         - name: ZeroGovernor
           file: ./abis/ZeroGovernor.json
+        - name: PowerToken
+          file: ./abis/PowerToken.json
       eventHandlers:
         - event: AllowedCashTokensSet(address[])
           handler: handleAllowedCashTokensSet
