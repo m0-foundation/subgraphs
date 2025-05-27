@@ -1,4 +1,4 @@
-import { BigInt, Bytes } from "@graphprotocol/graph-ts"
+import { BigInt } from "@graphprotocol/graph-ts"
 import {
   CashTokenSet as CashTokenSetEvent,
   HasVotedOnAllProposals as HasVotedOnAllProposalsEvent,
@@ -11,7 +11,6 @@ import {
 import {
   CashTokenSet,
   HasVotedOnAllProposal,
-  ProposalCreated,
   ProposalExecuted,
   ProposalFeeSentToVault,
   ProposalFeeSet,
@@ -19,6 +18,7 @@ import {
   ProposalParticipation,
 } from "../generated/schema"
 import {
+  createProposalCreatedEntity,
   handleProposalParticipation,
   powerToken_pastTotalSupply,
 } from "./utils"
@@ -53,23 +53,7 @@ export function handleHasVotedOnAllProposals(
 }
 
 export function handleProposalCreated(event: ProposalCreatedEvent): void {
-  let entity = new ProposalCreated(event.params.proposalId.toString())
-  entity.proposalId = event.params.proposalId
-  entity.proposer = event.params.proposer
-  // entity.targets = event.params.targets
-  entity.values = event.params.values
-  entity.signatures = event.params.signatures
-  entity.callDatas = event.params.callDatas
-  entity.voteStart = event.params.voteStart
-  entity.voteEnd = event.params.voteEnd
-  entity.description = event.params.description
-  entity.type = "standard"
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  createProposalCreatedEntity("standard", event)
 
   const proposalId = event.params.proposalId.toString()
   const participation = new ProposalParticipation(proposalId)

@@ -16,7 +16,10 @@ import {
   ThresholdRatioSet,
   VoteCast,
 } from "../generated/schema"
-import { handleProposalParticipation } from "./utils";
+import {
+  createProposalCreatedEntity,
+  handleProposalParticipation,
+} from "./utils"
 
 export function handleAllowedCashTokensSet(
   event: AllowedCashTokensSetEvent,
@@ -25,7 +28,7 @@ export function handleAllowedCashTokensSet(
     event.transaction.hash.concatI32(event.logIndex.toI32()),
   )
   // entity.allowedCashTokens = event.params.allowedCashTokens
-  entity.allowedCashTokens = [];
+  entity.allowedCashTokens = []
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
@@ -33,27 +36,8 @@ export function handleAllowedCashTokensSet(
   entity.save()
 }
 
-
 export function handleProposalCreated(event: ProposalCreatedEvent): void {
-  let entity = new ProposalCreated(
-    event.params.proposalId.toString(),
-  )
-  entity.proposalId = event.params.proposalId
-  entity.proposer = event.params.proposer
-  // entity.targets = event.params.targets
-  entity.values = event.params.values
-  entity.signatures = event.params.signatures
-  entity.callDatas = event.params.callDatas
-  entity.voteStart = event.params.voteStart
-  entity.voteEnd = event.params.voteEnd
-  entity.description = event.params.description
-  entity.type = "zero"
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  createProposalCreatedEntity("zero", event)
 }
 
 export function handleProposalExecuted(event: ProposalExecutedEvent): void {

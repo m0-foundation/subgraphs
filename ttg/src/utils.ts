@@ -1,8 +1,11 @@
 import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts"
 import { PowerToken } from "../generated/PowerToken/PowerToken"
 import { ZeroToken } from "../generated/ZeroToken/ZeroToken"
-import { ProposalParticipation } from "../generated/schema"
-import { VoteCast as VoteCastEvent } from "../generated/StandardGovernor/StandardGovernor"
+import { ProposalParticipation, ProposalCreated } from "../generated/schema"
+import {
+  VoteCast as VoteCastEvent,
+  ProposalCreated as ProposalCreatedEvent,
+} from "../generated/StandardGovernor/StandardGovernor"
 
 interface Token {
   balanceOf(account_: Address): BigInt
@@ -38,6 +41,31 @@ export function balanceOf<T extends Token>(
   accountAddress: Address,
 ): BigInt {
   return token.balanceOf(accountAddress)
+}
+
+export function createProposalCreatedEntity(
+  type: "emergency" | "standard" | "zero",
+  event: ProposalCreatedEvent,
+): ProposalCreated {
+  let entity = new ProposalCreated(event.params.proposalId.toString())
+  entity.type = type
+  entity.proposalId = event.params.proposalId
+  entity.proposer = event.params.proposer
+  // entity.targets = event.params.targets
+  entity.values = event.params.values
+  entity.signatures = event.params.signatures
+  entity.callDatas = event.params.callDatas
+  entity.voteStart = event.params.voteStart
+  entity.voteEnd = event.params.voteEnd
+  entity.description = event.params.description
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+
+  return entity
 }
 
 export function handleProposalParticipation<T extends VoteCastEvent>(
