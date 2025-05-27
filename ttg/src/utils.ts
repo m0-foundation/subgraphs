@@ -20,32 +20,11 @@ export function powerToken_balanceOf(
   return balanceOf<PowerToken>(token, accountAddress)
 }
 
-export function powerToken_pastTotalSupply(epoch: BigInt): BigInt {
+export function powerToken_currentTotalSupply(): BigInt {
   let token = PowerToken.bind(
     Address.fromString("0x5983B89FA184f14917013B9C3062afD9434C5b03"),
   )
-  const supply_result = token.try_totalSupply()
-
-  if (supply_result.reverted) {
-    log.warning("powerToken_totalSupply reverted for epoch {} at address {}", [
-      epoch.toString(),
-      token._address.toHexString(),
-    ])
-
-    const test = token.try_name()
-    if (test.reverted) {
-      log.warning("powerToken_name reverted for epoch {} at address {}", [
-        epoch.toString(),
-        token._address.toHexString(),
-      ])
-    } else {
-      log.warning("powerToken_name: {}", [test.value])
-    }
-
-    return BigInt.fromI32(1)
-  }
-
-  return supply_result.value
+  return token.totalSupply()
 }
 
 export function zeroToken_balanceOf(
@@ -72,10 +51,8 @@ export function createProposalParticipationEntity(
   participation.yesVotes = new BigInt(0)
   participation.noVotes = new BigInt(0)
 
-  // Use the voteStart minus one to get the total supply at the start of the voting period
-  // current epoch may already finished and inflation may have occurred
-  const targetEpoch = proposalVoteStart.minus(new BigInt(1))
-  participation.totalSupply = powerToken_pastTotalSupply(targetEpoch)
+  // get the current total supply of the power token
+  participation.totalSupply = powerToken_currentTotalSupply()
 
   participation.save()
 }
