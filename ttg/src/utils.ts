@@ -17,6 +17,14 @@ export function powerToken_balanceOf(
   return balanceOf<PowerToken>(token, accountAddress)
 }
 
+export function powerToken_pastTotalSupply(
+  tokenAddress: Address,
+  epoch: BigInt,
+): BigInt {
+  let token = PowerToken.bind(tokenAddress) //bind token
+  return token.pastTotalSupply(epoch)
+}
+
 export function zeroToken_balanceOf(
   tokenAddress: Address,
   accountAddress: Address,
