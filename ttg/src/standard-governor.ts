@@ -1,4 +1,3 @@
-import { BigInt, Bytes } from "@graphprotocol/graph-ts"
 import {
   CashTokenSet as CashTokenSetEvent,
   HasVotedOnAllProposals as HasVotedOnAllProposalsEvent,
@@ -16,9 +15,11 @@ import {
   ProposalFeeSentToVault,
   ProposalFeeSet,
   VoteCast,
-  ProposalParticipation,
 } from "../generated/schema"
-import { handleProposalParticipation } from "./utils"
+import {
+  createProposalParticipationEntity,
+  handleProposalParticipation,
+} from "./utils"
 
 export function handleCashTokenSet(event: CashTokenSetEvent): void {
   let entity = new CashTokenSet(
@@ -33,13 +34,11 @@ export function handleCashTokenSet(event: CashTokenSetEvent): void {
   entity.save()
 }
 
-
-
 export function handleHasVotedOnAllProposals(
-  event: HasVotedOnAllProposalsEvent
+  event: HasVotedOnAllProposalsEvent,
 ): void {
   let entity = new HasVotedOnAllProposal(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
   )
   entity.voter = event.params.voter
   entity.currentEpoch = event.params.currentEpoch
@@ -52,9 +51,9 @@ export function handleHasVotedOnAllProposals(
 }
 
 export function handleProposalCreated(event: ProposalCreatedEvent): void {
-  let entity = new ProposalCreated(
-    event.params.proposalId.toString(),
-  )
+  const proposalId = event.params.proposalId.toString()
+
+  let entity = new ProposalCreated(proposalId)
   entity.proposalId = event.params.proposalId
   entity.proposer = event.params.proposer
   // entity.targets = event.params.targets
@@ -72,12 +71,7 @@ export function handleProposalCreated(event: ProposalCreatedEvent): void {
 
   entity.save()
 
-  const proposalId = event.params.proposalId.toString();
-  const participation = new ProposalParticipation(proposalId)
-  participation.proposal = proposalId
-  participation.yesVotes = new BigInt(0)
-  participation.noVotes = new BigInt(0)
-  participation.save()
+  createProposalParticipationEntity(proposalId, entity.voteStart)
 }
 
 export function handleProposalExecuted(event: ProposalExecutedEvent): void {

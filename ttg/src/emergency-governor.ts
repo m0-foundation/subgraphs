@@ -12,14 +12,15 @@ import {
   ThresholdRatioSet,
   VoteCast,
 } from "../generated/schema"
-import { handleProposalParticipation } from "./utils"
-
-
+import {
+  createProposalParticipationEntity,
+  handleProposalParticipation,
+} from "./utils"
 
 export function handleProposalCreated(event: ProposalCreatedEvent): void {
-  let entity = new ProposalCreated(
-    event.params.proposalId.toString(),
-  )
+  const proposalId = event.params.proposalId.toString()
+
+  let entity = new ProposalCreated(proposalId)
   entity.proposalId = event.params.proposalId
   entity.proposer = event.params.proposer
   // entity.targets = event.params.targets
@@ -36,6 +37,8 @@ export function handleProposalCreated(event: ProposalCreatedEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  createProposalParticipationEntity(proposalId, entity.voteStart)
 }
 
 export function handleProposalExecuted(event: ProposalExecutedEvent): void {
