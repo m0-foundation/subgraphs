@@ -12,10 +12,6 @@ interface Token {
   try_balanceOf(account_: Address): ethereum.CallResult<BigInt>
 }
 
-const POWER_ADDRESS = Address.fromString(
-  "0x5983B89FA184f14917013B9C3062afD9434C5b03",
-)
-
 export function powerToken_balanceOf(
   tokenAddress: Address,
   accountAddress: Address,
@@ -25,16 +21,28 @@ export function powerToken_balanceOf(
 }
 
 export function powerToken_pastTotalSupply(epoch: BigInt): BigInt {
-  let token = PowerToken.bind(POWER_ADDRESS)
-  const supply_result = token.try_pastTotalSupply(epoch)
+  let token = PowerToken.bind(
+    Address.fromString("0x5983B89FA184f14917013B9C3062afD9434C5b03"),
+  )
+  const supply_result = token.try_totalSupply()
 
   if (supply_result.reverted) {
-    log.debug(
-      "powerToken_pastTotalSupply reverted for epoch {} at address {}",
-      [epoch.toString(), POWER_ADDRESS.toHexString()],
-    )
+    log.warning("powerToken_totalSupply reverted for epoch {} at address {}", [
+      epoch.toString(),
+      token._address.toHexString(),
+    ])
 
-    return new BigInt(1000000)
+    const test = token.try_name()
+    if (test.reverted) {
+      log.warning("powerToken_name reverted for epoch {} at address {}", [
+        epoch.toString(),
+        token._address.toHexString(),
+      ])
+    } else {
+      log.warning("powerToken_name: {}", [test.value])
+    }
+
+    return BigInt.fromI32(1)
   }
 
   return supply_result.value
