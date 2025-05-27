@@ -9,7 +9,6 @@ import {
 } from "../generated/ZeroGovernor/ZeroGovernor"
 import {
   AllowedCashTokensSet,
-  ProposalCreated,
   ProposalExecuted,
   QuorumNumeratorUpdated,
   ResetExecuted,

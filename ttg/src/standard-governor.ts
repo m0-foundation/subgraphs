@@ -1,4 +1,3 @@
-import { BigInt } from "@graphprotocol/graph-ts"
 import {
   CashTokenSet as CashTokenSetEvent,
   HasVotedOnAllProposals as HasVotedOnAllProposalsEvent,
@@ -15,12 +14,10 @@ import {
   ProposalFeeSentToVault,
   ProposalFeeSet,
   VoteCast,
-  ProposalParticipation,
 } from "../generated/schema"
 import {
   createProposalCreatedEntity,
   handleProposalParticipation,
-  powerToken_pastTotalSupply,
 } from "./utils"
 
 export function handleCashTokenSet(event: CashTokenSetEvent): void {

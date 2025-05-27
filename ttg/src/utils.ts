@@ -45,10 +45,14 @@ export function balanceOf<T extends Token>(
 }
 
 export function createProposalCreatedEntity(
-  type: "emergency" | "standard" | "zero",
+  type: string,
   event: ProposalCreatedEvent,
-): { proposal: ProposalCreated; participation: ProposalParticipation } {
+): void {
   const proposalId = event.params.proposalId.toString()
+
+  if (!["zero", "emergency", "standard"].includes(type)) {
+    throw new Error("Proposal type must be specified")
+  }
 
   let proposal = new ProposalCreated(proposalId)
   proposal.type = type
@@ -80,8 +84,6 @@ export function createProposalCreatedEntity(
   participation.totalSupply = powerToken_pastTotalSupply(targetEpoch)
 
   participation.save()
-
-  return { proposal, participation }
 }
 
 export function handleProposalParticipation<T extends VoteCastEvent>(
