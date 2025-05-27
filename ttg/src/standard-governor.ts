@@ -54,19 +54,6 @@ export function handleHasVotedOnAllProposals(
 
 export function handleProposalCreated(event: ProposalCreatedEvent): void {
   createProposalCreatedEntity("standard", event)
-
-  const proposalId = event.params.proposalId.toString()
-  const participation = new ProposalParticipation(proposalId)
-  participation.proposal = proposalId
-  participation.yesVotes = new BigInt(0)
-  participation.noVotes = new BigInt(0)
-
-  // Use the voteStart minus one to get the total supply at the start of the voting period
-  // current epoch may already finished and inflation may have occurred
-  const targetEpoch = event.params.voteStart.minus(new BigInt(1))
-  participation.totalSupply = powerToken_pastTotalSupply(targetEpoch)
-
-  participation.save()
 }
 
 export function handleProposalExecuted(event: ProposalExecutedEvent): void {

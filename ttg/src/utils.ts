@@ -47,26 +47,41 @@ export function balanceOf<T extends Token>(
 export function createProposalCreatedEntity(
   type: "emergency" | "standard" | "zero",
   event: ProposalCreatedEvent,
-): ProposalCreated {
-  let entity = new ProposalCreated(event.params.proposalId.toString())
-  entity.type = type
-  entity.proposalId = event.params.proposalId
-  entity.proposer = event.params.proposer
-  // entity.targets = event.params.targets
-  entity.values = event.params.values
-  entity.signatures = event.params.signatures
-  entity.callDatas = event.params.callDatas
-  entity.voteStart = event.params.voteStart
-  entity.voteEnd = event.params.voteEnd
-  entity.description = event.params.description
+): { proposal: ProposalCreated; participation: ProposalParticipation } {
+  const proposalId = event.params.proposalId.toString()
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
+  let proposal = new ProposalCreated(proposalId)
+  proposal.type = type
+  proposal.proposalId = event.params.proposalId
+  proposal.proposer = event.params.proposer
+  // proposal.targets = event.params.targets
+  proposal.values = event.params.values
+  proposal.signatures = event.params.signatures
+  proposal.callDatas = event.params.callDatas
+  proposal.voteStart = event.params.voteStart
+  proposal.voteEnd = event.params.voteEnd
+  proposal.description = event.params.description
 
-  entity.save()
+  proposal.blockNumber = event.block.number
+  proposal.blockTimestamp = event.block.timestamp
+  proposal.transactionHash = event.transaction.hash
 
-  return entity
+  proposal.save()
+
+  // Create a participation entity for the proposal
+  let participation = new ProposalParticipation(proposalId)
+  participation.proposal = proposalId
+  participation.yesVotes = new BigInt(0)
+  participation.noVotes = new BigInt(0)
+
+  // Use the voteStart minus one to get the total supply at the start of the voting period
+  // current epoch may already finished and inflation may have occurred
+  const targetEpoch = proposal.voteStart.minus(new BigInt(1))
+  participation.totalSupply = powerToken_pastTotalSupply(targetEpoch)
+
+  participation.save()
+
+  return { proposal, participation }
 }
 
 export function handleProposalParticipation<T extends VoteCastEvent>(
@@ -77,10 +92,9 @@ export function handleProposalParticipation<T extends VoteCastEvent>(
   let participation = ProposalParticipation.load(proposalId)
 
   if (!participation) {
-    participation = new ProposalParticipation(proposalId)
-    participation.proposal = proposalId
-    participation.yesVotes = new BigInt(0)
-    participation.noVotes = new BigInt(0)
+    throw new Error(
+      `Participation entity not found for proposal ID: ${proposalId}`,
+    )
   }
 
   if (event.params.support) {
