@@ -142,6 +142,7 @@ type ProposalParticipation @entity {
   proposal: ProposalCreated!
   yesVotes: BigInt! # uint256
   noVotes: BigInt! # uint256
+  totalSupply: BigInt! # uint256
 }
 
 type ProposalExecuted @entity(immutable: true) {
