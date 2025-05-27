@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts"
+import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts"
 import { PowerToken } from "../generated/PowerToken/PowerToken"
 import { ZeroToken } from "../generated/ZeroToken/ZeroToken"
 import { ProposalParticipation, ProposalCreated } from "../generated/schema"
@@ -26,7 +26,18 @@ export function powerToken_balanceOf(
 
 export function powerToken_pastTotalSupply(epoch: BigInt): BigInt {
   let token = PowerToken.bind(POWER_ADDRESS)
-  return token.pastTotalSupply(epoch)
+  const supply_result = token.try_pastTotalSupply(epoch)
+
+  if (supply_result.reverted) {
+    log.debug(
+      "powerToken_pastTotalSupply reverted for epoch {} at address {}",
+      [epoch.toString(), POWER_ADDRESS.toHexString()],
+    )
+
+    return new BigInt(1000000)
+  }
+
+  return supply_result.value
 }
 
 export function zeroToken_balanceOf(
