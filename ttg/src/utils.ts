@@ -44,35 +44,10 @@ export function balanceOf<T extends Token>(
   return token.balanceOf(accountAddress)
 }
 
-export function createProposalCreatedEntity(
-  type: string,
-  event: ProposalCreatedEvent,
+export function createProposalParticipationEntity(
+  proposalId: string,
+  proposalVoteStart: BigInt,
 ): void {
-  const proposalId = event.params.proposalId.toString()
-
-  if (!["zero", "emergency", "standard"].includes(type)) {
-    throw new Error("Proposal type must be specified")
-  }
-
-  let proposal = new ProposalCreated(proposalId)
-  proposal.type = type
-  proposal.proposalId = event.params.proposalId
-  proposal.proposer = event.params.proposer
-  // proposal.targets = event.params.targets
-  proposal.values = event.params.values
-  proposal.signatures = event.params.signatures
-  proposal.callDatas = event.params.callDatas
-  proposal.voteStart = event.params.voteStart
-  proposal.voteEnd = event.params.voteEnd
-  proposal.description = event.params.description
-
-  proposal.blockNumber = event.block.number
-  proposal.blockTimestamp = event.block.timestamp
-  proposal.transactionHash = event.transaction.hash
-
-  proposal.save()
-
-  // Create a participation entity for the proposal
   let participation = new ProposalParticipation(proposalId)
   participation.proposal = proposalId
   participation.yesVotes = new BigInt(0)
@@ -80,7 +55,7 @@ export function createProposalCreatedEntity(
 
   // Use the voteStart minus one to get the total supply at the start of the voting period
   // current epoch may already finished and inflation may have occurred
-  const targetEpoch = proposal.voteStart.minus(new BigInt(1))
+  const targetEpoch = proposalVoteStart.minus(new BigInt(1))
   participation.totalSupply = powerToken_pastTotalSupply(targetEpoch)
 
   participation.save()
