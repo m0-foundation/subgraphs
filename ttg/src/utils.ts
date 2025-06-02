@@ -1,8 +1,11 @@
-import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts"
+import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts"
 import { PowerToken } from "../generated/PowerToken/PowerToken"
 import { ZeroToken } from "../generated/ZeroToken/ZeroToken"
-import { ProposalParticipation } from "../generated/schema"
-import { VoteCast as VoteCastEvent } from "../generated/StandardGovernor/StandardGovernor"
+import { ProposalParticipation, ProposalCreated } from "../generated/schema"
+import {
+  VoteCast as VoteCastEvent,
+  ProposalCreated as ProposalCreatedEvent,
+} from "../generated/StandardGovernor/StandardGovernor"
 
 interface Token {
   balanceOf(account_: Address): BigInt
@@ -15,6 +18,13 @@ export function powerToken_balanceOf(
 ): BigInt {
   let token = PowerToken.bind(tokenAddress) //bind token
   return balanceOf<PowerToken>(token, accountAddress)
+}
+
+export function powerToken_currentTotalSupply(): BigInt {
+  let token = PowerToken.bind(
+    Address.fromString("0x5983B89FA184f14917013B9C3062afD9434C5b03"),
+  )
+  return token.totalSupply()
 }
 
 export function zeroToken_balanceOf(
@@ -32,6 +42,21 @@ export function balanceOf<T extends Token>(
   return token.balanceOf(accountAddress)
 }
 
+export function createProposalParticipationEntity(
+  proposalId: string,
+  proposalVoteStart: BigInt,
+): void {
+  let participation = new ProposalParticipation(proposalId)
+  participation.proposal = proposalId
+  participation.yesVotes = new BigInt(0)
+  participation.noVotes = new BigInt(0)
+
+  // get the current total supply of the power token
+  participation.totalSupply = powerToken_currentTotalSupply()
+
+  participation.save()
+}
+
 export function handleProposalParticipation<T extends VoteCastEvent>(
   event: T,
 ): void {
@@ -40,10 +65,9 @@ export function handleProposalParticipation<T extends VoteCastEvent>(
   let participation = ProposalParticipation.load(proposalId)
 
   if (!participation) {
-    participation = new ProposalParticipation(proposalId)
-    participation.proposal = proposalId
-    participation.yesVotes = new BigInt(0)
-    participation.noVotes = new BigInt(0)
+    throw new Error(
+      `Participation entity not found for proposal ID: ${proposalId}`,
+    )
   }
 
   if (event.params.support) {
