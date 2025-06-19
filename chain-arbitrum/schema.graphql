@@ -1,0 +1,43 @@
+type Token @entity {
+  id: ID!
+  name: String!
+  symbol: String!
+  decimals: Int!
+  totalSupply: BigInt!
+  indexUpdates: [IndexUpdate!]! @derivedFrom(field: "token")
+  totalSupplySnapshots: [TotalSupplySnapshot!]! @derivedFrom(field: "token")
+  transfers: [Transfer!]! @derivedFrom(field: "token")
+}
+
+type IndexUpdate @entity(immutable: true) {
+  id: Bytes!
+  token: Token!
+  index: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Transfer @entity(immutable: true) {
+  id: Bytes!
+  token: Token!
+  from: Bytes!
+  to: Bytes!
+  value: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  # Type of transfer: "mint", "burn", "transfer"
+  transferType: String!
+}
+
+type TotalSupplySnapshot @entity(immutable: true) {
+  id: Bytes!
+  token: Token!
+  totalSupply: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  # Reason for the snapshot: "index_update", "mint", "burn"
+  reason: String!
+} 
