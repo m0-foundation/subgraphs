@@ -1,6 +1,6 @@
-# 
+#
 # MinterGateway events
-# 
+#
 type BurnExecuted @entity(immutable: true) {
   id: Bytes!
   minter: Bytes! # address
@@ -132,33 +132,41 @@ type UndercollateralizedPenaltyImposed @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
-# 
+#
 # MinterGateway - NON events entities - timeseries - updated by handleNewBlock
-# 
+#
 type PrincipalOfTotalActiveOwedM @entity(immutable: true) {
   id: Bytes!
-  amount: BigInt! 
+  amount: BigInt!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
 }
 
 type TotalOwedM @entity(immutable: true) {
   id: Bytes!
-  amount: BigInt! 
+  amount: BigInt!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
 }
 
 type TotalActiveOwedM @entity(immutable: true) {
   id: Bytes!
-  amount: BigInt! 
+  amount: BigInt!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
 }
 
+type TotalActiveOwedMDailySnapshot @entity(immutable: false) {
+  id: String!
+  amount: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  timestamp: BigInt!
+}
+
 type TotalInactiveOwedM @entity(immutable: true) {
   id: Bytes!
-  amount: BigInt! 
+  amount: BigInt!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
 }
@@ -166,47 +174,47 @@ type TotalInactiveOwedM @entity(immutable: true) {
 # The difference between total owed M and M token total supply.
 type TotalExcessOwedM @entity(immutable: true) {
   id: Bytes!
-  amount: BigInt! 
+  amount: BigInt!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
 }
-# 
+#
 # Minter Entitites
-# 
-type MinterActiveOwedMOf @entity(immutable: true){
+#
+type MinterActiveOwedMOf @entity(immutable: true) {
   id: String!
   minter: Bytes! # address
-  amount: BigInt! 
+  amount: BigInt!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
 }
 
-type MinterInactiveOwedMOf @entity(immutable: true){
+type MinterInactiveOwedMOf @entity(immutable: true) {
   id: String!
   minter: Bytes! # address
-  amount: BigInt! 
+  amount: BigInt!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
 }
 
-type MinterPrincipalOfActiveOwedMOf @entity(immutable: true){
+type MinterPrincipalOfActiveOwedMOf @entity(immutable: true) {
   id: String!
   minter: Bytes! # address
-  amount: BigInt! 
+  amount: BigInt!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
 }
 
-type MinterCollateralOf @entity(immutable: true){
+type MinterCollateralOf @entity(immutable: true) {
   id: String!
   minter: Bytes! # address
-  amount: BigInt! 
+  amount: BigInt!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
 }
-# 
+#
 # M token special events
-# 
+#
 type MTokenAuthorizationCanceled @entity(immutable: true) {
   id: Bytes!
   authorizer: Bytes! # address
