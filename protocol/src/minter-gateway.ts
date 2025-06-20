@@ -329,6 +329,12 @@ function createTotalActiveOwedMDailySnapshot(
     entity.blockTimestamp = block.timestamp;
     entity.timestamp = day.times(SECONDS_PER_DAY); // Convert day to timestamp
     entity.save();
+  } else {
+    existing.amount = amount;
+    existing.blockNumber = block.number;
+    existing.blockTimestamp = block.timestamp;
+    existing.timestamp = day.times(SECONDS_PER_DAY); // Convert day to timestamp
+    existing.save();
   }
 }
 
