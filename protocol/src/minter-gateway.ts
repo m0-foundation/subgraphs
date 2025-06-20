@@ -308,22 +308,25 @@ export function handleTotalActiveOwedM(block: ethereum.Block): void {
   let contract = MinterGatewayContract.bind(dataSource.address());
   let amount = contract.totalActiveOwedM();
   let entity = new TotalActiveOwedM(block.hash);
-  entity = createTimeseriesEntity<TotalActiveOwedM>(entity, amount, block);
+  createTimeseriesEntity<TotalActiveOwedM>(entity, amount, block);
 
-  createTotalActiveOwedMDailySnapshot(entity);
+  createTotalActiveOwedMDailySnapshot(amount, block);
 }
 
-function createTotalActiveOwedMDailySnapshot(owedM: TotalActiveOwedM): void {
-  let day = dayFromTimestamp(owedM.blockTimestamp);
+function createTotalActiveOwedMDailySnapshot(
+  amount: BigInt,
+  block: ethereum.Block
+): void {
+  let day = dayFromTimestamp(block.timestamp);
   const id = day.toString();
 
   let existing = TotalActiveOwedMDailySnapshot.load(id);
 
   if (existing == null) {
     let entity = new TotalActiveOwedMDailySnapshot(id);
-    entity.amount = owedM.amount;
-    entity.blockNumber = owedM.blockNumber;
-    entity.blockTimestamp = owedM.blockTimestamp;
+    entity.amount = amount;
+    entity.blockNumber = block.number;
+    entity.blockTimestamp = block.timestamp;
     entity.timestamp = day.times(SECONDS_PER_DAY); // Convert day to timestamp
     entity.save();
   }
