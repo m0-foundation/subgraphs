@@ -157,7 +157,7 @@ type TotalActiveOwedM @entity(immutable: true) {
 }
 
 type TotalActiveOwedMDailySnapshot @entity(immutable: true) {
-  id: Bytes!
+  id: String!
   amount: BigInt!
   blockNumber: BigInt!
   blockTimestamp: BigInt!

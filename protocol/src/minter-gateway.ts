@@ -315,10 +315,12 @@ export function handleTotalActiveOwedM(block: ethereum.Block): void {
 
 function createTotalActiveOwedMDailySnapshot(owedM: TotalActiveOwedM): void {
   let day = dayFromTimestamp(owedM.blockTimestamp);
-  let existing = TotalActiveOwedMDailySnapshot.load(owedM.id);
+  const id = day.toString();
+
+  let existing = TotalActiveOwedMDailySnapshot.load(id);
 
   if (existing == null) {
-    let entity = new TotalActiveOwedMDailySnapshot(owedM.id);
+    let entity = new TotalActiveOwedMDailySnapshot(id);
     entity.amount = owedM.amount;
     entity.blockNumber = owedM.blockNumber;
     entity.blockTimestamp = owedM.blockTimestamp;
