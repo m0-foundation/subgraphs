@@ -321,19 +321,20 @@ function createTotalActiveOwedMDailySnapshot(
   const id = day.toString();
 
   let existing = TotalActiveOwedMDailySnapshot.load(id);
+  const timestamp = day.times(SECONDS_PER_DAY); // Convert day to timestamp
 
   if (existing == null) {
     let entity = new TotalActiveOwedMDailySnapshot(id);
     entity.amount = amount;
     entity.blockNumber = block.number;
     entity.blockTimestamp = block.timestamp;
-    entity.timestamp = day.times(SECONDS_PER_DAY); // Convert day to timestamp
+    entity.timestamp = timestamp;
     entity.save();
   } else {
     existing.amount = amount;
     existing.blockNumber = block.number;
     existing.blockTimestamp = block.timestamp;
-    existing.timestamp = day.times(SECONDS_PER_DAY); // Convert day to timestamp
+    existing.timestamp = timestamp;
     existing.save();
   }
 }
