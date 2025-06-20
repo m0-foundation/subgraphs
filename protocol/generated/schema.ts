@@ -1985,6 +1985,19 @@ export class TotalActiveOwedMDailySnapshot extends Entity {
   set blockTimestamp(value: BigInt) {
     this.set("blockTimestamp", Value.fromBigInt(value));
   }
+
+  get dayTimestamp(): BigInt {
+    let value = this.get("dayTimestamp");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set dayTimestamp(value: BigInt) {
+    this.set("dayTimestamp", Value.fromBigInt(value));
+  }
 }
 
 export class TotalInactiveOwedM extends Entity {
