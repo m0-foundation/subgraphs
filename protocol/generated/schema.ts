@@ -1986,8 +1986,8 @@ export class TotalActiveOwedMDailySnapshot extends Entity {
     this.set("blockTimestamp", Value.fromBigInt(value));
   }
 
-  get dayTimestamp(): BigInt {
-    let value = this.get("dayTimestamp");
+  get timestamp(): BigInt {
+    let value = this.get("timestamp");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -1995,8 +1995,8 @@ export class TotalActiveOwedMDailySnapshot extends Entity {
     }
   }
 
-  set dayTimestamp(value: BigInt) {
-    this.set("dayTimestamp", Value.fromBigInt(value));
+  set timestamp(value: BigInt) {
+    this.set("timestamp", Value.fromBigInt(value));
   }
 }
 

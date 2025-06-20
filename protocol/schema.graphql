@@ -161,7 +161,7 @@ type TotalActiveOwedMDailySnapshot @entity(immutable: true) {
   amount: BigInt!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
-  dayTimestamp: BigInt!
+  timestamp: BigInt!
 }
 
 type TotalInactiveOwedM @entity(immutable: true) {

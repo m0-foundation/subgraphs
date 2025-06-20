@@ -43,7 +43,7 @@ import {
   MinterCollateralOf,
 } from "../generated/schema";
 
-import { dayFromTimestamp } from "./utils";
+import { dayFromTimestamp, SECONDS_PER_DAY } from "./utils";
 
 export function handleBurnExecutedActiveOwedM(event: BurnExecutedEvent): void {
   let entity = new BurnExecuted(
@@ -322,7 +322,7 @@ function createTotalActiveOwedMDailySnapshot(owedM: TotalActiveOwedM): void {
     entity.amount = owedM.amount;
     entity.blockNumber = owedM.blockNumber;
     entity.blockTimestamp = owedM.blockTimestamp;
-    entity.dayTimestamp = day;
+    entity.timestamp = day.times(SECONDS_PER_DAY); // Convert day to timestamp
     entity.save();
   }
 }
