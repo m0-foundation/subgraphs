@@ -320,23 +320,16 @@ function createTotalActiveOwedMDailySnapshot(
   let day = dayFromTimestamp(block.timestamp);
   const id = day.toString();
 
-  let existing = TotalActiveOwedMDailySnapshot.load(id);
-  const timestamp = day.times(SECONDS_PER_DAY); // Convert day to timestamp
+  // Update or create the TotalActiveOwedMDailySnapshot entity
+  const existing = TotalActiveOwedMDailySnapshot.load(id);
+  const entity: TotalActiveOwedMDailySnapshot =
+    existing == null ? new TotalActiveOwedMDailySnapshot(id) : existing;
 
-  if (existing == null) {
-    let entity = new TotalActiveOwedMDailySnapshot(id);
-    entity.amount = amount;
-    entity.blockNumber = block.number;
-    entity.blockTimestamp = block.timestamp;
-    entity.timestamp = timestamp;
-    entity.save();
-  } else {
-    existing.amount = amount;
-    existing.blockNumber = block.number;
-    existing.blockTimestamp = block.timestamp;
-    existing.timestamp = timestamp;
-    existing.save();
-  }
+  entity.amount = amount;
+  entity.blockNumber = block.number;
+  entity.blockTimestamp = block.timestamp;
+  entity.timestamp = day.times(SECONDS_PER_DAY); // Convert day to timestamp
+  entity.save();
 }
 
 export function handleTotalInactiveOwedM(block: ethereum.Block): void {
