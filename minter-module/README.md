@@ -1,3 +1,12 @@
+# Deployment
+```
+graph deploy minter-module-mainnet \
+--version-label 1.0.0 \
+--node https://subgraphs.alchemy.com/api/subgraphs/deploy \
+--deploy-key <XXXXXXX>
+--ipfs https://ipfs.satsuma.xyz
+```
+
 # Deployed Sub Graph
 https://subgraph.satsuma-prod.com/the-things-team--3422500/minter-module-mainnet/playground
 
