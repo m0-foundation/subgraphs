@@ -1,0 +1,16 @@
+type DailyAccruedMinterRate @entity {
+  id: ID! @unique
+  date: String!
+  owedMStartOfDay: BigInt!
+  owedMEndOfDay: BigInt!
+  dailyTotalBurnAmount: BigInt!
+  dailyTotalMintAmount: BigInt!
+  dailyTotalPenaltyAmount: BigInt!
+  minter: String!
+  accruedMinterRate: BigInt!
+}
+
+type ActiveMinterList @entity {
+  id: ID! @unique
+  minterAddresses: [String!]!
+}

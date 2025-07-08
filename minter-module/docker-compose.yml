@@ -1,0 +1,6 @@
+version: "3"
+services:
+  nodejs:
+    image: node:alpine3.22
+    volumes:
+      - ./:/var/www/html:rw,cached

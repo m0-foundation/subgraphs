@@ -1,0 +1,41 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: MinterGateway
+    network: mainnet
+    source:
+      abi: MinterGateway
+      address: "0xf7f9638cb444D65e5A40bF5ff98ebE4ff319F04E"
+      startBlock: 19818438
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - DailyAccruedMinterRate
+        - ActiveMinterList
+      abis:
+        - name: MinterGateway
+          file: ./abis/MinterGateway.json
+      eventHandlers:
+        - event: MintExecuted(indexed uint48,indexed address,uint112,uint240)
+          handler: handleMintExecuted
+        - event: BurnExecuted(indexed address,uint112,uint240,indexed address)
+          handler: handleActiveBurn
+        - event: BurnExecuted(indexed address,uint240,indexed address)
+          handler: handleInactiveBurn
+        - event: MinterActivated(indexed address,indexed address)
+          handler: handleMinterActivated
+        - event: MinterDeactivated(indexed address,uint240,indexed address)
+          handler: handleMinterDeactivated
+        - event: MissedIntervalsPenaltyImposed(indexed address,uint40,uint240)
+          handler: handleMissedIntervalsPenaltyImposed
+        - event: UndercollateralizedPenaltyImposed(indexed address,uint240,uint40,uint240)
+          handler: handleUndercollateralizedPenaltyImposed
+      blockHandlers:
+        - handler: handleBlock
+      file: ./src/minter-gateway.ts
