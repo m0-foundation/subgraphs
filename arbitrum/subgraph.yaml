@@ -10,7 +10,7 @@ dataSources:
       source:
           abi: WrappedMToken
           address: '0x437cc33344a0b27a429f795ff6b469c72698b291'
-          startBlock: 20527882
+          startBlock: 307758620
       mapping:
           kind: ethereum/events
           apiVersion: 0.0.7
@@ -66,7 +66,7 @@ dataSources:
       source:
           abi: MToken
           address: '0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b'
-          startBlock: 19818438
+          startBlock: 307758493
       mapping:
           kind: ethereum/events
           apiVersion: 0.0.7
