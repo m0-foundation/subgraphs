@@ -6,7 +6,7 @@ schema:
 dataSources:
     - kind: ethereum
       name: WrappedMToken
-      network: mainnet
+      network: arbitrum-one
       source:
           abi: WrappedMToken
           address: '0x437cc33344a0b27a429f795ff6b469c72698b291'
@@ -62,7 +62,7 @@ dataSources:
           file: ./src/wrapped-m-token.ts
     - kind: ethereum
       name: MToken
-      network: mainnet
+      network: arbitrum-one
       source:
           abi: MToken
           address: '0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b'
