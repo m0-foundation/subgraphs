@@ -79,6 +79,6 @@ dataSources:
               - name: MToken
                 file: ./abis/MToken.json
           eventHandlers:
-              - event: IndexUpdated(indexed uint128,indexed uint32)
+              - event: IndexUpdated(indexed uint128)
                 handler: handleIndexUpdated
           file: ./src/wrapped-m-token.ts

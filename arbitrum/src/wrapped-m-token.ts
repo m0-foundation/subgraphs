@@ -219,7 +219,7 @@ export function handleIndexUpdated(event: IndexUpdatedEvent): void {
     const mToken = getMToken();
     const timestamp = event.block.timestamp.toI32();
 
-    _updateIndex(mToken, timestamp, event.params.index, event.params.rate);
+    _updateIndex(mToken, timestamp, event.params.index);
 
     mToken.lastUpdate = timestamp;
     mToken.save();
@@ -716,7 +716,7 @@ function _transfer(
     updateReceivedSnapshot(recipient, timestamp, recipient.received);
 }
 
-function _updateIndex(mToken: MToken, timestamp: Timestamp, index: BigInt, rate: BigInt): void {
+function _updateIndex(mToken: MToken, timestamp: Timestamp, index: BigInt): void {
     mToken.latestIndex = index;
     mToken.latestUpdateTimestamp = timestamp;
 
