@@ -73,7 +73,6 @@ dataSources:
           language: wasm/assemblyscript
           entities:
               - LatestIndexSnapshot
-              - LatestRateSnapshot
               - LatestUpdateTimestampSnapshot
               - MToken
           abis:

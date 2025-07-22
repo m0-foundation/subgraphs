@@ -11,7 +11,6 @@ import {
     IsEarningSnapshot,
     LastIndexSnapshot,
     LatestIndexSnapshot,
-    LatestRateSnapshot,
     LatestUpdateTimestampSnapshot,
     Migration,
     MToken,
@@ -47,6 +46,8 @@ const FIRST_WRAPPED_M_TOKEN_IMPLEMENTATION_ADDRESS = '0x813B926B1D096e117721bD1E
 const EXP_SCALED_ONE = BigInt.fromI32(10).pow(12);
 const BPS_SCALED_ONE = BigInt.fromI32(10).pow(4);
 const SECONDS_PER_YEAR = BigInt.fromI32(31_536_000);
+
+const RATE = BigInt.fromI32(415); // 4.15% per year in basis points
 
 /* ============ Handlers ============ */
 
@@ -281,7 +282,6 @@ function getMToken(): MToken {
     mToken = new MToken(id);
 
     mToken.latestIndex = BigInt.fromI32(0);
-    mToken.latestRate = BigInt.fromI32(0);
     mToken.latestUpdateTimestamp = 0;
     mToken.lastUpdate = 0;
 
@@ -566,22 +566,6 @@ function updateLatestIndexSnapshot(timestamp: Timestamp, value: BigInt): void {
     snapshot.save();
 }
 
-function updateLatestRateSnapshot(timestamp: Timestamp, value: BigInt): void {
-    const id = `latestRate-${timestamp.toString()}`;
-
-    let snapshot = LatestRateSnapshot.load(id);
-
-    if (!snapshot) {
-        snapshot = new LatestRateSnapshot(id);
-
-        snapshot.timestamp = timestamp;
-    }
-
-    snapshot.value = value;
-
-    snapshot.save();
-}
-
 function updateLatestUpdateTimestampSnapshot(timestamp: Timestamp, value: Timestamp): void {
     const id = `latestUpdateTimestamp-${timestamp.toString()}`;
 
@@ -734,18 +718,16 @@ function _transfer(
 
 function _updateIndex(mToken: MToken, timestamp: Timestamp, index: BigInt, rate: BigInt): void {
     mToken.latestIndex = index;
-    mToken.latestRate = rate;
     mToken.latestUpdateTimestamp = timestamp;
 
     updateLatestIndexSnapshot(timestamp, mToken.latestIndex);
-    updateLatestRateSnapshot(timestamp, mToken.latestRate);
     updateLatestUpdateTimestampSnapshot(timestamp, mToken.latestUpdateTimestamp);
 }
 
 function _getCurrentIndex(mToken: MToken, timestamp: Timestamp): BigInt {
     return _multiplyIndicesDown(
         mToken.latestIndex,
-        _getContinuousIndex(_convertFromBasisPoints(mToken.latestRate), timestamp - mToken.latestUpdateTimestamp)
+        _getContinuousIndex(_convertFromBasisPoints(RATE), timestamp - mToken.latestUpdateTimestamp)
     );
 }
 

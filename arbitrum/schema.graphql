@@ -230,12 +230,6 @@ type LatestIndexSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entit
     value: BigInt!
 }
 
-type LatestRateSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
-    id: ID! @unique
-    timestamp: Timestamp! @unique
-    value: BigInt!
-}
-
 type LatestUpdateTimestampSnapshot implements TimestampSnapshotEntity & SnapshotEntity @entity {
     id: ID! @unique
     timestamp: Timestamp! @unique
@@ -246,8 +240,6 @@ type MToken @entity {
     id: ID! @unique
     latestIndex: BigInt!
     latestIndexSnapshots: [LatestIndexSnapshot!]
-    latestRate: BigInt!
-    latestRateSnapshots: [LatestRateSnapshot!]
     latestUpdateTimestamp: Timestamp!
     latestUpdateTimestampSnapshots: [LatestUpdateTimestampSnapshot!]
     lastUpdate: Timestamp!
