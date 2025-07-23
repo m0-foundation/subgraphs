@@ -12,7 +12,6 @@ const computePeriodicYields = (
     lastIndexSnapshots,
     claimedSnapshots,
     indexSnapshots,
-    rateSnapshots,
     updateTimestampSnapshots,
     mostRecentPeriodEndTimestamp,
     historicalPeriods,
@@ -26,7 +25,6 @@ const computePeriodicYields = (
             const lastIndexIndex = findIndexOfLatest(lastIndexSnapshots, accumulator.lastIndexIndex, timestamp);
             const claimedIndex = findIndexOfLatest(claimedSnapshots, accumulator.claimedIndex, timestamp);
             const indexIndex = findIndexOfLatest(indexSnapshots, accumulator.indexIndex, timestamp);
-            const rateIndex = findIndexOfLatest(rateSnapshots, accumulator.rateIndex, timestamp);
 
             const updateTimestampIndex = findIndexOfLatest(
                 updateTimestampSnapshots,
@@ -40,7 +38,6 @@ const computePeriodicYields = (
             // );
             // console.log(`Claimed for ${timestamp} (${i}): ${claimedSnapshots[claimedIndex]?.value} (${claimedIndex})`);
             // console.log(`Index for ${timestamp} (${i}): ${indexSnapshots[indexIndex]?.value} (${indexIndex})`);
-            // console.log(`Rate for ${timestamp} (${i}): ${rateSnapshots[rateIndex]?.value} (${rateIndex})`);
             // console.log(
             //     `UpdateTimestamp for ${timestamp} (${i}): ${updateTimestampSnapshots[updateTimestampIndex]?.value} (${updateTimestampIndex})`
             // );
@@ -54,7 +51,6 @@ const computePeriodicYields = (
                           balanceSnapshots[balanceIndex]?.value ?? 0n,
                           lastIndex,
                           indexSnapshots[indexIndex]?.value ?? 0n,
-                          rateSnapshots[rateIndex]?.value ?? 0n,
                           updateTimestampSnapshots[updateTimestampIndex]?.value ?? 0n,
                           BigInt(timestamp)
                       );
@@ -77,7 +73,6 @@ const computePeriodicYields = (
                 balanceIndex: balanceIndex >= 0 ? balanceIndex : 0,
                 lastIndexIndex: lastIndexIndex >= 0 ? lastIndexIndex : 0,
                 claimedIndex: claimedIndex >= 0 ? claimedIndex : 0,
-                rateIndex: rateIndex >= 0 ? rateIndex : 0,
                 indexIndex: indexIndex >= 0 ? indexIndex : 0,
                 updateTimestampIndex: updateTimestampIndex >= 0 ? updateTimestampIndex : 0,
                 claimedYield,
@@ -90,7 +85,6 @@ const computePeriodicYields = (
             balanceIndex: 0,
             lastIndexIndex: 0,
             claimedIndex: 0,
-            rateIndex: 0,
             indexIndex: 0,
             updateTimestampIndex: 0,
             claimedYield: 0n,
@@ -109,7 +103,7 @@ const findIndexOfLatest = (snapshots, startingIndex, timestamp) =>
             ? startingIndex - 1
             : findIndexOfLatest(snapshots, startingIndex + 1, timestamp);
 
-const safeEarlyTimestamp = mostRecentPeriodEndTimestamp - (historicalPeriods * period) - (3 * 86400);
+const safeEarlyTimestamp = mostRecentPeriodEndTimestamp - historicalPeriods * period - 3 * 86400;
 
 // console.log(`Safe Early Timestamp: ${safeEarlyTimestamp}\n`);
 
@@ -129,10 +123,6 @@ const data = JSON.stringify({
             value
         }
         latestIndexSnapshots(where: {timestamp_gte: "${safeEarlyTimestamp}"}, orderBy: timestamp, orderDirection: asc, first: 1000) {
-            timestamp,
-            value
-        }
-        latestRateSnapshots(where: {timestamp_gte: "${safeEarlyTimestamp}"}, orderBy: timestamp, orderDirection: asc, first: 1000) {
             timestamp,
             value
         }
@@ -172,7 +162,6 @@ const req = https.request(options, (res) => {
             lastIndexSnapshots,
             claimedSnapshots,
             latestIndexSnapshots,
-            latestRateSnapshots,
             latestUpdateTimestampSnapshots,
         } = JSON.parse(data, (key, value) => (key == 'timestamp' || key == 'value' ? BigInt(value) : value)).data;
 
@@ -181,7 +170,6 @@ const req = https.request(options, (res) => {
             lastIndexSnapshots,
             claimedSnapshots,
             latestIndexSnapshots,
-            latestRateSnapshots,
             latestUpdateTimestampSnapshots,
             mostRecentPeriodEndTimestamp,
             historicalPeriods,

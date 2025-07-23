@@ -2,22 +2,24 @@ const EXP_SCALED_ONE = 10n ** 12n;
 const BPS_SCALED_ONE = 10n ** 4n;
 const SECONDS_PER_YEAR = 31_536_000n;
 
+const LATEST_RATE_BPS = 415n;
+
 const getBalanceWithYield = (balance, lastIndex, latestIndex, latestRate, latestUpdateTimestamp, timestamp) =>
     balance + getAccruedYield(balance, lastIndex, latestIndex, latestRate, latestUpdateTimestamp, timestamp);
 
-const getAccruedYield = (balance, lastIndex, latestIndex, latestRate, latestUpdateTimestamp, timestamp) => {
+const getAccruedYield = (balance, lastIndex, latestIndex, latestUpdateTimestamp, timestamp) => {
     const balanceWithYield = getPresentAmountRoundedDown(
         getPrincipalAmountRoundedDown(balance, lastIndex),
-        getCurrentIndex(latestIndex, latestRate, latestUpdateTimestamp, timestamp)
+        getCurrentIndex(latestIndex, latestUpdateTimestamp, timestamp)
     );
 
     return balanceWithYield <= balance ? 0n : balanceWithYield - balance;
 };
 
-const getCurrentIndex = (latestIndex, latestRate, latestUpdateTimestamp, timestamp) =>
+const getCurrentIndex = (latestIndex, latestUpdateTimestamp, timestamp) =>
     multiplyIndicesDown(
         latestIndex,
-        getContinuousIndex(convertFromBasisPoints(latestRate), timestamp - latestUpdateTimestamp)
+        getContinuousIndex(convertFromBasisPoints(LATEST_RATE_BPS), timestamp - latestUpdateTimestamp)
     );
 
 const multiplyIndicesDown = (index, deltaIndex) => (index * deltaIndex) / EXP_SCALED_ONE;

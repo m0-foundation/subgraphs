@@ -47,7 +47,7 @@ const EXP_SCALED_ONE = BigInt.fromI32(10).pow(12);
 const BPS_SCALED_ONE = BigInt.fromI32(10).pow(4);
 const SECONDS_PER_YEAR = BigInt.fromI32(31_536_000);
 
-const RATE = BigInt.fromI32(415); // 4.15% per year in basis points
+const LATEST_RATE_BPS = BigInt.fromI32(415); // 4.15% per year in basis points
 
 /* ============ Handlers ============ */
 
@@ -727,7 +727,7 @@ function _updateIndex(mToken: MToken, timestamp: Timestamp, index: BigInt): void
 function _getCurrentIndex(mToken: MToken, timestamp: Timestamp): BigInt {
     return _multiplyIndicesDown(
         mToken.latestIndex,
-        _getContinuousIndex(_convertFromBasisPoints(RATE), timestamp - mToken.latestUpdateTimestamp)
+        _getContinuousIndex(_convertFromBasisPoints(LATEST_RATE_BPS), timestamp - mToken.latestUpdateTimestamp)
     );
 }
 
