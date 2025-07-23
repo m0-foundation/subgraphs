@@ -1,0 +1,84 @@
+specVersion: 1.0.0
+indexerHints:
+    prune: auto
+schema:
+    file: ./schema.graphql
+dataSources:
+    - kind: ethereum
+      name: WrappedMToken
+      network: arbitrum-one
+      source:
+          abi: WrappedMToken
+          address: '0x437cc33344a0b27a429f795ff6b469c72698b291'
+          startBlock: 307758620
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.7
+          language: wasm/assemblyscript
+          entities:
+              - BalanceSnapshot
+              - LastIndexSnapshot
+              - IsEarningSnapshot
+              - ClaimedSnapshot
+              - ReceivedSnapshot
+              - SentSnapshot
+              - Holder
+              - TotalNonEarningSupplySnapshot
+              - PrincipalOfTotalEarningSupplySnapshot
+              - TotalEarningSupplySnapshot
+              - EnableMIndexSnapshot
+              - DisableIndexSnapshot
+              - TotalMintedSnapshot
+              - TotalBurnedSnapshot
+              - TotalClaimedSnapshot
+              - TotalExcessClaimedSnapshot
+              - ImplementationSnapshot
+              - WrappedMToken
+              - Transfer
+              - Claim
+              - ExcessClaim
+              - Migration
+              - MToken
+          abis:
+              - name: WrappedMToken
+                file: ./abis/WrappedMToken.json
+          eventHandlers:
+              - event: ExcessClaimed(uint240)
+                handler: handleExcessClaimed
+              - event: EarningEnabled(uint128)
+                handler: handleEarningEnabled
+              - event: EarningDisabled(uint128)
+                handler: handleEarningDisabled
+              - event: Transfer(indexed address,indexed address,uint256)
+                handler: handleTransfer
+              - event: StartedEarning(indexed address)
+                handler: handleStartedEarning
+              - event: StoppedEarning(indexed address)
+                handler: handleStoppedEarning
+              - event: Claimed(indexed address,indexed address,uint240)
+                handler: handleClaimed
+              - event: Migrated(indexed address,indexed address,indexed address)
+                handler: handleMigrated
+          file: ./src/wm-mappings-l2.ts
+    - kind: ethereum
+      name: MToken
+      network: arbitrum-one
+      source:
+          abi: MToken
+          address: '0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b'
+          startBlock: 307758493
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.7
+          language: wasm/assemblyscript
+          entities:
+              - LatestIndexSnapshot
+              - LatestUpdateTimestampSnapshot
+              - MToken
+          abis:
+              - name: MToken
+                file: ./abis/MToken.json
+          eventHandlers:
+              - event: IndexUpdated(indexed uint128)
+                handler: handleIndexUpdated
+          file: ./src/wm-mappings-l2.ts
