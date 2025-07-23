@@ -59,7 +59,7 @@ dataSources:
                 handler: handleClaimed
               - event: Migrated(indexed address,indexed address,indexed address)
                 handler: handleMigrated
-          file: ./src/wrapped-m-token.ts
+          file: ./src/wm-mappings-l2.ts
     - kind: ethereum
       name: MToken
       network: arbitrum-one
@@ -81,4 +81,4 @@ dataSources:
           eventHandlers:
               - event: IndexUpdated(indexed uint128)
                 handler: handleIndexUpdated
-          file: ./src/wrapped-m-token.ts
+          file: ./src/wm-mappings-l2.ts
