@@ -9,15 +9,16 @@ networks:
           - 0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b
         handler: src/EventHandlers.ts
         events:
-          - event: Approval(address indexed account, address indexed spender, uint256 amount)
-          - event: AuthorizationCanceled(address indexed authorizer, bytes32 indexed nonce)
-          - event: AuthorizationUsed(address indexed authorizer, bytes32 indexed nonce)
-          - event: EIP712DomainChanged()
           - event: IndexUpdated(uint128 indexed index)
-          - event: Initialized(uint64 version)
-          - event: Migrated(address indexed migrator, address indexed oldImplementation, address indexed newImplementation)
           - event: StartedEarning(address indexed account)
           - event: StoppedEarning(address indexed account)
           - event: Transfer(address indexed sender, address indexed recipient, uint256 amount)
-          - event: Upgraded(address indexed implementation)
+      - name: USDHL
+        address:
+          - 0xb50A96253aBDF803D85efcDce07Ad8becBc52BD5
+        handler: src/EventHandlers.ts
+        events:
+          - event: Transfer(address indexed from, address indexed to, uint256 value)
+          - event: YieldClaimed(uint256 yield)
+          - event: YieldRecipientSet(address indexed newRecipient)
 unordered_multichain_mode: true
