@@ -1,0 +1,62 @@
+type MToken_Approval {
+  id: ID!
+  account: String!
+  spender: String!
+  amount: BigInt!
+}
+
+type MToken_AuthorizationCanceled {
+  id: ID!
+  authorizer: String!
+  nonce: String!
+}
+
+type MToken_AuthorizationUsed {
+  id: ID!
+  authorizer: String!
+  nonce: String!
+}
+
+type MToken_EIP712DomainChanged {
+  id: ID!
+}
+
+type MToken_IndexUpdated {
+  id: ID!
+  index: BigInt!
+}
+
+type MToken_Initialized {
+  id: ID!
+  version: BigInt!
+}
+
+type MToken_Migrated {
+  id: ID!
+  migrator: String!
+  oldImplementation: String!
+  newImplementation: String!
+}
+
+type MToken_StartedEarning {
+  id: ID!
+  account: String!
+}
+
+type MToken_StoppedEarning {
+  id: ID!
+  account: String!
+}
+
+type MToken_Transfer {
+  id: ID!
+  sender: String!
+  recipient: String!
+  amount: BigInt!
+}
+
+type MToken_Upgraded {
+  id: ID!
+  implementation: String!
+}
+
