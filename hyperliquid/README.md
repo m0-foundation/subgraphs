@@ -1,8 +1,14 @@
-## Envio Indexer
+## Hyperliquid Indexer
 
-*Please refer to the [documentation website](https://docs.envio.dev) for a thorough guide on all [Envio](https://envio.dev) indexer features*
+This is hyperliquid indexer powered by Envio.
+
+_Please refer to the [documentation website](https://docs.envio.dev) for a thorough guide on all [Envio](https://envio.dev) indexer features_
 
 ### Run
+
+```bash
+pnpm install
+```
 
 ```bash
 pnpm dev
