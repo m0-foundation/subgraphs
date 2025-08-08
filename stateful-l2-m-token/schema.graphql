@@ -107,12 +107,6 @@ type LatestIndexSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entit
   value: BigInt!
 }
 
-type LatestRateSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity(immutable: true) {
-  id: ID! @unique
-  timestamp: Timestamp! @unique
-  value: BigInt!
-}
-
 type LatestUpdateTimestampSnapshot implements TimestampSnapshotEntity & SnapshotEntity @entity(immutable: true) {
   id: ID! @unique
   timestamp: Timestamp! @unique
@@ -131,12 +125,6 @@ type TotalBurnedSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entit
   value: BigInt!
 }
 
-type RateModelSnapshot implements StringSnapshotEntity & SnapshotEntity @entity(immutable: true) {
-  id: ID! @unique
-  timestamp: Timestamp! @unique
-  value: String!
-}
-
 type MToken @entity(immutable: true) {
   id: ID! @unique
   holders: [Holder!]
@@ -147,16 +135,12 @@ type MToken @entity(immutable: true) {
   transfers: [Transfer!]
   latestIndex: BigInt!
   latestIndexSnapshots: [LatestIndexSnapshot!]
-  latestRate: BigInt!
-  latestRateSnapshots: [LatestRateSnapshot!]
   latestUpdateTimestamp: Timestamp!
   latestUpdateTimestampSnapshots: [LatestUpdateTimestampSnapshot!]
   totalMinted: BigInt!
   totalMintedSnapshots: [TotalMintedSnapshot!]
   totalBurned: BigInt!
   totalBurnedSnapshots: [TotalBurnedSnapshot!]
-  rateModel: String!
-  rateModelSnapshots: [RateModelSnapshot!]
   lastUpdate: Timestamp!
 }
 

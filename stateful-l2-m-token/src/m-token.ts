@@ -4,12 +4,10 @@ import {
   Holder,
   IsEarningSnapshot,
   LatestIndexSnapshot,
-  LatestRateSnapshot,
   LatestUpdateTimestampSnapshot,
   MToken,
   NonEarningBalanceSnapshot,
   PrincipalOfTotalEarningSupplySnapshot,
-  RateModelSnapshot,
   ReceivedSnapshot,
   SentSnapshot,
   TotalBurnedSnapshot,
@@ -23,36 +21,17 @@ import {
   StoppedEarning as StoppedEarningEvent,
   Transfer as TransferEvent,
 } from '../generated/MToken/MToken';
-import { KeySet as KeySetEvent } from '../generated/Registrar/Registrar';
 
 const ZERO_ADDRESS = Address.fromString('0x0000000000000000000000000000000000000000');
 const M_TOKEN_ADDRESS = '0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b';
-
-const EARNER_RATE_MODEL_KEY = 'earner_rate_model';
 
 const EXP_SCALED_ONE = BigInt.fromI32(10).pow(12);
 const BPS_SCALED_ONE = BigInt.fromI32(10).pow(4);
 const SECONDS_PER_YEAR = BigInt.fromI32(31_536_000);
 
+const LATEST_RATE_BPS = BigInt.fromI32(415); // 4.15% per year in basis points
+
 /* ============ Handlers ============ */
-
-export function handleKeySet(event: KeySetEvent): void {
-  const mToken = getMToken();
-  const key = event.params.key.toString();
-  const timestamp = event.block.timestamp.toI32();
-
-  if (key == EARNER_RATE_MODEL_KEY) {
-    const value = `0x${event.params.value.toHexString().slice(26)}`;
-    updateRateModelSnapshot(timestamp, value);
-    mToken.rateModel = value;
-  } else {
-    return;
-  }
-
-  mToken.lastUpdate = timestamp;
-
-  mToken.save();
-}
 
 export function handleTransfer(event: TransferEvent): void {
   const mToken = getMToken();
@@ -124,7 +103,7 @@ export function handleIndexUpdated(event: IndexUpdatedEvent): void {
   const mToken = getMToken();
   const timestamp = event.block.timestamp.toI32();
 
-  _updateIndex(mToken, timestamp, event.params.index, event.params.rate);
+  _updateIndex(mToken, timestamp, event.params.index);
 
   mToken.lastUpdate = timestamp;
   mToken.save();
@@ -144,11 +123,9 @@ function getMToken(): MToken {
   mToken.totalNonEarningSupply = BigInt.fromI32(0);
   mToken.principalOfTotalEarningSupply = BigInt.fromI32(0);
   mToken.latestIndex = BigInt.fromI32(0);
-  mToken.latestRate = BigInt.fromI32(0);
   mToken.latestUpdateTimestamp = 0;
   mToken.totalMinted = BigInt.fromI32(0);
   mToken.totalBurned = BigInt.fromI32(0);
-  mToken.rateModel = ZERO_ADDRESS.toHexString();
   mToken.lastUpdate = 0;
 
   return mToken;
@@ -307,22 +284,6 @@ function updateLatestIndexSnapshot(timestamp: Timestamp, value: BigInt): void {
   snapshot.save();
 }
 
-function updateLatestRateSnapshot(timestamp: Timestamp, value: BigInt): void {
-  const id = `latestRate-${timestamp.toString()}`;
-
-  let snapshot = LatestRateSnapshot.load(id);
-
-  if (!snapshot) {
-    snapshot = new LatestRateSnapshot(id);
-
-    snapshot.timestamp = timestamp;
-  }
-
-  snapshot.value = value;
-
-  snapshot.save();
-}
-
 function updateLatestUpdateTimestampSnapshot(timestamp: Timestamp, value: Timestamp): void {
   const id = `latestUpdateTimestamp-${timestamp.toString()}`;
 
@@ -362,22 +323,6 @@ function updateTotalBurnedSnapshot(timestamp: Timestamp, value: BigInt): void {
 
   if (!snapshot) {
     snapshot = new TotalBurnedSnapshot(id);
-
-    snapshot.timestamp = timestamp;
-  }
-
-  snapshot.value = value;
-
-  snapshot.save();
-}
-
-function updateRateModelSnapshot(timestamp: Timestamp, value: string): void {
-  const id = `rateModel-${timestamp.toString()}`;
-
-  let snapshot = RateModelSnapshot.load(id);
-
-  if (!snapshot) {
-    snapshot = new RateModelSnapshot(id);
 
     snapshot.timestamp = timestamp;
   }
@@ -524,20 +469,18 @@ function _transfer(mToken: MToken, sender: Holder, recipient: Holder, amount: Bi
   }
 }
 
-function _updateIndex(mToken: MToken, timestamp: Timestamp, index: BigInt, rate: BigInt): void {
+function _updateIndex(mToken: MToken, timestamp: Timestamp, index: BigInt): void {
   mToken.latestIndex = index;
-  mToken.latestRate = rate;
   mToken.latestUpdateTimestamp = timestamp;
 
   updateLatestIndexSnapshot(timestamp, mToken.latestIndex);
-  updateLatestRateSnapshot(timestamp, mToken.latestRate);
   updateLatestUpdateTimestampSnapshot(timestamp, mToken.latestUpdateTimestamp);
 }
 
 function _getCurrentIndex(mToken: MToken, timestamp: Timestamp): BigInt {
   return _multiplyIndicesDown(
     mToken.latestIndex,
-    _getContinuousIndex(_convertFromBasisPoints(mToken.latestRate), timestamp - mToken.latestUpdateTimestamp)
+    _getContinuousIndex(_convertFromBasisPoints(LATEST_RATE_BPS), timestamp - mToken.latestUpdateTimestamp)
   );
 }
 

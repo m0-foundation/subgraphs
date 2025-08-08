@@ -25,7 +25,6 @@ dataSources:
         - TotalNonEarningSupplySnapshot
         - PrincipalOfTotalNonEarningSupplySnapshot
         - LatestIndexSnapshot
-        - LatestRateSnapshot
         - LatestUpdateTimestampSnapshot
         - TotalMintedSnapshot
         - TotalBurnedSnapshot
@@ -43,25 +42,4 @@ dataSources:
           handler: handleStoppedEarning
         - event: IndexUpdated(indexed uint128)
           handler: handleIndexUpdated
-      file: ./src/m-token.ts
-  - kind: ethereum
-    name: Registrar
-    network: hyperevm
-    source:
-      abi: Registrar
-      address: '0x119FbeeDD4F4f4298Fb59B720d5654442b81ae2c'
-      startBlock: 4107927
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.9
-      language: wasm/assemblyscript
-      entities:
-        - RateModelSnapshot
-        - MToken
-      abis:
-        - name: Registrar
-          file: ./abis/Registrar.json
-      eventHandlers:
-        - event: KeySet(indexed bytes32,indexed bytes32)
-          handler: handleKeySet
       file: ./src/m-token.ts
