@@ -1,0 +1,168 @@
+interface SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+}
+
+interface HolderSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    account: Holder!
+}
+
+interface BigIntSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    value: BigInt!
+}
+
+interface BooleanSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    value: Boolean!
+}
+
+interface TimestampSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    value: Timestamp!
+}
+
+interface StringSnapshotEntity implements SnapshotEntity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    value: String!
+}
+
+type EarningPrincipalSnapshot implements HolderSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    account: Holder!
+    value: BigInt!
+}
+
+type NonEarningBalanceSnapshot implements HolderSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    account: Holder!
+    value: BigInt!
+}
+
+type IsEarningSnapshot implements HolderSnapshotEntity & BooleanSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    account: Holder!
+    value: Boolean!
+}
+
+type ReceivedSnapshot implements HolderSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    account: Holder!
+    value: BigInt!
+}
+
+type SentSnapshot implements HolderSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp!
+    account: Holder!
+    value: BigInt!
+}
+
+type Holder @entity {
+    id: ID! @unique
+    address: String! @unique
+    earningPrincipal: BigInt!
+    earningPrincipalSnapshots: [EarningPrincipalSnapshot!] @derivedFrom(field: "account")
+    nonEarningBalance: BigInt!
+    nonEarningBalanceSnapshots: [NonEarningBalanceSnapshot!] @derivedFrom(field: "account")
+    isEarning: Boolean!
+    isEarningSnapshots: [IsEarningSnapshot!] @derivedFrom(field: "account")
+    transfersTo: [Transfer!] @derivedFrom(field: "recipient")
+    transfersFrom: [Transfer!] @derivedFrom(field: "sender")
+    received: BigInt!
+    receivedSnapshots: [ReceivedSnapshot!] @derivedFrom(field: "account")
+    sent: BigInt!
+    sentSnapshots: [SentSnapshot!] @derivedFrom(field: "account")
+    lastUpdate: Timestamp!
+}
+
+type TotalNonEarningSupplySnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type PrincipalOfTotalEarningSupplySnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type LatestIndexSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type LatestRateSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type LatestUpdateTimestampSnapshot implements TimestampSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: Timestamp!
+}
+
+type TotalMintedSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type TotalBurnedSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: BigInt!
+}
+
+type RateModelSnapshot implements StringSnapshotEntity & SnapshotEntity @entity {
+    id: ID! @unique
+    timestamp: Timestamp! @unique
+    value: String!
+}
+
+type MToken @entity {
+    id: ID! @unique
+    holders: [Holder!]
+    totalNonEarningSupply: BigInt!
+    totalNonEarningSupplySnapshots: [TotalNonEarningSupplySnapshot!]
+    principalOfTotalEarningSupply: BigInt!
+    principalOfTotalEarningSupplySnapshots: [PrincipalOfTotalEarningSupplySnapshot!]
+    transfers: [Transfer!]
+    latestIndex: BigInt!
+    latestIndexSnapshots: [LatestIndexSnapshot!]
+    latestRate: BigInt!
+    latestRateSnapshots: [LatestRateSnapshot!]
+    latestUpdateTimestamp: Timestamp!
+    latestUpdateTimestampSnapshots: [LatestUpdateTimestampSnapshot!]
+    totalMinted: BigInt!
+    totalMintedSnapshots: [TotalMintedSnapshot!]
+    totalBurned: BigInt!
+    totalBurnedSnapshots: [TotalBurnedSnapshot!]
+    rateModel: String!
+    rateModelSnapshots: [RateModelSnapshot!]
+    lastUpdate: Timestamp!
+}
+
+type Transfer @entity(immutable: true) {
+    id: ID! @unique
+    sender: Holder!
+    recipient: Holder!
+    amount: BigInt!
+    timestamp: Timestamp!
+    transactionHash: String!
+    logIndex: BigInt!
+}
