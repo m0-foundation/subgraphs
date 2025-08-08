@@ -71,7 +71,7 @@ type SentSnapshot implements HolderSnapshotEntity & BigIntSnapshotEntity & Snaps
   value: BigInt!
 }
 
-type Holder @entity(immutable: true) {
+type Holder @entity(immutable: false) {
   id: ID! @unique
   address: String! @unique
   earningPrincipal: BigInt!
@@ -125,7 +125,7 @@ type TotalBurnedSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entit
   value: BigInt!
 }
 
-type MToken @entity(immutable: true) {
+type MToken @entity(immutable: false) {
   id: ID! @unique
   holders: [Holder!]
   totalNonEarningSupply: BigInt!
