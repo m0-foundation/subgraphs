@@ -4,6 +4,7 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
+    "deploy": "goldsky subgraph deploy m-token-hyperliquid/0.2.0 --path .",
     "create-local": "graph create --node http://localhost:8020/ mzero/m-token",
     "remove-local": "graph remove --node http://localhost:8020/ mzero/m-token",
     "deploy-local": "graph deploy --node http://localhost:8020/ mzero/m-token",
