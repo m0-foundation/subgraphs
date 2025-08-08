@@ -18,7 +18,5 @@ networks:
           - 0xb50A96253aBDF803D85efcDce07Ad8becBc52BD5
         handler: src/EventHandlers.ts
         events:
-          - event: Transfer(address indexed from, address indexed to, uint256 value)
           - event: YieldClaimed(uint256 yield)
-          - event: YieldRecipientSet(address indexed newRecipient)
 unordered_multichain_mode: true
