@@ -1,0 +1,59 @@
+specVersion: 1.3.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: USDHL
+    network: mainnet
+    source:
+      address: "0xb50A96253aBDF803D85efcDce07Ad8becBc52BD5"
+      abi: USDHL
+      startBlock: 4714837
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - Blacklisted
+        - EIP712DomainChanged
+        - EarningEnabled
+        - Initialized
+        - RoleAdminChanged
+        - RoleGranted
+        - RoleRevoked
+        - Transfer
+        - Unblacklisted
+        - YieldClaimed
+        - YieldRecipientSet
+      abis:
+        - name: USDHL
+          file: ./abis/USDHL.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: Blacklisted(indexed address,uint256)
+          handler: handleBlacklisted
+        - event: EIP712DomainChanged()
+          handler: handleEIP712DomainChanged
+        - event: EarningEnabled(uint128)
+          handler: handleEarningEnabled
+        - event: Initialized(uint64)
+          handler: handleInitialized
+        - event: RoleAdminChanged(indexed bytes32,indexed bytes32,indexed bytes32)
+          handler: handleRoleAdminChanged
+        - event: RoleGranted(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleGranted
+        - event: RoleRevoked(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleRevoked
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Unblacklisted(indexed address,uint256)
+          handler: handleUnblacklisted
+        - event: YieldClaimed(uint256)
+          handler: handleYieldClaimed
+        - event: YieldRecipientSet(indexed address)
+          handler: handleYieldRecipientSet
+      file: ./src/usdhl.ts
