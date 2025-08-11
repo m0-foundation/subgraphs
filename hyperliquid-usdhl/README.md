@@ -21,7 +21,9 @@ Update generated code
 yarn codegen
 ```
 
-Deploy
+Deploy via [Goldsky](https://goldsky.com)
+
+> Goldsky CLI and valid log in is required. [See more](https://docs.goldsky.com/subgraphs/deploying-subgraphs#install-goldskys-cli-and-log-in)
 
 ```sh
 yarn deploy <VERSION>
@@ -29,5 +31,3 @@ yarn deploy <VERSION>
 # e.g.,
 yarn deploy 0.1.0
 ```
-
-This Subgraph is currently deployed on [Goldsky](https://goldsky.com)
