@@ -1,6 +1,7 @@
 {
   "name": "hyperliquid-usdhl",
   "license": "UNLICENSED",
+  "description": "Tracks USDHL yield claim events on Hyperliquid.",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
