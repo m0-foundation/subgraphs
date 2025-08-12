@@ -1,0 +1,29 @@
+specVersion: 1.3.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: USDHL
+    network: hyperevm
+    source:
+      address: "0xb50A96253aBDF803D85efcDce07Ad8becBc52BD5"
+      abi: USDHL
+      startBlock: 4714837
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Transfer
+        - YieldClaimed
+      abis:
+        - name: USDHL
+          file: ./abis/USDHL.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: YieldClaimed(uint256)
+          handler: handleYieldClaimed
+      file: ./src/usdhl.ts
