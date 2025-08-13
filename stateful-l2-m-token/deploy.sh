@@ -6,6 +6,12 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
+if [ -z "$DEPLOY_KEY" ]; then
+  echo "Error: ALCHEMY_DEPLOY_KEY environment variable not set."
+  echo "Set it with: export ALCHEMY_DEPLOY_KEY=your_key_here"
+  exit 1
+fi
+
 VERSION="$1"
 
 echo "🧼 Cleaning up..."
@@ -16,6 +22,10 @@ yarn codegen
 yarn build
 
 echo "🚀 Deploying subgraph with version: $VERSION"
-goldsky subgraph deploy "m-token-hyperliquid/$VERSION" --path .
+yarn graph deploy m-token-linea \
+  --version-label "$VERSION" \
+  --node https://subgraphs.alchemy.com/api/subgraphs/deploy \
+  --deploy-key "$ALCHEMY_DEPLOY_KEY" \
+  --ipfs https://ipfs.satsuma.xyz
 
 echo "✅ Deployment complete"
