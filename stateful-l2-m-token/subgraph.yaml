@@ -6,11 +6,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: MToken
-    network: hyperevm
+    network: linea
     source:
       abi: MToken
       address: '0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b'
-      startBlock: 4107927
+      startBlock: 21511394
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
