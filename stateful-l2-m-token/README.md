@@ -16,3 +16,11 @@ On `subgraph.yml`,
 On `deploy.sh`,
 
 1. Update the deploy script to match Subgraph service (Alchemy Satsuma, Goldsky, The Graph).
+
+Currently, the `deploy.sh` script points to Alchemy Satsuma. Usage example
+
+```sh
+export ALCHEMY_DEPLOY_KEY=your_key_here
+
+yarn deploy 0.1.0
+```
