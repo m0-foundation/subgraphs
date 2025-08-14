@@ -15,7 +15,7 @@ fi
 VERSION="$1"
 
 echo "🧼 Cleaning up..."
-rm -rf ./build
+rm -rf ./build ./generated
 
 echo "👷‍♀️ Building subgraph..."
 yarn codegen
