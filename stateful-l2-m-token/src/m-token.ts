@@ -18,6 +18,7 @@ import {
   Transfer as TransferEvent,
 } from '../generated/MToken/MToken';
 
+const ZERO_ADDRESS = Address.fromString('0x0000000000000000000000000000000000000000');
 const M_TOKEN_ADDRESS = '0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b';
 
 const EXP_SCALED_ONE = BigInt.fromI32(10).pow(12);
@@ -71,6 +72,10 @@ export function handleTransfer(event: TransferEvent): void {
   const timestamp = event.block.timestamp.toI32();
   const amount = event.params.amount;
 
+  if (!event.params.sender.equals(ZERO_ADDRESS) && !event.params.recipient.equals(ZERO_ADDRESS)) {
+    _transfer(mToken, sender, recipient, amount, timestamp);
+  }
+
   mToken.lastUpdate = timestamp;
   mToken.save();
 
@@ -92,6 +97,56 @@ export function handleTransfer(event: TransferEvent): void {
   transfer.transactionHash = event.transaction.hash.toHexString();
 
   transfer.save();
+}
+
+function _transfer(mToken: MToken, sender: Holder, recipient: Holder, amount: BigInt, timestamp: Timestamp): void {
+  if (amount.equals(BigInt.fromI32(0))) return;
+
+  const index = _getCurrentIndex(mToken, timestamp);
+
+  if (sender.isEarning == recipient.isEarning) {
+    _transferAmountInKind(sender, recipient, amount, index, timestamp);
+  } else if (sender.isEarning) {
+    _subtractEarningAmount(mToken, sender, _getPrincipalAmountRoundedUp(amount, index), timestamp);
+    _addNonEarningAmount(mToken, recipient, amount, timestamp);
+  } else {
+    _subtractNonEarningAmount(mToken, sender, amount, timestamp);
+    _addEarningAmount(mToken, recipient, _getPrincipalAmountRoundedDown(amount, index), timestamp);
+  }
+}
+
+function _transferAmountInKind(
+  sender: Holder,
+  recipient: Holder,
+  amount: BigInt,
+  index: BigInt,
+  timestamp: Timestamp
+): void {
+  if (sender.address == recipient.address) return;
+
+  if (sender.isEarning) {
+    const principal = _getPrincipalAmountRoundedUp(amount, index);
+
+    if (principal.equals(BigInt.fromI32(0))) return;
+
+    sender.earningPrincipal = sender.earningPrincipal.minus(principal);
+
+    updateEarningPrincipalSnapshot(sender, timestamp, sender.earningPrincipal);
+
+    recipient.earningPrincipal = recipient.earningPrincipal.plus(principal);
+
+    updateEarningPrincipalSnapshot(recipient, timestamp, recipient.earningPrincipal);
+  } else {
+    if (amount.equals(BigInt.fromI32(0))) return;
+
+    sender.nonEarningBalance = sender.nonEarningBalance.minus(amount);
+
+    updateNonEarningBalanceSnapshot(sender, timestamp, sender.nonEarningBalance);
+
+    recipient.nonEarningBalance = recipient.nonEarningBalance.plus(amount);
+
+    updateNonEarningBalanceSnapshot(recipient, timestamp, recipient.nonEarningBalance);
+  }
 }
 
 function _startEarning(mToken: MToken, account: Holder, timestamp: Timestamp): void {
