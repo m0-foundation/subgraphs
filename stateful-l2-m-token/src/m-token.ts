@@ -4,6 +4,7 @@ import {
   LatestUpdateTimestampSnapshot,
   MToken,
   Holder,
+  Transfer,
   NonEarningBalanceSnapshot,
   PrincipalOfTotalEarningSupplySnapshot,
   TotalNonEarningSupplySnapshot,
@@ -14,6 +15,7 @@ import {
   IndexUpdated as IndexUpdatedEvent,
   StartedEarning as StartedEarningEvent,
   StoppedEarning as StoppedEarningEvent,
+  Transfer as TransferEvent,
 } from '../generated/MToken/MToken';
 
 const M_TOKEN_ADDRESS = '0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b';
@@ -60,6 +62,36 @@ export function handleStoppedEarning(event: StoppedEarningEvent): void {
 
   account.lastUpdate = timestamp;
   account.save();
+}
+
+export function handleTransfer(event: TransferEvent): void {
+  const mToken = getMToken();
+  const sender = getHolder(event.params.sender);
+  const recipient = getHolder(event.params.recipient);
+  const timestamp = event.block.timestamp.toI32();
+  const amount = event.params.amount;
+
+  mToken.lastUpdate = timestamp;
+  mToken.save();
+
+  sender.lastUpdate = timestamp;
+  sender.save();
+
+  recipient.lastUpdate = timestamp;
+  recipient.save();
+
+  const transfer = new Transfer(
+    `transfer-${event.transaction.hash.toHexString()}-${event.logIndex.toI32().toString()}`
+  );
+
+  transfer.sender = sender.id;
+  transfer.recipient = recipient.id;
+  transfer.amount = amount;
+  transfer.timestamp = timestamp;
+  transfer.logIndex = event.logIndex;
+  transfer.transactionHash = event.transaction.hash.toHexString();
+
+  transfer.save();
 }
 
 function _startEarning(mToken: MToken, account: Holder, timestamp: Timestamp): void {

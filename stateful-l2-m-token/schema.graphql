@@ -87,6 +87,16 @@ type Holder @entity(immutable: false) {
   lastUpdate: Timestamp!
 }
 
+type Transfer @entity(immutable: true) {
+  id: ID! @unique
+  sender: Holder!
+  recipient: Holder!
+  amount: BigInt!
+  timestamp: Timestamp!
+  transactionHash: String!
+  logIndex: BigInt!
+}
+
 type MToken @entity(immutable: false) {
   id: ID! @unique
   latestIndex: BigInt!

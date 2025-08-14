@@ -26,10 +26,13 @@ dataSources:
         - LatestIndexSnapshot
         - LatestUpdateTimestampSnapshot
         - MToken
+        - Transfer
       abis:
         - name: MToken
           file: ./abis/MToken.json
       eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
         - event: StartedEarning(indexed address)
           handler: handleStartedEarning
         - event: StoppedEarning(indexed address)
