@@ -6,7 +6,7 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
-if [ -z "$DEPLOY_KEY" ]; then
+if [ -z "$ALCHEMY_DEPLOY_KEY" ]; then
   echo "Error: ALCHEMY_DEPLOY_KEY environment variable not set."
   echo "Set it with: export ALCHEMY_DEPLOY_KEY=your_key_here"
   exit 1
