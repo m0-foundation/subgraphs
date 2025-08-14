@@ -32,6 +32,8 @@ dataSources:
       eventHandlers:
         - event: StartedEarning(indexed address)
           handler: handleStartedEarning
+        - event: StoppedEarning(indexed address)
+          handler: handleStoppedEarning
         - event: IndexUpdated(indexed uint128)
           handler: handleIndexUpdated
       file: ./src/m-token.ts

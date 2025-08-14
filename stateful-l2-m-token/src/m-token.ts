@@ -10,7 +10,11 @@ import {
   EarningPrincipalSnapshot,
   IsEarningSnapshot,
 } from '../generated/schema';
-import { IndexUpdated as IndexUpdatedEvent, StartedEarning as StartedEarningEvent } from '../generated/MToken/MToken';
+import {
+  IndexUpdated as IndexUpdatedEvent,
+  StartedEarning as StartedEarningEvent,
+  StoppedEarning as StoppedEarningEvent,
+} from '../generated/MToken/MToken';
 
 const M_TOKEN_ADDRESS = '0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b';
 
@@ -44,6 +48,20 @@ export function handleStartedEarning(event: StartedEarningEvent): void {
   account.save();
 }
 
+export function handleStoppedEarning(event: StoppedEarningEvent): void {
+  const mToken = getMToken();
+  const account = getHolder(event.params.account);
+  const timestamp = event.block.timestamp.toI32();
+
+  _stopEarning(mToken, account, timestamp);
+
+  mToken.lastUpdate = timestamp;
+  mToken.save();
+
+  account.lastUpdate = timestamp;
+  account.save();
+}
+
 function _startEarning(mToken: MToken, account: Holder, timestamp: Timestamp): void {
   account.isEarning = true;
 
@@ -57,6 +75,21 @@ function _startEarning(mToken: MToken, account: Holder, timestamp: Timestamp): v
   const principal = _getPrincipalAmountRoundedDown(balance, index);
 
   _addEarningAmount(mToken, account, principal, timestamp);
+}
+
+function _stopEarning(mToken: MToken, account: Holder, timestamp: Timestamp): void {
+  account.isEarning = false;
+
+  updateIsEarningSnapshot(account, timestamp, account.isEarning);
+
+  const principal = account.earningPrincipal;
+
+  _subtractEarningAmount(mToken, account, principal, timestamp);
+
+  const index = _getCurrentIndex(mToken, timestamp);
+  const balance = _getPresentAmountRoundedDown(principal, index);
+
+  _addNonEarningAmount(mToken, account, balance, timestamp);
 }
 
 function _subtractNonEarningAmount(mToken: MToken, account: Holder, amount: BigInt, timestamp: Timestamp): void {
@@ -113,6 +146,30 @@ function _addEarningAmount(mToken: MToken, account: Holder, principal: BigInt, t
   mToken.principalOfTotalEarningSupply = mToken.principalOfTotalEarningSupply.plus(principal);
 
   updatePrincipalOfTotalEarningSupplySnapshot(timestamp, mToken.principalOfTotalEarningSupply);
+}
+
+function _subtractEarningAmount(mToken: MToken, account: Holder, principal: BigInt, timestamp: Timestamp): void {
+  if (principal.equals(BigInt.fromI32(0))) return;
+
+  account.earningPrincipal = account.earningPrincipal.minus(principal);
+
+  updateEarningPrincipalSnapshot(account, timestamp, account.earningPrincipal);
+
+  mToken.principalOfTotalEarningSupply = mToken.principalOfTotalEarningSupply.minus(principal);
+
+  updatePrincipalOfTotalEarningSupplySnapshot(timestamp, mToken.principalOfTotalEarningSupply);
+}
+
+function _addNonEarningAmount(mToken: MToken, account: Holder, amount: BigInt, timestamp: Timestamp): void {
+  if (amount.equals(BigInt.fromI32(0))) return;
+
+  account.nonEarningBalance = account.nonEarningBalance.plus(amount);
+
+  updateNonEarningBalanceSnapshot(account, timestamp, account.nonEarningBalance);
+
+  mToken.totalNonEarningSupply = mToken.totalNonEarningSupply.plus(amount);
+
+  updateTotalNonEarningSupplySnapshot(timestamp, mToken.totalNonEarningSupply);
 }
 
 function updateEarningPrincipalSnapshot(holder: Holder, timestamp: Timestamp, value: BigInt): void {
