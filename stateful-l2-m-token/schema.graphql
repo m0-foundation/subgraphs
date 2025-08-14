@@ -3,6 +3,12 @@ interface SnapshotEntity {
   timestamp: Timestamp!
 }
 
+interface BooleanSnapshotEntity implements SnapshotEntity {
+  id: ID! @unique
+  timestamp: Timestamp!
+  value: Boolean!
+}
+
 interface TimestampSnapshotEntity implements SnapshotEntity {
   id: ID! @unique
   timestamp: Timestamp!
@@ -13,6 +19,12 @@ interface BigIntSnapshotEntity implements SnapshotEntity {
   id: ID! @unique
   timestamp: Timestamp!
   value: BigInt!
+}
+
+interface HolderSnapshotEntity implements SnapshotEntity {
+  id: ID! @unique
+  timestamp: Timestamp!
+  account: Holder!
 }
 
 type LatestIndexSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity(immutable: true) {
@@ -27,9 +39,62 @@ type LatestUpdateTimestampSnapshot implements TimestampSnapshotEntity & Snapshot
   value: Timestamp!
 }
 
+type EarningPrincipalSnapshot implements HolderSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity
+  @entity(immutable: true) {
+  id: ID! @unique
+  timestamp: Timestamp!
+  account: Holder!
+  value: BigInt!
+}
+
+type NonEarningBalanceSnapshot implements HolderSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity
+  @entity(immutable: true) {
+  id: ID! @unique
+  timestamp: Timestamp!
+  account: Holder!
+  value: BigInt!
+}
+
+type PrincipalOfTotalEarningSupplySnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity(immutable: true) {
+  id: ID! @unique
+  timestamp: Timestamp! @unique
+  value: BigInt!
+}
+
+type TotalNonEarningSupplySnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity(immutable: true) {
+  id: ID! @unique
+  timestamp: Timestamp! @unique
+  value: BigInt!
+}
+
+type IsEarningSnapshot implements HolderSnapshotEntity & BooleanSnapshotEntity & SnapshotEntity
+  @entity(immutable: true) {
+  id: ID! @unique
+  timestamp: Timestamp!
+  account: Holder!
+  value: Boolean!
+}
+
+type Holder @entity(immutable: false) {
+  id: ID! @unique
+  address: String! @unique
+  earningPrincipal: BigInt!
+  earningPrincipalSnapshots: [EarningPrincipalSnapshot!] @derivedFrom(field: "account")
+  nonEarningBalance: BigInt!
+  nonEarningBalanceSnapshots: [NonEarningBalanceSnapshot!] @derivedFrom(field: "account")
+  isEarning: Boolean!
+  isEarningSnapshots: [IsEarningSnapshot!] @derivedFrom(field: "account")
+  lastUpdate: Timestamp!
+}
+
 type MToken @entity(immutable: false) {
   id: ID! @unique
   latestIndex: BigInt!
+  holders: [Holder!]
+  totalNonEarningSupply: BigInt!
+  totalNonEarningSupplySnapshots: [TotalNonEarningSupplySnapshot!]
+  principalOfTotalEarningSupply: BigInt!
+  principalOfTotalEarningSupplySnapshots: [PrincipalOfTotalEarningSupplySnapshot!]
   latestIndexSnapshots: [LatestIndexSnapshot!]
   latestUpdateTimestamp: Timestamp!
   latestUpdateTimestampSnapshots: [LatestUpdateTimestampSnapshot!]

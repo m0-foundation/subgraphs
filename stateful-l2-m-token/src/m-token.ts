@@ -1,8 +1,22 @@
 import { Address, BigInt, Timestamp } from '@graphprotocol/graph-ts';
-import { LatestIndexSnapshot, LatestUpdateTimestampSnapshot, MToken } from '../generated/schema';
-import { IndexUpdated as IndexUpdatedEvent } from '../generated/MToken/MToken';
+import {
+  LatestIndexSnapshot,
+  LatestUpdateTimestampSnapshot,
+  MToken,
+  Holder,
+  NonEarningBalanceSnapshot,
+  PrincipalOfTotalEarningSupplySnapshot,
+  TotalNonEarningSupplySnapshot,
+  EarningPrincipalSnapshot,
+  IsEarningSnapshot,
+} from '../generated/schema';
+import { IndexUpdated as IndexUpdatedEvent, StartedEarning as StartedEarningEvent } from '../generated/MToken/MToken';
 
 const M_TOKEN_ADDRESS = '0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b';
+
+const EXP_SCALED_ONE = BigInt.fromI32(10).pow(12);
+const BPS_SCALED_ONE = BigInt.fromI32(10).pow(4);
+const SECONDS_PER_YEAR = BigInt.fromI32(31_536_000);
 
 /* ============ Handlers ============ */
 
@@ -16,6 +30,167 @@ export function handleIndexUpdated(event: IndexUpdatedEvent): void {
   mToken.save();
 }
 
+export function handleStartedEarning(event: StartedEarningEvent): void {
+  const mToken = getMToken();
+  const account = getHolder(event.params.account);
+  const timestamp = event.block.timestamp.toI32();
+
+  _startEarning(mToken, account, timestamp);
+
+  mToken.lastUpdate = timestamp;
+  mToken.save();
+
+  account.lastUpdate = timestamp;
+  account.save();
+}
+
+function _startEarning(mToken: MToken, account: Holder, timestamp: Timestamp): void {
+  account.isEarning = true;
+
+  updateIsEarningSnapshot(account, timestamp, account.isEarning);
+
+  const balance = account.nonEarningBalance;
+
+  _subtractNonEarningAmount(mToken, account, balance, timestamp);
+
+  const index = _getCurrentIndex(mToken, timestamp);
+  const principal = _getPrincipalAmountRoundedDown(balance, index);
+
+  _addEarningAmount(mToken, account, principal, timestamp);
+}
+
+function _subtractNonEarningAmount(mToken: MToken, account: Holder, amount: BigInt, timestamp: Timestamp): void {
+  if (amount.equals(BigInt.fromI32(0))) return;
+
+  account.nonEarningBalance = account.nonEarningBalance.minus(amount);
+
+  updateNonEarningBalanceSnapshot(account, timestamp, account.nonEarningBalance);
+
+  mToken.totalNonEarningSupply = mToken.totalNonEarningSupply.minus(amount);
+
+  updateTotalNonEarningSupplySnapshot(timestamp, mToken.totalNonEarningSupply);
+}
+
+function updateTotalNonEarningSupplySnapshot(timestamp: Timestamp, value: BigInt): void {
+  const id = `totalNonEarningSupply-${timestamp.toString()}`;
+
+  let snapshot = TotalNonEarningSupplySnapshot.load(id);
+
+  if (!snapshot) {
+    snapshot = new TotalNonEarningSupplySnapshot(id);
+
+    snapshot.timestamp = timestamp;
+  }
+
+  snapshot.value = value;
+
+  snapshot.save();
+}
+
+function updatePrincipalOfTotalEarningSupplySnapshot(timestamp: Timestamp, value: BigInt): void {
+  const id = `principalOfTotalEarningSupply-${timestamp.toString()}`;
+
+  let snapshot = PrincipalOfTotalEarningSupplySnapshot.load(id);
+
+  if (!snapshot) {
+    snapshot = new PrincipalOfTotalEarningSupplySnapshot(id);
+
+    snapshot.timestamp = timestamp;
+  }
+
+  snapshot.value = value;
+
+  snapshot.save();
+}
+
+function _addEarningAmount(mToken: MToken, account: Holder, principal: BigInt, timestamp: Timestamp): void {
+  if (principal.equals(BigInt.fromI32(0))) return;
+
+  account.earningPrincipal = account.earningPrincipal.plus(principal);
+
+  updateEarningPrincipalSnapshot(account, timestamp, account.earningPrincipal);
+
+  mToken.principalOfTotalEarningSupply = mToken.principalOfTotalEarningSupply.plus(principal);
+
+  updatePrincipalOfTotalEarningSupplySnapshot(timestamp, mToken.principalOfTotalEarningSupply);
+}
+
+function updateEarningPrincipalSnapshot(holder: Holder, timestamp: Timestamp, value: BigInt): void {
+  const id = `earningPrincipal-${holder.address}-${timestamp.toString()}`;
+
+  let snapshot = EarningPrincipalSnapshot.load(id);
+
+  if (!snapshot) {
+    snapshot = new EarningPrincipalSnapshot(id);
+
+    snapshot.account = holder.id;
+    snapshot.timestamp = timestamp;
+  }
+
+  snapshot.value = value;
+
+  snapshot.save();
+}
+
+function updateNonEarningBalanceSnapshot(holder: Holder, timestamp: Timestamp, value: BigInt): void {
+  const id = `nonEarningBalance-${holder.address}-${timestamp.toString()}`;
+
+  let snapshot = NonEarningBalanceSnapshot.load(id);
+
+  if (!snapshot) {
+    snapshot = new NonEarningBalanceSnapshot(id);
+
+    snapshot.account = holder.id;
+    snapshot.timestamp = timestamp;
+  }
+
+  snapshot.value = value;
+
+  snapshot.save();
+}
+
+function updateIsEarningSnapshot(holder: Holder, timestamp: Timestamp, value: boolean): void {
+  const id = `isEarning-${holder.address}-${timestamp.toString()}`;
+
+  let snapshot = IsEarningSnapshot.load(id);
+
+  if (!snapshot) {
+    snapshot = new IsEarningSnapshot(id);
+
+    snapshot.account = holder.id;
+    snapshot.timestamp = timestamp;
+  }
+
+  snapshot.value = value;
+
+  snapshot.save();
+}
+
+function getHolder(address: Address): Holder {
+  const id = `holder-${address.toHexString()}`;
+
+  let holder = Holder.load(id);
+
+  if (holder) return holder;
+
+  holder = new Holder(id);
+
+  holder.address = address.toHexString();
+  holder.earningPrincipal = BigInt.fromI32(0);
+  holder.nonEarningBalance = BigInt.fromI32(0);
+  holder.isEarning = false;
+  holder.lastUpdate = 0;
+
+  return holder;
+}
+
+function _getCurrentIndex(mToken: MToken, timestamp: Timestamp): BigInt {
+  return _multiplyIndicesDown(
+    mToken.latestIndex,
+    _getContinuousIndex(_convertFromBasisPoints(BigInt.fromI32(415)), timestamp - mToken.latestUpdateTimestamp)
+  );
+}
+
 /* ============ Entity Helpers ============ */
 
 function getMToken(): MToken {
@@ -27,6 +202,8 @@ function getMToken(): MToken {
 
   mToken = new MToken(id);
 
+  mToken.totalNonEarningSupply = BigInt.fromI32(0);
+  mToken.principalOfTotalEarningSupply = BigInt.fromI32(0);
   mToken.latestIndex = BigInt.fromI32(0);
   mToken.latestUpdateTimestamp = 0;
   mToken.lastUpdate = 0;
@@ -74,4 +251,60 @@ function _updateIndex(mToken: MToken, timestamp: Timestamp, index: BigInt): void
 
   updateLatestIndexSnapshot(timestamp, mToken.latestIndex);
   updateLatestUpdateTimestampSnapshot(timestamp, mToken.latestUpdateTimestamp);
+}
+
+/* ============ Contract Helpers ============ */
+
+function _getPresentAmountRoundedDown(principalAmount: BigInt, index: BigInt): BigInt {
+  return _multiplyDown(principalAmount, index);
+}
+
+function _getPrincipalAmountRoundedUp(presentAmount: BigInt, index: BigInt): BigInt {
+  return _divideUp(presentAmount, index);
+}
+
+function _getPrincipalAmountRoundedDown(presentAmount: BigInt, index: BigInt): BigInt {
+  return _divideDown(presentAmount, index);
+}
+
+function _divideUp(x: BigInt, index: BigInt): BigInt {
+  return x.times(EXP_SCALED_ONE).plus(index).minus(BigInt.fromI32(1)).div(index);
+}
+
+function _divideDown(x: BigInt, index: BigInt): BigInt {
+  return x.times(EXP_SCALED_ONE).div(index);
+}
+
+function _multiplyDown(x: BigInt, index: BigInt): BigInt {
+  return x.times(index).div(EXP_SCALED_ONE);
+}
+
+function _convertFromBasisPoints(rate: BigInt): BigInt {
+  return EXP_SCALED_ONE.times(rate).div(BPS_SCALED_ONE);
+}
+
+function _getContinuousIndex(yearlyRate: BigInt, time: Timestamp): BigInt {
+  return _exponent(yearlyRate.times(BigInt.fromI64(time)).div(SECONDS_PER_YEAR));
+}
+
+function _exponent(x: BigInt): BigInt {
+  const x2 = x.times(x);
+
+  const _84e27 = BigInt.fromI32(84).times(BigInt.fromI32(10).pow(27));
+  const _9e3 = BigInt.fromI32(9).times(BigInt.fromI32(10).pow(3));
+  const _2e11 = BigInt.fromI32(2).times(BigInt.fromI32(10).pow(11));
+  const _1e11 = BigInt.fromI32(10).pow(11);
+  const _42e15 = BigInt.fromI32(42).times(BigInt.fromI32(10).pow(15));
+  const _1e9 = BigInt.fromI32(10).pow(9);
+  const _1e12 = BigInt.fromI32(10).pow(12);
+
+  const additiveTerms = _84e27.plus(x2.times(_9e3)).plus(x2.div(_2e11).times(x2.div(_1e11)));
+
+  const differentTerms = x.times(_42e15.plus(x2.div(_1e9)));
+
+  return additiveTerms.plus(differentTerms).times(_1e12).div(additiveTerms.minus(differentTerms));
+}
+
+function _multiplyIndicesDown(index: BigInt, deltaIndex: BigInt): BigInt {
+  return index.times(deltaIndex).div(EXP_SCALED_ONE);
 }

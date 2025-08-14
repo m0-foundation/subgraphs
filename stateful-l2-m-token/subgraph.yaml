@@ -16,6 +16,13 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
+        - Holder
+        - IsEarningSnapshot
+        - TotalNonEarningSupplySnapshot
+        - PrincipalOfTotalEarningSupplySnapshot
+        - NonEarningBalanceSnapshot
+        - IsEarningSnapshot
+        - EarningPrincipalSnapshot
         - LatestIndexSnapshot
         - LatestUpdateTimestampSnapshot
         - MToken
@@ -23,6 +30,8 @@ dataSources:
         - name: MToken
           file: ./abis/MToken.json
       eventHandlers:
+        - event: StartedEarning(indexed address)
+          handler: handleStartedEarning
         - event: IndexUpdated(indexed uint128)
           handler: handleIndexUpdated
       file: ./src/m-token.ts
