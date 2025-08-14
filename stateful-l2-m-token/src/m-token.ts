@@ -109,6 +109,304 @@ export function handleTransfer(event: TransferEvent): void {
   transfer.save();
 }
 
+/* ============ Entity Helpers ============ */
+
+function getMToken(): MToken {
+  const id = `mToken-${M_TOKEN_ADDRESS}`;
+
+  let mToken = MToken.load(id);
+
+  if (mToken) return mToken;
+
+  mToken = new MToken(id);
+
+  mToken.totalNonEarningSupply = BigInt.zero();
+  mToken.principalOfTotalEarningSupply = BigInt.zero();
+  mToken.latestIndex = BigInt.zero();
+  mToken.totalMinted = BigInt.zero();
+  mToken.totalBurned = BigInt.zero();
+  mToken.latestUpdateTimestamp = 0;
+  mToken.lastUpdate = 0;
+
+  return mToken;
+}
+
+function getHolder(address: Address): Holder {
+  const id = `holder-${address.toHexString()}`;
+
+  let holder = Holder.load(id);
+
+  if (holder) return holder;
+
+  holder = new Holder(id);
+
+  holder.address = address.toHexString();
+  holder.earningPrincipal = BigInt.zero();
+  holder.nonEarningBalance = BigInt.zero();
+  holder.received = BigInt.zero();
+  holder.sent = BigInt.zero();
+  holder.isEarning = false;
+  holder.lastUpdate = 0;
+
+  return holder;
+}
+
+function updateLatestIndexSnapshot(timestamp: Timestamp, value: BigInt): void {
+  const id = `latestIndex-${timestamp.toString()}`;
+
+  let snapshot = LatestIndexSnapshot.load(id);
+
+  if (!snapshot) {
+    snapshot = new LatestIndexSnapshot(id);
+
+    snapshot.timestamp = timestamp;
+  }
+
+  snapshot.value = value;
+
+  snapshot.save();
+}
+
+function updateLatestUpdateTimestampSnapshot(timestamp: Timestamp, value: Timestamp): void {
+  const id = `latestUpdateTimestamp-${timestamp.toString()}`;
+
+  let snapshot = LatestUpdateTimestampSnapshot.load(id);
+
+  if (!snapshot) {
+    snapshot = new LatestUpdateTimestampSnapshot(id);
+
+    snapshot.timestamp = timestamp;
+  }
+
+  snapshot.value = value;
+
+  snapshot.save();
+}
+
+function updateTotalNonEarningSupplySnapshot(timestamp: Timestamp, value: BigInt): void {
+  const id = `totalNonEarningSupply-${timestamp.toString()}`;
+
+  let snapshot = TotalNonEarningSupplySnapshot.load(id);
+
+  if (!snapshot) {
+    snapshot = new TotalNonEarningSupplySnapshot(id);
+
+    snapshot.timestamp = timestamp;
+  }
+
+  snapshot.value = value;
+
+  snapshot.save();
+}
+
+function updatePrincipalOfTotalEarningSupplySnapshot(timestamp: Timestamp, value: BigInt): void {
+  const id = `principalOfTotalEarningSupply-${timestamp.toString()}`;
+
+  let snapshot = PrincipalOfTotalEarningSupplySnapshot.load(id);
+
+  if (!snapshot) {
+    snapshot = new PrincipalOfTotalEarningSupplySnapshot(id);
+
+    snapshot.timestamp = timestamp;
+  }
+
+  snapshot.value = value;
+
+  snapshot.save();
+}
+
+function updateReceivedSnapshot(holder: Holder, timestamp: Timestamp, value: BigInt): void {
+  const id = `received-${holder.address}-${timestamp.toString()}`;
+
+  let snapshot = ReceivedSnapshot.load(id);
+
+  if (!snapshot) {
+    snapshot = new ReceivedSnapshot(id);
+
+    snapshot.account = holder.id;
+    snapshot.timestamp = timestamp;
+  }
+
+  snapshot.value = value;
+
+  snapshot.save();
+}
+
+function updateSentSnapshot(holder: Holder, timestamp: Timestamp, value: BigInt): void {
+  const id = `sent-${holder.address}-${timestamp.toString()}`;
+
+  let snapshot = SentSnapshot.load(id);
+
+  if (!snapshot) {
+    snapshot = new SentSnapshot(id);
+
+    snapshot.account = holder.id;
+    snapshot.timestamp = timestamp;
+  }
+
+  snapshot.value = value;
+
+  snapshot.save();
+}
+
+function updateTotalMintedSnapshot(timestamp: Timestamp, value: BigInt): void {
+  const id = `totalMinted-${timestamp.toString()}`;
+
+  let snapshot = TotalMintedSnapshot.load(id);
+
+  if (!snapshot) {
+    snapshot = new TotalMintedSnapshot(id);
+
+    snapshot.timestamp = timestamp;
+  }
+
+  snapshot.value = value;
+
+  snapshot.save();
+}
+
+function updateTotalBurnedSnapshot(timestamp: Timestamp, value: BigInt): void {
+  const id = `totalBurned-${timestamp.toString()}`;
+
+  let snapshot = TotalBurnedSnapshot.load(id);
+
+  if (!snapshot) {
+    snapshot = new TotalBurnedSnapshot(id);
+
+    snapshot.timestamp = timestamp;
+  }
+
+  snapshot.value = value;
+
+  snapshot.save();
+}
+
+function updateEarningPrincipalSnapshot(holder: Holder, timestamp: Timestamp, value: BigInt): void {
+  const id = `earningPrincipal-${holder.address}-${timestamp.toString()}`;
+
+  let snapshot = EarningPrincipalSnapshot.load(id);
+
+  if (!snapshot) {
+    snapshot = new EarningPrincipalSnapshot(id);
+
+    snapshot.account = holder.id;
+    snapshot.timestamp = timestamp;
+  }
+
+  snapshot.value = value;
+
+  snapshot.save();
+}
+
+function updateNonEarningBalanceSnapshot(holder: Holder, timestamp: Timestamp, value: BigInt): void {
+  const id = `nonEarningBalance-${holder.address}-${timestamp.toString()}`;
+
+  let snapshot = NonEarningBalanceSnapshot.load(id);
+
+  if (!snapshot) {
+    snapshot = new NonEarningBalanceSnapshot(id);
+
+    snapshot.account = holder.id;
+    snapshot.timestamp = timestamp;
+  }
+
+  snapshot.value = value;
+
+  snapshot.save();
+}
+
+function updateIsEarningSnapshot(holder: Holder, timestamp: Timestamp, value: boolean): void {
+  const id = `isEarning-${holder.address}-${timestamp.toString()}`;
+
+  let snapshot = IsEarningSnapshot.load(id);
+
+  if (!snapshot) {
+    snapshot = new IsEarningSnapshot(id);
+
+    snapshot.account = holder.id;
+    snapshot.timestamp = timestamp;
+  }
+
+  snapshot.value = value;
+
+  snapshot.save();
+}
+
+/* ============ Contract Stateful Tracking ============ */
+
+function _burn(mToken: MToken, account: Holder, amount: BigInt, timestamp: Timestamp): void {
+  if (amount.equals(BigInt.fromI32(0))) return;
+
+  let sent: BigInt;
+
+  if (account.isEarning) {
+    const index = _getCurrentIndex(mToken, timestamp);
+    const startingBalance = _getPresentAmountRoundedDown(account.earningPrincipal, index);
+
+    _subtractEarningAmount(mToken, account, _getPrincipalAmountRoundedUp(amount, index), timestamp);
+
+    sent = _getPresentAmountRoundedDown(account.earningPrincipal, index).minus(startingBalance);
+  } else {
+    _subtractNonEarningAmount(mToken, account, amount, timestamp);
+
+    sent = amount;
+  }
+
+  mToken.totalBurned = mToken.totalBurned.plus(amount);
+
+  updateTotalBurnedSnapshot(timestamp, mToken.totalBurned);
+
+  if (sent.equals(BigInt.fromI32(0))) return;
+
+  account.sent = account.sent.plus(amount);
+
+  updateSentSnapshot(account, timestamp, account.sent);
+}
+
+function _mint(mToken: MToken, recipient: Holder, amount: BigInt, timestamp: Timestamp): void {
+  if (amount.equals(BigInt.fromI32(0))) return;
+
+  let received: BigInt;
+
+  if (recipient.isEarning) {
+    const index = _getCurrentIndex(mToken, timestamp);
+    const startingBalance = _getPresentAmountRoundedDown(recipient.earningPrincipal, index);
+
+    _addEarningAmount(mToken, recipient, _getPrincipalAmountRoundedDown(amount, index), timestamp);
+
+    received = _getPresentAmountRoundedDown(recipient.earningPrincipal, index).minus(startingBalance);
+  } else {
+    _addNonEarningAmount(mToken, recipient, amount, timestamp);
+
+    received = amount;
+  }
+
+  mToken.totalMinted = mToken.totalMinted.plus(amount);
+
+  updateTotalMintedSnapshot(timestamp, mToken.totalMinted);
+
+  if (received.equals(BigInt.fromI32(0))) return;
+
+  recipient.received = recipient.received.plus(amount);
+
+  updateReceivedSnapshot(recipient, timestamp, recipient.received);
+}
+
+function _updateIndex(mToken: MToken, timestamp: Timestamp, index: BigInt): void {
+  mToken.latestIndex = index;
+  mToken.latestUpdateTimestamp = timestamp;
+
+  updateLatestIndexSnapshot(timestamp, mToken.latestIndex);
+  updateLatestUpdateTimestampSnapshot(timestamp, mToken.latestUpdateTimestamp);
+}
+
+function _getCurrentIndex(mToken: MToken, timestamp: Timestamp): BigInt {
+  return _multiplyIndicesDown(
+    mToken.latestIndex,
+    _getContinuousIndex(_convertFromBasisPoints(LATEST_RATE_BPS), timestamp - mToken.latestUpdateTimestamp)
+  );
+}
+
 function _transfer(mToken: MToken, sender: Holder, recipient: Holder, amount: BigInt, timestamp: Timestamp): void {
   if (amount.equals(BigInt.fromI32(0))) return;
 
@@ -232,162 +530,6 @@ function _subtractNonEarningAmount(mToken: MToken, account: Holder, amount: BigI
   updateTotalNonEarningSupplySnapshot(timestamp, mToken.totalNonEarningSupply);
 }
 
-function updateTotalNonEarningSupplySnapshot(timestamp: Timestamp, value: BigInt): void {
-  const id = `totalNonEarningSupply-${timestamp.toString()}`;
-
-  let snapshot = TotalNonEarningSupplySnapshot.load(id);
-
-  if (!snapshot) {
-    snapshot = new TotalNonEarningSupplySnapshot(id);
-
-    snapshot.timestamp = timestamp;
-  }
-
-  snapshot.value = value;
-
-  snapshot.save();
-}
-
-function updatePrincipalOfTotalEarningSupplySnapshot(timestamp: Timestamp, value: BigInt): void {
-  const id = `principalOfTotalEarningSupply-${timestamp.toString()}`;
-
-  let snapshot = PrincipalOfTotalEarningSupplySnapshot.load(id);
-
-  if (!snapshot) {
-    snapshot = new PrincipalOfTotalEarningSupplySnapshot(id);
-
-    snapshot.timestamp = timestamp;
-  }
-
-  snapshot.value = value;
-
-  snapshot.save();
-}
-
-function _burn(mToken: MToken, account: Holder, amount: BigInt, timestamp: Timestamp): void {
-  if (amount.equals(BigInt.fromI32(0))) return;
-
-  let sent: BigInt;
-
-  if (account.isEarning) {
-    const index = _getCurrentIndex(mToken, timestamp);
-    const startingBalance = _getPresentAmountRoundedDown(account.earningPrincipal, index);
-
-    _subtractEarningAmount(mToken, account, _getPrincipalAmountRoundedUp(amount, index), timestamp);
-
-    sent = _getPresentAmountRoundedDown(account.earningPrincipal, index).minus(startingBalance);
-  } else {
-    _subtractNonEarningAmount(mToken, account, amount, timestamp);
-
-    sent = amount;
-  }
-
-  mToken.totalBurned = mToken.totalBurned.plus(amount);
-
-  updateTotalBurnedSnapshot(timestamp, mToken.totalBurned);
-
-  if (sent.equals(BigInt.fromI32(0))) return;
-
-  account.sent = account.sent.plus(amount);
-
-  updateSentSnapshot(account, timestamp, account.sent);
-}
-
-function _mint(mToken: MToken, recipient: Holder, amount: BigInt, timestamp: Timestamp): void {
-  if (amount.equals(BigInt.fromI32(0))) return;
-
-  let received: BigInt;
-
-  if (recipient.isEarning) {
-    const index = _getCurrentIndex(mToken, timestamp);
-    const startingBalance = _getPresentAmountRoundedDown(recipient.earningPrincipal, index);
-
-    _addEarningAmount(mToken, recipient, _getPrincipalAmountRoundedDown(amount, index), timestamp);
-
-    received = _getPresentAmountRoundedDown(recipient.earningPrincipal, index).minus(startingBalance);
-  } else {
-    _addNonEarningAmount(mToken, recipient, amount, timestamp);
-
-    received = amount;
-  }
-
-  mToken.totalMinted = mToken.totalMinted.plus(amount);
-
-  updateTotalMintedSnapshot(timestamp, mToken.totalMinted);
-
-  if (received.equals(BigInt.fromI32(0))) return;
-
-  recipient.received = recipient.received.plus(amount);
-
-  updateReceivedSnapshot(recipient, timestamp, recipient.received);
-}
-
-function updateReceivedSnapshot(holder: Holder, timestamp: Timestamp, value: BigInt): void {
-  const id = `received-${holder.address}-${timestamp.toString()}`;
-
-  let snapshot = ReceivedSnapshot.load(id);
-
-  if (!snapshot) {
-    snapshot = new ReceivedSnapshot(id);
-
-    snapshot.account = holder.id;
-    snapshot.timestamp = timestamp;
-  }
-
-  snapshot.value = value;
-
-  snapshot.save();
-}
-
-function updateSentSnapshot(holder: Holder, timestamp: Timestamp, value: BigInt): void {
-  const id = `sent-${holder.address}-${timestamp.toString()}`;
-
-  let snapshot = SentSnapshot.load(id);
-
-  if (!snapshot) {
-    snapshot = new SentSnapshot(id);
-
-    snapshot.account = holder.id;
-    snapshot.timestamp = timestamp;
-  }
-
-  snapshot.value = value;
-
-  snapshot.save();
-}
-
-function updateTotalMintedSnapshot(timestamp: Timestamp, value: BigInt): void {
-  const id = `totalMinted-${timestamp.toString()}`;
-
-  let snapshot = TotalMintedSnapshot.load(id);
-
-  if (!snapshot) {
-    snapshot = new TotalMintedSnapshot(id);
-
-    snapshot.timestamp = timestamp;
-  }
-
-  snapshot.value = value;
-
-  snapshot.save();
-}
-
-function updateTotalBurnedSnapshot(timestamp: Timestamp, value: BigInt): void {
-  const id = `totalBurned-${timestamp.toString()}`;
-
-  let snapshot = TotalBurnedSnapshot.load(id);
-
-  if (!snapshot) {
-    snapshot = new TotalBurnedSnapshot(id);
-
-    snapshot.timestamp = timestamp;
-  }
-
-  snapshot.value = value;
-
-  snapshot.save();
-}
-
 function _addEarningAmount(mToken: MToken, account: Holder, principal: BigInt, timestamp: Timestamp): void {
   if (principal.equals(BigInt.fromI32(0))) return;
 
@@ -422,148 +564,6 @@ function _addNonEarningAmount(mToken: MToken, account: Holder, amount: BigInt, t
   mToken.totalNonEarningSupply = mToken.totalNonEarningSupply.plus(amount);
 
   updateTotalNonEarningSupplySnapshot(timestamp, mToken.totalNonEarningSupply);
-}
-
-function updateEarningPrincipalSnapshot(holder: Holder, timestamp: Timestamp, value: BigInt): void {
-  const id = `earningPrincipal-${holder.address}-${timestamp.toString()}`;
-
-  let snapshot = EarningPrincipalSnapshot.load(id);
-
-  if (!snapshot) {
-    snapshot = new EarningPrincipalSnapshot(id);
-
-    snapshot.account = holder.id;
-    snapshot.timestamp = timestamp;
-  }
-
-  snapshot.value = value;
-
-  snapshot.save();
-}
-
-function updateNonEarningBalanceSnapshot(holder: Holder, timestamp: Timestamp, value: BigInt): void {
-  const id = `nonEarningBalance-${holder.address}-${timestamp.toString()}`;
-
-  let snapshot = NonEarningBalanceSnapshot.load(id);
-
-  if (!snapshot) {
-    snapshot = new NonEarningBalanceSnapshot(id);
-
-    snapshot.account = holder.id;
-    snapshot.timestamp = timestamp;
-  }
-
-  snapshot.value = value;
-
-  snapshot.save();
-}
-
-function updateIsEarningSnapshot(holder: Holder, timestamp: Timestamp, value: boolean): void {
-  const id = `isEarning-${holder.address}-${timestamp.toString()}`;
-
-  let snapshot = IsEarningSnapshot.load(id);
-
-  if (!snapshot) {
-    snapshot = new IsEarningSnapshot(id);
-
-    snapshot.account = holder.id;
-    snapshot.timestamp = timestamp;
-  }
-
-  snapshot.value = value;
-
-  snapshot.save();
-}
-
-function getHolder(address: Address): Holder {
-  const id = `holder-${address.toHexString()}`;
-
-  let holder = Holder.load(id);
-
-  if (holder) return holder;
-
-  holder = new Holder(id);
-
-  holder.address = address.toHexString();
-  holder.earningPrincipal = BigInt.zero();
-  holder.nonEarningBalance = BigInt.zero();
-  holder.received = BigInt.zero();
-  holder.sent = BigInt.zero();
-  holder.isEarning = false;
-  holder.lastUpdate = 0;
-
-  return holder;
-}
-
-function _getCurrentIndex(mToken: MToken, timestamp: Timestamp): BigInt {
-  return _multiplyIndicesDown(
-    mToken.latestIndex,
-    _getContinuousIndex(_convertFromBasisPoints(LATEST_RATE_BPS), timestamp - mToken.latestUpdateTimestamp)
-  );
-}
-
-/* ============ Entity Helpers ============ */
-
-function getMToken(): MToken {
-  const id = `mToken-${M_TOKEN_ADDRESS}`;
-
-  let mToken = MToken.load(id);
-
-  if (mToken) return mToken;
-
-  mToken = new MToken(id);
-
-  mToken.totalNonEarningSupply = BigInt.zero();
-  mToken.principalOfTotalEarningSupply = BigInt.zero();
-  mToken.latestIndex = BigInt.zero();
-  mToken.totalMinted = BigInt.zero();
-  mToken.totalBurned = BigInt.zero();
-  mToken.latestUpdateTimestamp = 0;
-  mToken.lastUpdate = 0;
-
-  return mToken;
-}
-
-function updateLatestIndexSnapshot(timestamp: Timestamp, value: BigInt): void {
-  const id = `latestIndex-${timestamp.toString()}`;
-
-  let snapshot = LatestIndexSnapshot.load(id);
-
-  if (!snapshot) {
-    snapshot = new LatestIndexSnapshot(id);
-
-    snapshot.timestamp = timestamp;
-  }
-
-  snapshot.value = value;
-
-  snapshot.save();
-}
-
-function updateLatestUpdateTimestampSnapshot(timestamp: Timestamp, value: Timestamp): void {
-  const id = `latestUpdateTimestamp-${timestamp.toString()}`;
-
-  let snapshot = LatestUpdateTimestampSnapshot.load(id);
-
-  if (!snapshot) {
-    snapshot = new LatestUpdateTimestampSnapshot(id);
-
-    snapshot.timestamp = timestamp;
-  }
-
-  snapshot.value = value;
-
-  snapshot.save();
-}
-
-/* ============ Contract Stateful Tracking ============ */
-
-function _updateIndex(mToken: MToken, timestamp: Timestamp, index: BigInt): void {
-  mToken.latestIndex = index;
-  mToken.latestUpdateTimestamp = timestamp;
-
-  updateLatestIndexSnapshot(timestamp, mToken.latestIndex);
-  updateLatestUpdateTimestampSnapshot(timestamp, mToken.latestUpdateTimestamp);
 }
 
 /* ============ Contract Helpers ============ */
