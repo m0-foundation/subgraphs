@@ -18,7 +18,6 @@ import {
   Transfer as TransferEvent,
 } from '../generated/MToken/MToken';
 
-const ZERO_ADDRESS = Address.fromString('0x0000000000000000000000000000000000000000');
 const M_TOKEN_ADDRESS = '0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b';
 
 const EXP_SCALED_ONE = BigInt.fromI32(10).pow(12);
@@ -71,6 +70,8 @@ export function handleTransfer(event: TransferEvent): void {
   const recipient = getHolder(event.params.recipient);
   const timestamp = event.block.timestamp.toI32();
   const amount = event.params.amount;
+
+  const ZERO_ADDRESS = Address.fromString('0x0000000000000000000000000000000000000000');
 
   if (!event.params.sender.equals(ZERO_ADDRESS) && !event.params.recipient.equals(ZERO_ADDRESS)) {
     _transfer(mToken, sender, recipient, amount, timestamp);
