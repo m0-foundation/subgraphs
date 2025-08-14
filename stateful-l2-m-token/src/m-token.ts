@@ -1,4 +1,4 @@
-import { Address, BigInt, Timestamp } from '@graphprotocol/graph-ts';
+import { Address, BigInt, log, Timestamp } from '@graphprotocol/graph-ts';
 import {
   EarningPrincipalSnapshot,
   Holder,
@@ -100,13 +100,39 @@ export function handleStoppedEarning(event: StoppedEarningEvent): void {
 }
 
 export function handleIndexUpdated(event: IndexUpdatedEvent): void {
-  const mToken = getMToken();
   const timestamp = event.block.timestamp.toI32();
+  log.info('timestamp: {}', [timestamp.toString()]);
 
-  _updateIndex(mToken, timestamp, event.params.index);
+  const id = 'mToken-0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b';
 
-  mToken.lastUpdate = timestamp;
-  mToken.save();
+  log.info('mToken id: {}', [id]);
+
+  let token = MToken.load(id);
+
+  if (token) {
+    log.info('token loaded w id: {}', [token.id.toString()]);
+  }
+
+  if (!token) {
+    log.info('token not found, creating new one', []);
+
+    token = new MToken(id);
+
+    log.info('token created w id: {}', [token.id.toString()]);
+
+    token.totalNonEarningSupply = BigInt.fromI32(0);
+    token.principalOfTotalEarningSupply = BigInt.fromI32(0);
+    token.latestIndex = BigInt.fromI32(0);
+    token.latestUpdateTimestamp = 0;
+    token.totalMinted = BigInt.fromI32(0);
+    token.totalBurned = BigInt.fromI32(0);
+    token.lastUpdate = 0;
+  }
+
+  _updateIndex(token, timestamp, event.params.index);
+
+  token.lastUpdate = timestamp;
+  token.save();
 }
 
 /* ============ Entity Helpers ============ */
