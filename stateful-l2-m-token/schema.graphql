@@ -75,9 +75,41 @@ type IsEarningSnapshot implements HolderSnapshotEntity & BooleanSnapshotEntity &
   value: Boolean!
 }
 
+type ReceivedSnapshot implements HolderSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity(immutable: true) {
+  id: ID! @unique
+  timestamp: Timestamp!
+  account: Holder!
+  value: BigInt!
+}
+
+type SentSnapshot implements HolderSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity(immutable: true) {
+  id: ID! @unique
+  timestamp: Timestamp!
+  account: Holder!
+  value: BigInt!
+}
+
+type TotalMintedSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity(immutable: true) {
+  id: ID! @unique
+  timestamp: Timestamp! @unique
+  value: BigInt!
+}
+
+type TotalBurnedSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity(immutable: true) {
+  id: ID! @unique
+  timestamp: Timestamp! @unique
+  value: BigInt!
+}
+
 type Holder @entity(immutable: false) {
   id: ID! @unique
   address: String! @unique
+  transfersTo: [Transfer!] @derivedFrom(field: "recipient")
+  transfersFrom: [Transfer!] @derivedFrom(field: "sender")
+  received: BigInt!
+  receivedSnapshots: [ReceivedSnapshot!] @derivedFrom(field: "account")
+  sent: BigInt!
+  sentSnapshots: [SentSnapshot!] @derivedFrom(field: "account")
   earningPrincipal: BigInt!
   earningPrincipalSnapshots: [EarningPrincipalSnapshot!] @derivedFrom(field: "account")
   nonEarningBalance: BigInt!
@@ -108,5 +140,9 @@ type MToken @entity(immutable: false) {
   latestIndexSnapshots: [LatestIndexSnapshot!]
   latestUpdateTimestamp: Timestamp!
   latestUpdateTimestampSnapshots: [LatestUpdateTimestampSnapshot!]
+  totalMinted: BigInt!
+  totalMintedSnapshots: [TotalMintedSnapshot!]
+  totalBurned: BigInt!
+  totalBurnedSnapshots: [TotalBurnedSnapshot!]
   lastUpdate: Timestamp!
 }

@@ -27,6 +27,10 @@ dataSources:
         - LatestUpdateTimestampSnapshot
         - MToken
         - Transfer
+        - TotalMintedSnapshot
+        - TotalBurnedSnapshot
+        - ReceivedSnapshot
+        - SentSnapshot
       abis:
         - name: MToken
           file: ./abis/MToken.json
