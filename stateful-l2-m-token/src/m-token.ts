@@ -485,8 +485,8 @@ function getHolder(address: Address): Holder {
   holder = new Holder(id);
 
   holder.address = address.toHexString();
-  holder.earningPrincipal = BigInt.fromI32(0);
-  holder.nonEarningBalance = BigInt.fromI32(0);
+  holder.earningPrincipal = BigInt.zero();
+  holder.nonEarningBalance = BigInt.zero();
   holder.received = BigInt.zero();
   holder.sent = BigInt.zero();
   holder.isEarning = false;
@@ -513,11 +513,11 @@ function getMToken(): MToken {
 
   mToken = new MToken(id);
 
-  mToken.totalNonEarningSupply = BigInt.fromI32(0);
-  mToken.principalOfTotalEarningSupply = BigInt.fromI32(0);
-  mToken.latestIndex = BigInt.fromI32(0);
-  mToken.totalMinted = BigInt.fromI32(0);
-  mToken.totalBurned = BigInt.fromI32(0);
+  mToken.totalNonEarningSupply = BigInt.zero();
+  mToken.principalOfTotalEarningSupply = BigInt.zero();
+  mToken.latestIndex = BigInt.zero();
+  mToken.totalMinted = BigInt.zero();
+  mToken.totalBurned = BigInt.zero();
   mToken.latestUpdateTimestamp = 0;
   mToken.lastUpdate = 0;
 
