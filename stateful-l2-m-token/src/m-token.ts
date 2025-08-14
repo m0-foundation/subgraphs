@@ -27,6 +27,8 @@ const M_TOKEN_ADDRESS = '0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b';
 const EXP_SCALED_ONE = BigInt.fromI32(10).pow(12);
 const BPS_SCALED_ONE = BigInt.fromI32(10).pow(4);
 const SECONDS_PER_YEAR = BigInt.fromI32(31_536_000);
+// @fixme(FS-223): This is a hardcoded value for the latest rate in basis points (4.15%).
+const LATEST_RATE_BPS = BigInt.fromI32(415);
 
 /* ============ Handlers ============ */
 
@@ -496,7 +498,7 @@ function getHolder(address: Address): Holder {
 function _getCurrentIndex(mToken: MToken, timestamp: Timestamp): BigInt {
   return _multiplyIndicesDown(
     mToken.latestIndex,
-    _getContinuousIndex(_convertFromBasisPoints(BigInt.fromI32(415)), timestamp - mToken.latestUpdateTimestamp)
+    _getContinuousIndex(_convertFromBasisPoints(LATEST_RATE_BPS), timestamp - mToken.latestUpdateTimestamp)
   );
 }
 
