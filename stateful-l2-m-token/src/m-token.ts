@@ -4,11 +4,6 @@ import {
   LatestUpdateTimestampSnapshot,
   MToken,
   Holder,
-  Transfer,
-  ReceivedSnapshot,
-  SentSnapshot,
-  TotalMintedSnapshot,
-  TotalBurnedSnapshot,
   NonEarningBalanceSnapshot,
   PrincipalOfTotalEarningSupplySnapshot,
   TotalNonEarningSupplySnapshot,
@@ -19,10 +14,8 @@ import {
   IndexUpdated as IndexUpdatedEvent,
   StartedEarning as StartedEarningEvent,
   StoppedEarning as StoppedEarningEvent,
-  Transfer as TransferEvent,
 } from '../generated/MToken/MToken';
 
-const ZERO_ADDRESS = Address.fromString('0x0000000000000000000000000000000000000000');
 const M_TOKEN_ADDRESS = '0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b';
 
 const EXP_SCALED_ONE = BigInt.fromI32(10).pow(12);
@@ -69,125 +62,6 @@ export function handleStoppedEarning(event: StoppedEarningEvent): void {
   account.save();
 }
 
-export function handleTransfer(event: TransferEvent): void {
-  const mToken = getMToken();
-  const sender = getHolder(event.params.sender);
-  const recipient = getHolder(event.params.recipient);
-  const timestamp = event.block.timestamp.toI32();
-  const amount = event.params.amount;
-
-  if (event.params.sender.equals(ZERO_ADDRESS)) {
-    _mint(mToken, recipient, amount, timestamp);
-  } else if (event.params.recipient.equals(ZERO_ADDRESS)) {
-    _burn(mToken, sender, amount, timestamp);
-  } else {
-    _transfer(mToken, sender, recipient, amount, timestamp);
-  }
-
-  mToken.lastUpdate = timestamp;
-  mToken.save();
-
-  sender.lastUpdate = timestamp;
-  sender.save();
-
-  recipient.lastUpdate = timestamp;
-  recipient.save();
-
-  const transfer = new Transfer(
-    `transfer-${event.transaction.hash.toHexString()}-${event.logIndex.toI32().toString()}`
-  );
-
-  transfer.sender = sender.id;
-  transfer.recipient = recipient.id;
-  transfer.amount = amount;
-  transfer.timestamp = timestamp;
-  transfer.logIndex = event.logIndex;
-  transfer.transactionHash = event.transaction.hash.toHexString();
-
-  transfer.save();
-}
-
-function _transfer(mToken: MToken, sender: Holder, recipient: Holder, amount: BigInt, timestamp: Timestamp): void {
-  if (amount.equals(BigInt.fromI32(0))) return;
-
-  const index = _getCurrentIndex(mToken, timestamp);
-
-  const startingSenderBalance = sender.isEarning
-    ? _getPresentAmountRoundedDown(sender.earningPrincipal, index)
-    : sender.nonEarningBalance;
-
-  const startingRecipientBalance = recipient.isEarning
-    ? _getPresentAmountRoundedDown(recipient.earningPrincipal, index)
-    : recipient.nonEarningBalance;
-
-  if (sender.isEarning == recipient.isEarning) {
-    _transferAmountInKind(sender, recipient, amount, index, timestamp);
-  } else if (sender.isEarning) {
-    _subtractEarningAmount(mToken, sender, _getPrincipalAmountRoundedUp(amount, index), timestamp);
-    _addNonEarningAmount(mToken, recipient, amount, timestamp);
-  } else {
-    _subtractNonEarningAmount(mToken, sender, amount, timestamp);
-    _addEarningAmount(mToken, recipient, _getPrincipalAmountRoundedDown(amount, index), timestamp);
-  }
-
-  const endingSenderBalance = sender.isEarning
-    ? _getPresentAmountRoundedDown(sender.earningPrincipal, index)
-    : sender.nonEarningBalance;
-
-  const endingRecipientBalance = recipient.isEarning
-    ? _getPresentAmountRoundedDown(recipient.earningPrincipal, index)
-    : recipient.nonEarningBalance;
-
-  const sent = startingSenderBalance.minus(endingSenderBalance);
-  const received = endingRecipientBalance.minus(startingRecipientBalance);
-
-  if (sent.notEqual(BigInt.fromI32(0))) {
-    sender.sent = sender.sent.plus(sent);
-
-    updateSentSnapshot(sender, timestamp, sender.sent);
-  }
-
-  if (received.notEqual(BigInt.fromI32(0))) {
-    recipient.received = recipient.received.plus(received);
-
-    updateReceivedSnapshot(recipient, timestamp, recipient.received);
-  }
-}
-
-function _transferAmountInKind(
-  sender: Holder,
-  recipient: Holder,
-  amount: BigInt,
-  index: BigInt,
-  timestamp: Timestamp
-): void {
-  if (sender.address == recipient.address) return;
-
-  if (sender.isEarning) {
-    const principal = _getPrincipalAmountRoundedUp(amount, index);
-
-    if (principal.equals(BigInt.fromI32(0))) return;
-
-    sender.earningPrincipal = sender.earningPrincipal.minus(principal);
-
-    updateEarningPrincipalSnapshot(sender, timestamp, sender.earningPrincipal);
-
-    recipient.earningPrincipal = recipient.earningPrincipal.plus(principal);
-
-    updateEarningPrincipalSnapshot(recipient, timestamp, recipient.earningPrincipal);
-  } else {
-    if (amount.equals(BigInt.fromI32(0))) return;
-
-    sender.nonEarningBalance = sender.nonEarningBalance.minus(amount);
-
-    updateNonEarningBalanceSnapshot(sender, timestamp, sender.nonEarningBalance);
-
-    recipient.nonEarningBalance = recipient.nonEarningBalance.plus(amount);
-
-    updateNonEarningBalanceSnapshot(recipient, timestamp, recipient.nonEarningBalance);
-  }
-}
-
 function _startEarning(mToken: MToken, account: Holder, timestamp: Timestamp): void {
   account.isEarning = true;
 
@@ -228,130 +102,6 @@ function _subtractNonEarningAmount(mToken: MToken, account: Holder, amount: BigI
   mToken.totalNonEarningSupply = mToken.totalNonEarningSupply.minus(amount);
 
   updateTotalNonEarningSupplySnapshot(timestamp, mToken.totalNonEarningSupply);
-}
-
-function _burn(mToken: MToken, account: Holder, amount: BigInt, timestamp: Timestamp): void {
-  if (amount.equals(BigInt.fromI32(0))) return;
-
-  let sent: BigInt;
-
-  if (account.isEarning) {
-    const index = _getCurrentIndex(mToken, timestamp);
-    const startingBalance = _getPresentAmountRoundedDown(account.earningPrincipal, index);
-
-    _subtractEarningAmount(mToken, account, _getPrincipalAmountRoundedUp(amount, index), timestamp);
-
-    sent = _getPresentAmountRoundedDown(account.earningPrincipal, index).minus(startingBalance);
-  } else {
-    _subtractNonEarningAmount(mToken, account, amount, timestamp);
-
-    sent = amount;
-  }
-
-  mToken.totalBurned = mToken.totalBurned.plus(amount);
-
-  updateTotalBurnedSnapshot(timestamp, mToken.totalBurned);
-
-  if (sent.equals(BigInt.fromI32(0))) return;
-
-  account.sent = account.sent.plus(amount);
-
-  updateSentSnapshot(account, timestamp, account.sent);
-}
-
-function _mint(mToken: MToken, recipient: Holder, amount: BigInt, timestamp: Timestamp): void {
-  if (amount.equals(BigInt.fromI32(0))) return;
-
-  let received: BigInt;
-
-  if (recipient.isEarning) {
-    const index = _getCurrentIndex(mToken, timestamp);
-    const startingBalance = _getPresentAmountRoundedDown(recipient.earningPrincipal, index);
-
-    _addEarningAmount(mToken, recipient, _getPrincipalAmountRoundedDown(amount, index), timestamp);
-
-    received = _getPresentAmountRoundedDown(recipient.earningPrincipal, index).minus(startingBalance);
-  } else {
-    _addNonEarningAmount(mToken, recipient, amount, timestamp);
-
-    received = amount;
-  }
-
-  mToken.totalMinted = mToken.totalMinted.plus(amount);
-
-  updateTotalMintedSnapshot(timestamp, mToken.totalMinted);
-
-  if (received.equals(BigInt.fromI32(0))) return;
-
-  recipient.received = recipient.received.plus(amount);
-
-  updateReceivedSnapshot(recipient, timestamp, recipient.received);
-}
-
-function updateReceivedSnapshot(holder: Holder, timestamp: Timestamp, value: BigInt): void {
-  const id = `received-${holder.address}-${timestamp.toString()}`;
-
-  let snapshot = ReceivedSnapshot.load(id);
-
-  if (!snapshot) {
-    snapshot = new ReceivedSnapshot(id);
-
-    snapshot.account = holder.id;
-    snapshot.timestamp = timestamp;
-  }
-
-  snapshot.value = value;
-
-  snapshot.save();
-}
-
-function updateSentSnapshot(holder: Holder, timestamp: Timestamp, value: BigInt): void {
-  const id = `sent-${holder.address}-${timestamp.toString()}`;
-
-  let snapshot = SentSnapshot.load(id);
-
-  if (!snapshot) {
-    snapshot = new SentSnapshot(id);
-
-    snapshot.account = holder.id;
-    snapshot.timestamp = timestamp;
-  }
-
-  snapshot.value = value;
-
-  snapshot.save();
-}
-
-function updateTotalMintedSnapshot(timestamp: Timestamp, value: BigInt): void {
-  const id = `totalMinted-${timestamp.toString()}`;
-
-  let snapshot = TotalMintedSnapshot.load(id);
-
-  if (!snapshot) {
-    snapshot = new TotalMintedSnapshot(id);
-
-    snapshot.timestamp = timestamp;
-  }
-
-  snapshot.value = value;
-
-  snapshot.save();
-}
-
-function updateTotalBurnedSnapshot(timestamp: Timestamp, value: BigInt): void {
-  const id = `totalBurned-${timestamp.toString()}`;
-
-  let snapshot = TotalBurnedSnapshot.load(id);
-
-  if (!snapshot) {
-    snapshot = new TotalBurnedSnapshot(id);
-
-    snapshot.timestamp = timestamp;
-  }
-
-  snapshot.value = value;
-
-  snapshot.save();
 }
 
 function updateTotalNonEarningSupplySnapshot(timestamp: Timestamp, value: BigInt): void {
@@ -486,8 +236,6 @@ function getHolder(address: Address): Holder {
   holder.earningPrincipal = BigInt.fromI32(0);
   holder.nonEarningBalance = BigInt.fromI32(0);
   holder.isEarning = false;
-  holder.received = BigInt.zero();
-  holder.sent = BigInt.zero();
   holder.lastUpdate = 0;
 
   return holder;
@@ -514,8 +262,6 @@ function getMToken(): MToken {
   mToken.totalNonEarningSupply = BigInt.fromI32(0);
   mToken.principalOfTotalEarningSupply = BigInt.fromI32(0);
   mToken.latestIndex = BigInt.fromI32(0);
-  mToken.totalMinted = BigInt.fromI32(0);
-  mToken.totalBurned = BigInt.fromI32(0);
   mToken.latestUpdateTimestamp = 0;
   mToken.lastUpdate = 0;
 
