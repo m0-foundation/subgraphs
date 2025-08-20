@@ -1,4 +1,3 @@
-// computeYields.ts
 import 'dotenv/config';
 import { getBalance } from './utils';
 
@@ -8,30 +7,24 @@ type Snapshots = Snapshot[];
 const account = (process.argv[2] || '').toLowerCase();
 const mostRecentPeriodEndTimestamp = BigInt(parseInt(process.argv[3] || '0', 10));
 const historicalPeriods = parseInt(process.argv[4] || '0', 10);
-const period = BigInt(parseInt(process.argv[5] ?? '86400', 10)); // default 1 day (secs -> bigint)
+const period = BigInt(parseInt(process.argv[5] ?? '86400', 10));
 
-if (!account || mostRecentPeriodEndTimestamp === 0n || Number.isNaN(historicalPeriods)) {
-  console.error('Usage: ts-node computeYields.ts <account> <mostRecentEndTs> <historicalPeriods> [periodSeconds]');
+if (!process.env.API_SUBGRAPH || !process.env.API_M_ETHEREUM) {
+  console.error('Missing API_SUBGRAPH or API_M_ETHEREUM environment variables');
   process.exit(1);
 }
 
-const safeEarlyTimestamp = Number(mostRecentPeriodEndTimestamp - BigInt(historicalPeriods) * period) - 3 * 86400; // for GraphQL filter (number OK)
+const safeEarlyTimestamp = Number(mostRecentPeriodEndTimestamp - BigInt(historicalPeriods) * period) - 3 * 86400;
 
 function findIndexOfLatest(snapshots: Snapshots, startingIndex: number, targetTs: bigint): number {
-  // Guard empty
   if (snapshots.length === 0) return -1;
-
-  // Fast path: clamp starting index
-  let lo = Math.max(0, Math.min(startingIndex, snapshots.length - 1));
-  // Expand window if needed
-  if (snapshots[lo]!.timestamp <= targetTs) {
-    // move forward while <= targetTs
-    while (lo + 1 < snapshots.length && snapshots[lo + 1]!.timestamp <= targetTs) lo++;
-    return lo;
+  let i = Math.max(0, Math.min(startingIndex, snapshots.length - 1));
+  if (snapshots[i]!.timestamp <= targetTs) {
+    while (i + 1 < snapshots.length && snapshots[i + 1]!.timestamp <= targetTs) i++;
+    return i;
   } else {
-    // move backward until <= targetTs (could be -1)
-    while (lo >= 0 && snapshots[lo]!.timestamp > targetTs) lo--;
-    return lo;
+    while (i >= 0 && snapshots[i]!.timestamp > targetTs) i--;
+    return i;
   }
 }
 
@@ -67,10 +60,8 @@ function computePeriodicYields(
   checkpoints.forEach((timestamp, i) => {
     const sentIndex = findIndexOfLatest(sentSnapshots, acc.sentIndex, timestamp);
     const receivedIndex = findIndexOfLatest(receivedSnapshots, acc.receivedIndex, timestamp);
-
     const nonEarningBalanceIndex = findIndexOfLatest(nonEarningBalanceSnapshots, acc.nonEarningBalanceIndex, timestamp);
     const earningPrincipalIndex = findIndexOfLatest(earningPrincipalSnapshots, acc.earningPrincipalIndex, timestamp);
-
     const indexIndex = findIndexOfLatest(indexSnapshots, acc.indexIndex, timestamp);
     const rateIndex = findIndexOfLatest(rateSnapshots, acc.rateIndex, timestamp);
     const updateTimestampIndex = findIndexOfLatest(updateTimestampSnapshots, acc.updateTimestampIndex, timestamp);
@@ -91,9 +82,7 @@ function computePeriodicYields(
     const earnedYield =
       balance + (sentSnapshots[sentIndex]?.value ?? 0n) - (receivedSnapshots[receivedIndex]?.value ?? 0n);
 
-    if (i !== 0) {
-      acc.periodYields.push({ timestamp, yield: earnedYield - acc.earnedYield });
-    }
+    if (i !== 0) acc.periodYields.push({ timestamp, yield: earnedYield - acc.earnedYield });
 
     acc.sentIndex = Math.max(0, sentIndex);
     acc.receivedIndex = Math.max(0, receivedIndex);
@@ -108,7 +97,8 @@ function computePeriodicYields(
   return acc.periodYields;
 }
 
-function gqlBody(account: string, safeEarlyTimestamp: number) {
+// ---------- GQL bodies ----------
+function gqlBodyMain(account: string, safeEarlyTimestamp: number) {
   return JSON.stringify({
     query: `
       {
@@ -132,10 +122,6 @@ function gqlBody(account: string, safeEarlyTimestamp: number) {
           timestamp
           value
         }
-        latestRateSnapshots(where: {timestamp_gte: "${safeEarlyTimestamp}"}, orderBy: timestamp, orderDirection: asc, first: 1000) {
-          timestamp
-          value
-        }
         latestUpdateTimestampSnapshots(where: {timestamp_gte: "${safeEarlyTimestamp}"}, orderBy: timestamp, orderDirection: asc, first: 1000) {
           timestamp
           value
@@ -145,19 +131,24 @@ function gqlBody(account: string, safeEarlyTimestamp: number) {
   });
 }
 
-async function fetchGraphQL(body: string) {
-  const host = process.env.API_ENDPOINT;
-  const path = process.env.API_PATH;
-  if (!host || !path) {
-    throw new Error('Missing API_ENDPOINT or API_PATH in env');
-  }
-  const url = `https://${host}${path}`;
+function gqlBodyRates(safeEarlyTimestamp: number) {
+  return JSON.stringify({
+    query: `
+      {
+        latestRateSnapshots(where: {timestamp_gte: "${safeEarlyTimestamp}"}, orderBy: timestamp, orderDirection: asc, first: 1000) {
+          timestamp
+          value
+        }
+      }
+    `,
+  });
+}
+
+// ---------- Fetch helpers ----------
+async function fetchGraphQLFromUrl(url: string, body: string) {
   const res = await fetch(url, {
     method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'user-agent': 'Node',
-    },
+    headers: { 'content-type': 'application/json', 'user-agent': 'Node' },
     body,
   });
   if (!res.ok) {
@@ -165,17 +156,7 @@ async function fetchGraphQL(body: string) {
     throw new Error(`GraphQL error ${res.status}: ${text}`);
   }
   const text = await res.text();
-  // revive BigInts for timestamp/value fields
-  const json = JSON.parse(text, (key, value) => (key === 'timestamp' || key === 'value' ? BigInt(value) : value));
-  return json.data as {
-    sentSnapshots: Snapshots;
-    receivedSnapshots: Snapshots;
-    nonEarningBalanceSnapshots: Snapshots;
-    earningPrincipalSnapshots: Snapshots;
-    latestIndexSnapshots: Snapshots;
-    latestRateSnapshots: Snapshots;
-    latestUpdateTimestampSnapshots: Snapshots;
-  };
+  return JSON.parse(text, (k, v) => (k === 'timestamp' || k === 'value' ? BigInt(v) : v)).data;
 }
 
 function formatMicroDecimal(x: bigint): string {
@@ -186,34 +167,36 @@ function formatMicroDecimal(x: bigint): string {
 
 (async function main() {
   try {
-    const body = gqlBody(account, safeEarlyTimestamp);
-    const {
-      sentSnapshots,
-      receivedSnapshots,
-      nonEarningBalanceSnapshots,
-      earningPrincipalSnapshots,
-      latestIndexSnapshots,
-      latestRateSnapshots,
-      latestUpdateTimestampSnapshots,
-    } = await fetchGraphQL(body);
+    // 1) Main snapshots this subgraph on spoke/L2 network
+    const mainData: {
+      sentSnapshots: Snapshots;
+      receivedSnapshots: Snapshots;
+      nonEarningBalanceSnapshots: Snapshots;
+      earningPrincipalSnapshots: Snapshots;
+      latestIndexSnapshots: Snapshots;
+      latestUpdateTimestampSnapshots: Snapshots;
+    } = await fetchGraphQLFromUrl(process.env.API_SUBGRAPH!, gqlBodyMain(account, safeEarlyTimestamp));
+
+    // 2) Spoke/L2s do not push rates, so we fetch them from the mainnet subgraph.
+    const rateData: { latestRateSnapshots: Snapshots } = await fetchGraphQLFromUrl(
+      process.env.API_M_ETHEREUM!,
+      gqlBodyRates(safeEarlyTimestamp)
+    );
 
     const periodYields = computePeriodicYields(
-      sentSnapshots,
-      receivedSnapshots,
-      nonEarningBalanceSnapshots,
-      earningPrincipalSnapshots,
-      latestIndexSnapshots,
-      latestRateSnapshots,
-      latestUpdateTimestampSnapshots,
+      mainData.sentSnapshots,
+      mainData.receivedSnapshots,
+      mainData.nonEarningBalanceSnapshots,
+      mainData.earningPrincipalSnapshots,
+      mainData.latestIndexSnapshots,
+      rateData.latestRateSnapshots,
+      mainData.latestUpdateTimestampSnapshots,
       mostRecentPeriodEndTimestamp,
       historicalPeriods,
       period
     );
 
-    const csv = periodYields.map(({ timestamp, yield: y }) => `${timestamp},${formatMicroDecimal(y)}`).join('\n');
-    console.log(csv);
-    console.log(``);
-    console.log(`Total yield: ${formatMicroDecimal(periodYields.reduce((acc, { yield: y }) => acc + y, 0n))}`);
+    console.log(periodYields.map(({ timestamp, yield: y }) => `${timestamp},${formatMicroDecimal(y)}`).join('\n'));
   } catch (err: any) {
     console.error(err?.message ?? err);
     process.exit(1);
