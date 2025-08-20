@@ -46,7 +46,7 @@ const FIRST_WRAPPED_M_TOKEN_IMPLEMENTATION_ADDRESS = '0x813B926B1D096e117721bD1E
 const EXP_SCALED_ONE = BigInt.fromI32(10).pow(12);
 const BPS_SCALED_ONE = BigInt.fromI32(10).pow(4);
 const SECONDS_PER_YEAR = BigInt.fromI32(31_536_000);
-
+// @fixme(FS-223): This is a hardcoded value for the latest rate in basis points (4.15%).
 const LATEST_RATE_BPS = BigInt.fromI32(415); // 4.15% per year in basis points
 
 /* ============ Handlers ============ */

@@ -11,16 +11,16 @@
         "remove-local": "graph remove --node http://localhost:8020/ mzero/wrapped-m-token",
         "deploy-local": "graph deploy --node http://localhost:8020/ mzero/wrapped-m-token",
         "test": "graph test",
-        "prettier": "prettier --write 'src/**/*.ts' 'scripts/**/*.js'"
+        "prettier": "prettier --write 'src/**/*.ts' 'scripts/**/*.js'",
+        "run:script": "ts-node ./scripts/periodic-yield.ts"
     },
     "dependencies": {},
     "devDependencies": {
         "@graphprotocol/graph-cli": "^0.88.0",
         "@graphprotocol/graph-ts": "^0.35.1",
         "dotenv": "^16.4.5",
-        "prettier": "^3.3.3"
-    },
-    "engines": {
-        "node": ">=23.2.0"
+        "prettier": "^3.3.3",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.9.2"
     }
 }
