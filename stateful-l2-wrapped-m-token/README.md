@@ -4,6 +4,8 @@ This a subgraph indexer to index $M (Wrapped) token on "Spoke networks".
 
 On Spoke networks, we don't push the rate on `IndexUpdate` events. All Ethereum L2s, Hyperliquid and Solana base their yield accrual on the bridged index updates only.
 
+Check the examples in the [`scripts` folder](./scripts/) to learn how to use it to compute accrued yield
+
 ## How to deploy to new networks
 
 This subgraph can be deployed to different spoke networks. Make sure to check the following lines:
