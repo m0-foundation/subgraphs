@@ -274,8 +274,6 @@ function getHolder(address: Address): Holder {
 
     holder.address = address.toHexString();
     holder.balance = BigInt.fromI32(0);
-    holder.checkpointBalance = BigInt.fromI32(0);
-    holder.checkpointTimestamp = 0;
     holder.isEarning = false;
     holder.claimed = BigInt.fromI32(0);
     holder.received = BigInt.fromI32(0);
@@ -625,8 +623,6 @@ function _mint(wrappedMToken: WrappedMToken, recipient: Holder, amount: BigInt, 
 
 function _startEarning(wrappedMToken: WrappedMToken, account: Holder, timestamp: Timestamp): void {
     account.isEarning = true;
-    account.checkpointTimestamp = timestamp;
-    account.checkpointBalance = account.balance;
 
     updateIsEarningSnapshot(account, timestamp, account.isEarning);
 
@@ -641,8 +637,6 @@ function _startEarning(wrappedMToken: WrappedMToken, account: Holder, timestamp:
 
 function _stopEarning(wrappedMToken: WrappedMToken, account: Holder, timestamp: Timestamp): void {
     account.isEarning = false;
-    account.checkpointTimestamp = 0;
-    account.checkpointBalance = account.balance;
 
     updateIsEarningSnapshot(account, timestamp, account.isEarning);
 
@@ -657,8 +651,6 @@ function _stopEarning(wrappedMToken: WrappedMToken, account: Holder, timestamp: 
 
 function _claim(wrappedMToken: WrappedMToken, account: Holder, amount: BigInt, timestamp: Timestamp): void {
     account.claimed = account.claimed.plus(amount);
-    account.checkpointTimestamp = timestamp;
-    account.checkpointBalance = account.balance;
 
     updateClaimedSnapshot(account, timestamp, account.claimed);
 

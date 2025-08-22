@@ -100,8 +100,6 @@ type Holder @entity {
     sentSnapshots: [SentSnapshot!] @derivedFrom(field: "account")
     lastUpdate: Timestamp!
     # deterministic checkpoints at the exact times the accrual state changes (claim/start/stop)
-    checkpointBalance: BigInt!
-    checkpointTimestamp: Timestamp!
     checkpointSnapshots: [CheckpointSnapshot!] @derivedFrom(field: "account")
 }
 
