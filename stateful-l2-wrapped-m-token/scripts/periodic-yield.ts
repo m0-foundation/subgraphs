@@ -6,9 +6,9 @@ type Snapshot = { timestamp: bigint; value: bigint };
 type Snapshots = Snapshot[];
 type CheckpointSnapshots = {
     timestamp: bigint;
-    balance: bigint;
-    mLatestIndex: bigint;
-    mLatestUpdateTimestamp: bigint;
+    balance: string;
+    mLatestIndex: string;
+    mLatestUpdateTimestamp: string;
 }[];
 
 if (!process.env.API_SUBGRAPH || !process.env.API_M_ETHEREUM) {
@@ -101,9 +101,9 @@ function computePeriodicYields(
             throw new Error(`No checkpoint found at timestamp ${timestamp}`);
         }
         const holderLastCheckpointIndex = getCurrentIndex(
-            checkpoint.mLatestIndex,
+            BigInt(checkpoint.mLatestIndex),
             latestRate,
-            checkpoint.mLatestUpdateTimestamp,
+            BigInt(checkpoint.mLatestUpdateTimestamp),
             checkpoint.timestamp
         );
 
