@@ -49,6 +49,8 @@ type CheckpointSnapshot implements HolderSnapshotEntity & SnapshotEntity @entity
     balance: BigInt!
     blockNumber: BigInt!
     logIndex: BigInt!
+    mLatestIndex: BigInt!
+    mLatestUpdateTimestamp: Timestamp!
 }
 
 type IsEarningSnapshot implements HolderSnapshotEntity & BooleanSnapshotEntity & SnapshotEntity @entity {

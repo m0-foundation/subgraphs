@@ -302,6 +302,7 @@ function updateBalanceSnapshot(holder: Holder, timestamp: Timestamp, value: BigI
 
 function updateCheckpointSnapshot(holder: Holder, timestamp: Timestamp, blockNumber: BigInt, logIndex: BigInt): void {
     const id = `checkpointSnapshot-${holder.address}-${timestamp.toString()}`;
+    const mToken = getMToken();
 
     let snapshot = CheckpointSnapshot.load(id);
 
@@ -314,6 +315,8 @@ function updateCheckpointSnapshot(holder: Holder, timestamp: Timestamp, blockNum
     snapshot.balance = holder.balance;
     snapshot.blockNumber = blockNumber;
     snapshot.logIndex = logIndex;
+    snapshot.mLatestIndex = mToken.latestIndex;
+    snapshot.mLatestUpdateTimestamp = mToken.latestUpdateTimestamp;
 
     snapshot.save();
 }
@@ -393,22 +396,6 @@ function updateTotalNonEarningSupplySnapshot(timestamp: Timestamp, value: BigInt
 
     if (!snapshot) {
         snapshot = new TotalNonEarningSupplySnapshot(id);
-
-        snapshot.timestamp = timestamp;
-    }
-
-    snapshot.value = value;
-
-    snapshot.save();
-}
-
-function updatePrincipalOfTotalEarningSupplySnapshot(timestamp: Timestamp, value: BigInt): void {
-    const id = `principalOfTotalEarningSupply-${timestamp.toString()}`;
-
-    let snapshot = PrincipalOfTotalEarningSupplySnapshot.load(id);
-
-    if (!snapshot) {
-        snapshot = new PrincipalOfTotalEarningSupplySnapshot(id);
 
         snapshot.timestamp = timestamp;
     }
