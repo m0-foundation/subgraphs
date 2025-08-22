@@ -102,7 +102,7 @@ type Holder @entity {
     # deterministic checkpoints at the exact times the accrual state changes (claim/start/stop)
     checkpointBalance: BigInt!
     checkpointTimestamp: Timestamp!
-    CheckpointSnapshot: [CheckpointSnapshot!] @derivedFrom(field: "account")
+    checkpointSnapshots: [CheckpointSnapshot!] @derivedFrom(field: "account")
 }
 
 type TotalNonEarningSupplySnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
