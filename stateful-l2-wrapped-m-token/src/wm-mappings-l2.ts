@@ -89,7 +89,13 @@ export function handleStartedEarning(event: StartedEarningEvent): void {
     const timestamp = event.block.timestamp.toI32();
 
     _startEarning(wrappedMToken, account, timestamp);
-    updateCheckpointSnapshot(account, timestamp, event.block.number, event.logIndex);
+    updateCheckpointSnapshot(
+        account,
+        timestamp,
+        event.block.number,
+        event.logIndex,
+        event.transaction.hash.toHexString()
+    );
 
     wrappedMToken.lastUpdate = timestamp;
     wrappedMToken.save();
@@ -104,7 +110,13 @@ export function handleStoppedEarning(event: StoppedEarningEvent): void {
     const timestamp = event.block.timestamp.toI32();
 
     _stopEarning(wrappedMToken, account, timestamp);
-    updateCheckpointSnapshot(account, timestamp, event.block.number, event.logIndex);
+    updateCheckpointSnapshot(
+        account,
+        timestamp,
+        event.block.number,
+        event.logIndex,
+        event.transaction.hash.toHexString()
+    );
 
     wrappedMToken.lastUpdate = timestamp;
     wrappedMToken.save();
@@ -167,7 +179,13 @@ export function handleClaimed(event: ClaimedEvent): void {
     const timestamp = event.block.timestamp.toI32();
 
     _claim(wrappedMToken, account, event.params.amount, timestamp);
-    updateCheckpointSnapshot(account, timestamp, event.block.number, event.logIndex);
+    updateCheckpointSnapshot(
+        account,
+        timestamp,
+        event.block.number,
+        event.logIndex,
+        event.transaction.hash.toHexString()
+    );
 
     account.lastUpdate = timestamp;
     account.save();
@@ -300,8 +318,14 @@ function updateBalanceSnapshot(holder: Holder, timestamp: Timestamp, value: BigI
     snapshot.save();
 }
 
-function updateCheckpointSnapshot(holder: Holder, timestamp: Timestamp, blockNumber: BigInt, logIndex: BigInt): void {
-    const id = `checkpointSnapshot-${holder.address}-${timestamp.toString()}`;
+function updateCheckpointSnapshot(
+    holder: Holder,
+    timestamp: Timestamp,
+    blockNumber: BigInt,
+    logIndex: BigInt,
+    txHash: string
+): void {
+    const id = `checkpoint-${holder.address}-${txHash}-${logIndex.toString()}`;
     const mToken = getMToken();
 
     let snapshot = CheckpointSnapshot.load(id);
