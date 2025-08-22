@@ -140,15 +140,6 @@ async function fetchGraphQLFromUrl<T = any>(url: string, body: string): Promise<
 
         const now = BigInt(Math.floor(Date.now() / 1000));
 
-        // console.log({
-        //     timestamp,
-        //     latestIndex,
-        //     latestRate,
-        //     latestTimestamp,
-        //     checkpoint,
-        //     derivedIndex: holderLastCheckpointIndex,
-        // });
-
         const unclaimedYield =
             holderLastCheckpointIndex === 0n
                 ? 0n

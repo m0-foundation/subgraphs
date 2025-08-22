@@ -105,15 +105,6 @@ function computePeriodicYields(
             checkpoint.timestamp
         );
 
-        // console.log({
-        //     timestamp,
-        //     latestIndex,
-        //     latestRate,
-        //     latestTimestamp,
-        //     checkpoint,
-        //     derivedIndex: holderLastCheckpointIndex,
-        // });
-
         const unclaimedYield =
             holderLastCheckpointIndex === 0n
                 ? 0n
