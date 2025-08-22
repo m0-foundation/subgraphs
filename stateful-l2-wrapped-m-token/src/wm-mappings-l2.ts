@@ -89,7 +89,9 @@ export function handleStartedEarning(event: StartedEarningEvent): void {
     const timestamp = event.block.timestamp.toI32();
 
     _startEarning(wrappedMToken, account, timestamp);
+
     updateCheckpointSnapshot(
+        'START',
         account,
         timestamp,
         event.block.number,
@@ -111,6 +113,7 @@ export function handleStoppedEarning(event: StoppedEarningEvent): void {
 
     _stopEarning(wrappedMToken, account, timestamp);
     updateCheckpointSnapshot(
+        'STOP',
         account,
         timestamp,
         event.block.number,
@@ -180,6 +183,7 @@ export function handleClaimed(event: ClaimedEvent): void {
 
     _claim(wrappedMToken, account, event.params.amount, timestamp);
     updateCheckpointSnapshot(
+        'CLAIM',
         account,
         timestamp,
         event.block.number,
@@ -279,6 +283,7 @@ function getHolder(address: Address): Holder {
     holder.received = BigInt.fromI32(0);
     holder.sent = BigInt.fromI32(0);
     holder.lastUpdate = 0;
+    holder.activeCheckpoint = null;
 
     return holder;
 }
@@ -317,6 +322,7 @@ function updateBalanceSnapshot(holder: Holder, timestamp: Timestamp, value: BigI
 }
 
 function updateCheckpointSnapshot(
+    kind: 'START' | 'STOP' | 'CLAIM',
     holder: Holder,
     timestamp: Timestamp,
     blockNumber: BigInt,
@@ -332,6 +338,7 @@ function updateCheckpointSnapshot(
         snapshot = new CheckpointSnapshot(id);
     }
 
+    snapshot.kind = kind;
     snapshot.timestamp = timestamp;
     snapshot.account = holder.id;
     snapshot.balance = holder.balance;
@@ -341,6 +348,12 @@ function updateCheckpointSnapshot(
     snapshot.mLatestUpdateTimestamp = mToken.latestUpdateTimestamp;
 
     snapshot.save();
+
+    if (kind === 'STOP') {
+        holder.activeCheckpoint = null;
+    } else {
+        holder.activeCheckpoint = snapshot.id;
+    }
 }
 
 function updateIsEarningSnapshot(holder: Holder, timestamp: Timestamp, value: boolean): void {

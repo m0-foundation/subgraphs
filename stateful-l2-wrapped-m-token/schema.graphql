@@ -44,6 +44,7 @@ type BalanceSnapshot implements HolderSnapshotEntity & BigIntSnapshotEntity & Sn
 # Deterministic checkpoints at the exact times the accrual state changes (claim/start/stop) for stateful accounting
 type CheckpointSnapshot implements HolderSnapshotEntity & SnapshotEntity @entity(immutable: true) {
     id: ID! @unique
+    kind: String! # (START|CLAIM|STOP)
     timestamp: Timestamp!
     account: Holder!
     balance: BigInt!
@@ -100,6 +101,7 @@ type Holder @entity {
     sentSnapshots: [SentSnapshot!] @derivedFrom(field: "account")
     lastUpdate: Timestamp!
     # deterministic checkpoints at the exact times the accrual state changes (claim/start/stop)
+    activeCheckpoint: CheckpointSnapshot # nullable
     checkpointSnapshots: [CheckpointSnapshot!] @derivedFrom(field: "account")
 }
 
