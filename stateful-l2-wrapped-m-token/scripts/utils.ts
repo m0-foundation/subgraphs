@@ -28,7 +28,7 @@ export function getAccruedYield(
     return balanceWithYield <= balance ? 0n : balanceWithYield - balance;
 }
 
-function getCurrentIndex(
+export function getCurrentIndex(
     latestIndex: bigint,
     latestRate: bigint,
     latestUpdateTimestamp: bigint,

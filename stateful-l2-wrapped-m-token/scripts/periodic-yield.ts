@@ -1,9 +1,15 @@
 import 'dotenv/config';
-import { getAccruedYield } from './utils';
+import { getAccruedYield, getCurrentIndex } from './utils';
 
 // Types
 type Snapshot = { timestamp: bigint; value: bigint };
 type Snapshots = Snapshot[];
+type CheckpointSnapshots = {
+    timestamp: bigint;
+    balance: bigint;
+    mLatestIndex: bigint;
+    mLatestUpdateTimestamp: bigint;
+}[];
 
 if (!process.env.API_SUBGRAPH || !process.env.API_M_ETHEREUM) {
     console.error('Missing API_SUBGRAPH or API_M_ETHEREUM environment variables');
@@ -27,7 +33,7 @@ if (!account || mostRecentPeriodEndTimestamp === 0n || Number.isNaN(historicalPe
 const safeEarlyTimestamp = Number(mostRecentPeriodEndTimestamp - BigInt(historicalPeriods) * period) - 3 * 86400;
 
 // -------- helpers --------
-function findIndexOfLatest(snapshots: Snapshots, startingIndex: number, targetTs: bigint): number {
+function findIndexOfLatest(snapshots: { timestamp: bigint }[], startingIndex: number, targetTs: bigint): number {
     if (snapshots.length === 0) return -1;
     let i = Math.max(0, Math.min(startingIndex, snapshots.length - 1));
     if (snapshots[i]!.timestamp <= targetTs) {
@@ -48,7 +54,7 @@ function formatMicroDecimal(x: bigint): string {
 // -------- Core logic --------
 function computePeriodicYields(
     balanceSnapshots: Snapshots,
-    lastIndexSnapshots: Snapshots,
+    checkpointSnapshots: CheckpointSnapshots,
     claimedSnapshots: Snapshots,
     indexSnapshots: Snapshots,
     rateSnapshots: Snapshots,
@@ -64,7 +70,7 @@ function computePeriodicYields(
 
     const acc = {
         balanceIndex: 0,
-        lastIndexIndex: 0,
+        checkpointIndex: 0,
         claimedIndex: 0,
         rateIndex: 0,
         indexIndex: 0,
@@ -77,23 +83,48 @@ function computePeriodicYields(
 
     checkpoints.forEach((timestamp, i) => {
         const balanceIndex = findIndexOfLatest(balanceSnapshots, acc.balanceIndex, timestamp);
-        const lastIndexIndex = findIndexOfLatest(lastIndexSnapshots, acc.lastIndexIndex, timestamp);
         const claimedIndex = findIndexOfLatest(claimedSnapshots, acc.claimedIndex, timestamp);
         const indexIndex = findIndexOfLatest(indexSnapshots, acc.indexIndex, timestamp);
         const rateIndex = findIndexOfLatest(rateSnapshots, acc.rateIndex, timestamp);
         const updateTimestampIndex = findIndexOfLatest(updateTimestampSnapshots, acc.updateTimestampIndex, timestamp);
+        const checkpointIndex = findIndexOfLatest(checkpointSnapshots, acc.checkpointIndex, timestamp);
 
-        const lastIndex = lastIndexSnapshots[lastIndexIndex]?.value ?? 0n;
+        const { value: latestIndex, timestamp: latestTimestamp } = indexSnapshots[indexIndex] ?? {
+            value: 0n,
+            timestamp: 0n,
+        };
+        const latestRate = rateSnapshots[rateIndex]?.value ?? 0n;
+
+        // Get the last checkpoint index for the holder
+        const checkpoint = checkpointSnapshots[checkpointIndex];
+        if (!checkpoint) {
+            throw new Error(`No checkpoint found at timestamp ${timestamp}`);
+        }
+        const holderLastCheckpointIndex = getCurrentIndex(
+            checkpoint.mLatestIndex,
+            latestRate,
+            checkpoint.mLatestUpdateTimestamp,
+            checkpoint.timestamp
+        );
+
+        // console.log({
+        //     timestamp,
+        //     latestIndex,
+        //     latestRate,
+        //     latestTimestamp,
+        //     checkpoint,
+        //     derivedIndex: holderLastCheckpointIndex,
+        // });
 
         const unclaimedYield =
-            lastIndex === 0n
+            holderLastCheckpointIndex === 0n
                 ? 0n
                 : getAccruedYield(
                       balanceSnapshots[balanceIndex]?.value ?? 0n,
-                      lastIndex,
-                      indexSnapshots[indexIndex]?.value ?? 0n,
-                      rateSnapshots[rateIndex]?.value ?? 0n,
-                      updateTimestampSnapshots[updateTimestampIndex]?.value ?? 0n,
+                      holderLastCheckpointIndex,
+                      latestIndex,
+                      latestRate,
+                      latestTimestamp,
                       timestamp
                   );
 
@@ -105,7 +136,7 @@ function computePeriodicYields(
         }
 
         acc.balanceIndex = Math.max(0, balanceIndex);
-        acc.lastIndexIndex = Math.max(0, lastIndexIndex);
+        acc.checkpointIndex = Math.max(0, checkpointIndex);
         acc.claimedIndex = Math.max(0, claimedIndex);
         acc.indexIndex = Math.max(0, indexIndex);
         acc.rateIndex = Math.max(0, rateIndex);
@@ -120,7 +151,6 @@ function computePeriodicYields(
 
 // -------- GQL bodies (split: main vs. rates) --------
 function gqlBodyMain(account: string, safeEarlyTimestamp: number) {
-    // NOTE: latestRateSnapshots removed here
     return JSON.stringify({
         query: `
       {
@@ -128,9 +158,11 @@ function gqlBodyMain(account: string, safeEarlyTimestamp: number) {
           timestamp
           value
         }
-        lastIndexSnapshots(where: {account: "holder-${account}"}, orderBy: timestamp, orderDirection: asc, first: 10000) {
-          timestamp
-          value
+        checkpointSnapshots(where: {account: "holder-${account}"}, orderBy: timestamp, orderDirection: asc, first: 10000) {
+            timestamp
+            balance
+            mLatestIndex
+            mLatestUpdateTimestamp
         }
         claimedSnapshots(where: {account: "holder-${account}"}, orderBy: timestamp, orderDirection: asc, first: 10000) {
           timestamp
@@ -183,7 +215,7 @@ async function fetchGraphQLFromUrl<T = any>(url: string, body: string): Promise<
         // 1) Fetch main payload (no rates)
         const main = await fetchGraphQLFromUrl<{
             balanceSnapshots: Snapshots;
-            lastIndexSnapshots: Snapshots;
+            checkpointSnapshots: CheckpointSnapshots;
             claimedSnapshots: Snapshots;
             latestIndexSnapshots: Snapshots;
             latestUpdateTimestampSnapshots: Snapshots;
@@ -197,7 +229,7 @@ async function fetchGraphQLFromUrl<T = any>(url: string, body: string): Promise<
 
         const periodYields = computePeriodicYields(
             main.balanceSnapshots,
-            main.lastIndexSnapshots,
+            main.checkpointSnapshots,
             main.claimedSnapshots,
             main.latestIndexSnapshots,
             rates.latestRateSnapshots, // from secondary endpoint
@@ -209,6 +241,10 @@ async function fetchGraphQLFromUrl<T = any>(url: string, body: string): Promise<
 
         const csv = periodYields.map(({ timestamp, yield: y }) => `${timestamp},${formatMicroDecimal(y)}`).join('\n');
         console.log(csv);
+
+        console.log(
+            `Total accrued yield: ${formatMicroDecimal(periodYields.reduce((sum, { yield: y }) => sum + y, 0n))}`
+        );
     } catch (err: any) {
         console.error(err?.message ?? err);
         process.exit(1);
