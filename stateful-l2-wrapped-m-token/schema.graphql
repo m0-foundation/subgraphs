@@ -42,7 +42,7 @@ type BalanceSnapshot implements HolderSnapshotEntity & BigIntSnapshotEntity & Sn
 
 # Earner's Balance and timestamp checkpoints to calculate principal and periodic yields
 # Deterministic checkpoints at the exact times the accrual state changes (claim/start/stop) for stateful accounting
-type CheckpointSnapshot implements HolderSnapshotEntity & SnapshotEntity @entity {
+type CheckpointSnapshot implements HolderSnapshotEntity & SnapshotEntity @entity(immutable: true) {
     id: ID! @unique
     timestamp: Timestamp!
     account: Holder!
