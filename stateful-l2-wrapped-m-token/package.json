@@ -12,7 +12,8 @@
         "deploy-local": "graph deploy --node http://localhost:8020/ mzero/wrapped-m-token",
         "test": "graph test",
         "prettier": "prettier --write 'src/**/*.ts' 'scripts/**/*.js'",
-        "run:script": "ts-node ./scripts/periodic-yield.ts"
+        "test:periodic-yield": "ts-node ./scripts/periodic-yield.ts",
+        "test:total-accrued-yield": "ts-node ./scripts/total-accrued-yield.ts"
     },
     "dependencies": {},
     "devDependencies": {

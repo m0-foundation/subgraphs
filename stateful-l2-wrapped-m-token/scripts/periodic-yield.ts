@@ -23,9 +23,7 @@ const historicalPeriods = parseInt(process.argv[4] || '0', 10);
 const period = BigInt(parseInt(process.argv[5] ?? '86400', 10)); // default 1 day in seconds
 
 if (!account || mostRecentPeriodEndTimestamp === 0n || Number.isNaN(historicalPeriods)) {
-    console.error(
-        'Usage: ts-node computeAccruedYields.ts <account> <mostRecentEndTs> <historicalPeriods> [periodSeconds]'
-    );
+    console.error('Usage: ts-node periodict-yield.ts <account> <mostRecentEndTs> <historicalPeriods> [periodSeconds]');
     process.exit(1);
 }
 
