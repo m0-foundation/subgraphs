@@ -111,12 +111,6 @@ type TotalNonEarningSupplySnapshot implements BigIntSnapshotEntity & SnapshotEnt
     value: BigInt!
 }
 
-type PrincipalOfTotalEarningSupplySnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
-    id: ID! @unique
-    timestamp: Timestamp! @unique
-    value: BigInt!
-}
-
 type TotalEarningSupplySnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
     id: ID! @unique
     timestamp: Timestamp! @unique

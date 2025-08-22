@@ -14,7 +14,6 @@ import {
     LatestUpdateTimestampSnapshot,
     Migration,
     MToken,
-    PrincipalOfTotalEarningSupplySnapshot,
     ReceivedSnapshot,
     SentSnapshot,
     TotalBurnedSnapshot,
