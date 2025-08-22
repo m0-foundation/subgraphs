@@ -5,14 +5,15 @@
     "scripts": {
         "codegen": "graph codegen",
         "build": "graph build",
-        "deploy": "graph deploy --node https://api.thegraph.com/deploy/ mzero/wrapped-m-token",
+        "deploy": "./deploy.sh",
         "deploy:mainnet": "graph deploy wrapped-m-token-mainnet --network mainnet --version-label $(grep VERSION_LABEL .env | cut -d '=' -f2) --node https://subgraphs.alchemy.com/api/subgraphs/deploy --deploy-key $(grep DEPLOY_KEY .env | cut -d '=' -f2)",
         "create-local": "graph create --node http://localhost:8020/ mzero/wrapped-m-token",
         "remove-local": "graph remove --node http://localhost:8020/ mzero/wrapped-m-token",
         "deploy-local": "graph deploy --node http://localhost:8020/ mzero/wrapped-m-token",
         "test": "graph test",
         "prettier": "prettier --write 'src/**/*.ts' 'scripts/**/*.js'",
-        "run:script": "ts-node ./scripts/periodic-yield.ts"
+        "test:periodic-yield": "ts-node ./scripts/periodic-yield.ts",
+        "test:total-accrued-yield": "ts-node ./scripts/total-accrued-yield.ts"
     },
     "dependencies": {},
     "devDependencies": {

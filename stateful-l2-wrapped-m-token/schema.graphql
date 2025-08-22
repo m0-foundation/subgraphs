@@ -40,11 +40,18 @@ type BalanceSnapshot implements HolderSnapshotEntity & BigIntSnapshotEntity & Sn
     value: BigInt!
 }
 
-type LastIndexSnapshot implements HolderSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity @entity {
+# Earner's Balance and timestamp checkpoints to calculate principal and periodic yields
+# Deterministic checkpoints at the exact times the accrual state changes (claim/start/stop) for stateful accounting
+type CheckpointSnapshot implements HolderSnapshotEntity & SnapshotEntity @entity(immutable: true) {
     id: ID! @unique
+    kind: String! # (START|CLAIM|STOP)
     timestamp: Timestamp!
     account: Holder!
-    value: BigInt!
+    balance: BigInt!
+    blockNumber: BigInt!
+    logIndex: BigInt!
+    mLatestIndex: BigInt!
+    mLatestUpdateTimestamp: Timestamp!
 }
 
 type IsEarningSnapshot implements HolderSnapshotEntity & BooleanSnapshotEntity & SnapshotEntity @entity {
@@ -80,8 +87,6 @@ type Holder @entity {
     address: String! @unique
     balance: BigInt!
     balanceSnapshots: [BalanceSnapshot!] @derivedFrom(field: "account")
-    lastIndex: BigInt!
-    lastIndexSnapshots: [LastIndexSnapshot!] @derivedFrom(field: "account")
     isEarning: Boolean!
     isEarningSnapshots: [IsEarningSnapshot!] @derivedFrom(field: "account")
     transfersTo: [Transfer!] @derivedFrom(field: "recipient")
@@ -95,15 +100,12 @@ type Holder @entity {
     sent: BigInt!
     sentSnapshots: [SentSnapshot!] @derivedFrom(field: "account")
     lastUpdate: Timestamp!
+    # deterministic checkpoints at the exact times the accrual state changes (claim/start/stop)
+    activeCheckpoint: CheckpointSnapshot # nullable
+    checkpointSnapshots: [CheckpointSnapshot!] @derivedFrom(field: "account")
 }
 
 type TotalNonEarningSupplySnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
-    id: ID! @unique
-    timestamp: Timestamp! @unique
-    value: BigInt!
-}
-
-type PrincipalOfTotalEarningSupplySnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
     id: ID! @unique
     timestamp: Timestamp! @unique
     value: BigInt!
@@ -162,8 +164,6 @@ type WrappedMToken @entity {
     holders: [Holder!]
     totalNonEarningSupply: BigInt!
     totalNonEarningSupplySnapshots: [TotalNonEarningSupplySnapshot!]
-    principalOfTotalEarningSupply: BigInt!
-    principalOfTotalEarningSupplySnapshots: [PrincipalOfTotalEarningSupplySnapshot!]
     totalEarningSupply: BigInt!
     totalEarningSupplySnapshots: [TotalEarningSupplySnapshot!]
     enableMIndex: BigInt!
