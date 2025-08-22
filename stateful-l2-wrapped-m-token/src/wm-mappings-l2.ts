@@ -321,7 +321,7 @@ function updateBalanceSnapshot(holder: Holder, timestamp: Timestamp, value: BigI
 }
 
 function updateCheckpointSnapshot(
-    kind: 'START' | 'STOP' | 'CLAIM',
+    kind: string, // 'START' | 'STOP' | 'CLAIM'
     holder: Holder,
     timestamp: Timestamp,
     blockNumber: BigInt,
