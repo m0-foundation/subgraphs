@@ -9,7 +9,7 @@ import {
     Holder,
     ImplementationSnapshot,
     IsEarningSnapshot,
-    LastIndexTimestampSnapshot,
+    CheckpointSnapshot,
     LatestIndexSnapshot,
     LatestUpdateTimestampSnapshot,
     Migration,
@@ -85,11 +85,11 @@ export function handleTransfer(event: TransferEvent): void {
 
 export function handleStartedEarning(event: StartedEarningEvent): void {
     const wrappedMToken = getWrappedMToken();
-    const mToken = getMToken();
     const account = getHolder(event.params.account);
     const timestamp = event.block.timestamp.toI32();
 
-    _startEarning(wrappedMToken, mToken, account, timestamp);
+    _startEarning(wrappedMToken, account, timestamp);
+    updateCheckpointSnapshot(account, timestamp, event.block.number, event.logIndex);
 
     wrappedMToken.lastUpdate = timestamp;
     wrappedMToken.save();
@@ -104,6 +104,7 @@ export function handleStoppedEarning(event: StoppedEarningEvent): void {
     const timestamp = event.block.timestamp.toI32();
 
     _stopEarning(wrappedMToken, account, timestamp);
+    updateCheckpointSnapshot(account, timestamp, event.block.number, event.logIndex);
 
     wrappedMToken.lastUpdate = timestamp;
     wrappedMToken.save();
@@ -161,12 +162,12 @@ export function handleEarningDisabled(event: EarningDisabledEvent): void {
 
 export function handleClaimed(event: ClaimedEvent): void {
     const wrappedMToken = getWrappedMToken();
-    const mToken = getMToken();
     const account = getHolder(event.params.account);
     const recipient = getHolder(event.params.recipient);
     const timestamp = event.block.timestamp.toI32();
 
-    _claim(wrappedMToken, mToken, account, event.params.amount, timestamp);
+    _claim(wrappedMToken, account, event.params.amount, timestamp);
+    updateCheckpointSnapshot(account, timestamp, event.block.number, event.logIndex);
 
     account.lastUpdate = timestamp;
     account.save();
@@ -255,7 +256,8 @@ function getHolder(address: Address): Holder {
 
     holder.address = address.toHexString();
     holder.balance = BigInt.fromI32(0);
-    holder.lastIndexTimestamp = 0;
+    holder.checkpointBalance = BigInt.fromI32(0);
+    holder.checkpointTimestamp = 0;
     holder.isEarning = false;
     holder.claimed = BigInt.fromI32(0);
     holder.received = BigInt.fromI32(0);
@@ -297,18 +299,21 @@ function updateBalanceSnapshot(holder: Holder, timestamp: Timestamp, value: BigI
 
     snapshot.save();
 }
-function updateLastIndexTimestampSnapshot(holder: Holder, timestamp: Timestamp): void {
-    const id = `lastIndexTimestamp-${holder.address}-${timestamp.toString()}`;
 
-    let snapshot = LastIndexTimestampSnapshot.load(id);
+function updateCheckpointSnapshot(holder: Holder, timestamp: Timestamp, blockNumber: BigInt, logIndex: BigInt): void {
+    const id = `checkpointSnapshot-${holder.address}-${timestamp.toString()}`;
+
+    let snapshot = CheckpointSnapshot.load(id);
 
     if (!snapshot) {
-        snapshot = new LastIndexTimestampSnapshot(id);
-
-        snapshot.account = holder.id;
+        snapshot = new CheckpointSnapshot(id);
     }
 
     snapshot.timestamp = timestamp;
+    snapshot.account = holder.id;
+    snapshot.balance = holder.balance;
+    snapshot.blockNumber = blockNumber;
+    snapshot.logIndex = logIndex;
 
     snapshot.save();
 }
@@ -607,12 +612,12 @@ function _mint(wrappedMToken: WrappedMToken, recipient: Holder, amount: BigInt, 
     updateTotalMintedSnapshot(timestamp, wrappedMToken.totalMinted);
 }
 
-function _startEarning(wrappedMToken: WrappedMToken, mToken: MToken, account: Holder, timestamp: Timestamp): void {
+function _startEarning(wrappedMToken: WrappedMToken, account: Holder, timestamp: Timestamp): void {
     account.isEarning = true;
-    account.lastIndexTimestamp = timestamp;
+    account.checkpointTimestamp = timestamp;
+    account.checkpointBalance = account.balance;
 
     updateIsEarningSnapshot(account, timestamp, account.isEarning);
-    updateLastIndexTimestampSnapshot(account, timestamp);
 
     if (account.balance.equals(BigInt.fromI32(0))) return;
 
@@ -625,10 +630,10 @@ function _startEarning(wrappedMToken: WrappedMToken, mToken: MToken, account: Ho
 
 function _stopEarning(wrappedMToken: WrappedMToken, account: Holder, timestamp: Timestamp): void {
     account.isEarning = false;
-    account.lastIndexTimestamp = 0;
+    account.checkpointTimestamp = 0;
+    account.checkpointBalance = account.balance;
 
     updateIsEarningSnapshot(account, timestamp, account.isEarning);
-    updateLastIndexTimestampSnapshot(account, timestamp);
 
     if (account.balance.equals(BigInt.fromI32(0))) return;
 
@@ -639,18 +644,12 @@ function _stopEarning(wrappedMToken: WrappedMToken, account: Holder, timestamp: 
     updateTotalEarningSupplySnapshot(timestamp, wrappedMToken.totalEarningSupply);
 }
 
-function _claim(
-    wrappedMToken: WrappedMToken,
-    mToken: MToken,
-    account: Holder,
-    amount: BigInt,
-    timestamp: Timestamp
-): void {
+function _claim(wrappedMToken: WrappedMToken, account: Holder, amount: BigInt, timestamp: Timestamp): void {
     account.claimed = account.claimed.plus(amount);
-    account.lastIndexTimestamp = timestamp;
+    account.checkpointTimestamp = timestamp;
+    account.checkpointBalance = account.balance;
 
     updateClaimedSnapshot(account, timestamp, account.claimed);
-    updateLastIndexTimestampSnapshot(account, timestamp);
 
     wrappedMToken.totalClaimed = wrappedMToken.totalClaimed.plus(amount);
 

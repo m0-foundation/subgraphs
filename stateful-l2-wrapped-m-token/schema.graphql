@@ -40,10 +40,15 @@ type BalanceSnapshot implements HolderSnapshotEntity & BigIntSnapshotEntity & Sn
     value: BigInt!
 }
 
-type LastIndexTimestampSnapshot implements HolderSnapshotEntity & SnapshotEntity @entity {
+# Earner's Balance and timestamp checkpoints to calculate principal and periodic yields
+# Deterministic checkpoints at the exact times the accrual state changes (claim/start/stop) for stateful accounting
+type CheckpointSnapshot implements HolderSnapshotEntity & SnapshotEntity @entity {
     id: ID! @unique
     timestamp: Timestamp!
     account: Holder!
+    balance: BigInt!
+    blockNumber: BigInt!
+    logIndex: BigInt!
 }
 
 type IsEarningSnapshot implements HolderSnapshotEntity & BooleanSnapshotEntity & SnapshotEntity @entity {
@@ -79,8 +84,6 @@ type Holder @entity {
     address: String! @unique
     balance: BigInt!
     balanceSnapshots: [BalanceSnapshot!] @derivedFrom(field: "account")
-    lastIndexTimestamp: Timestamp!
-    lastIndexTimestampSnapshots: [LastIndexTimestampSnapshot!] @derivedFrom(field: "account")
     isEarning: Boolean!
     isEarningSnapshots: [IsEarningSnapshot!] @derivedFrom(field: "account")
     transfersTo: [Transfer!] @derivedFrom(field: "recipient")
@@ -94,6 +97,10 @@ type Holder @entity {
     sent: BigInt!
     sentSnapshots: [SentSnapshot!] @derivedFrom(field: "account")
     lastUpdate: Timestamp!
+    # deterministic checkpoints at the exact times the accrual state changes (claim/start/stop)
+    checkpointBalance: BigInt!
+    checkpointTimestamp: Timestamp!
+    CheckpointSnapshot: [CheckpointSnapshot!] @derivedFrom(field: "account")
 }
 
 type TotalNonEarningSupplySnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity {
