@@ -13,7 +13,7 @@ dataSources:
       startBlock: 21952038
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.7
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - Holder
