@@ -115,17 +115,24 @@ export function handleYieldClaimed(event: YieldClaimedEvent): void {
   const logIndex = event.logIndex;
   const transactionHash = event.transaction.hash;
   const holder = getHolder(event.address);
+  const amount = event.params.yield_;
+  const timestamp = event.block.timestamp.toI32();
 
   let entity = new YieldClaimedSnapshot(`yieldClaimed-${transactionHash.toHexString()}-${logIndex.toString()}`);
 
   entity.account = holder.id;
-  entity.timestamp = event.block.timestamp.toI32();
-  entity.value = event.params.yield_;
+  entity.timestamp = timestamp;
+  entity.value = amount;
   entity.blockNumber = event.block.number;
   entity.transactionHash = transactionHash.toHexString();
   entity.logIndex = logIndex;
 
   entity.save();
+
+  // update holder
+  holder.claimed = holder.claimed.plus(amount);
+  holder.lastUpdate = timestamp;
+  holder.save();
 }
 
 /* ============ Entity Helpers ============ */
@@ -164,6 +171,7 @@ function getHolder(address: Address): Holder {
   holder.nonEarningBalance = BigInt.zero();
   holder.received = BigInt.zero();
   holder.sent = BigInt.zero();
+  holder.claimed = BigInt.zero();
   holder.isEarning = false;
   holder.lastUpdate = 0;
 
