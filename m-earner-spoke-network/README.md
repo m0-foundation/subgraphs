@@ -1,4 +1,4 @@
-# stateful-l2-m-token
+# m-earner-spoke-network
 
 This a subgraph indexer to index $M token on "Spoke networks".
 

@@ -39,6 +39,17 @@ type LatestUpdateTimestampSnapshot implements TimestampSnapshotEntity & Snapshot
   value: Timestamp!
 }
 
+type YieldClaimedSnapshot implements HolderSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity
+  @entity(immutable: true) {
+  id: ID! @unique
+  timestamp: Timestamp!
+  account: Holder!
+  value: BigInt!
+  blockNumber: BigInt!
+  transactionHash: String!
+  logIndex: BigInt!
+}
+
 type EarningPrincipalSnapshot implements HolderSnapshotEntity & BigIntSnapshotEntity & SnapshotEntity
   @entity(immutable: true) {
   id: ID! @unique
@@ -116,6 +127,8 @@ type Holder @entity(immutable: false) {
   nonEarningBalanceSnapshots: [NonEarningBalanceSnapshot!] @derivedFrom(field: "account")
   isEarning: Boolean!
   isEarningSnapshots: [IsEarningSnapshot!] @derivedFrom(field: "account")
+  claimed: BigInt!
+  yieldClaimedSnapshots: [YieldClaimedSnapshot!] @derivedFrom(field: "account")
   lastUpdate: Timestamp!
 }
 

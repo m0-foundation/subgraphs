@@ -14,6 +14,7 @@ import {
   TotalBurnedSnapshot,
   ReceivedSnapshot,
   SentSnapshot,
+  YieldClaimedSnapshot,
 } from '../generated/schema';
 import {
   IndexUpdated as IndexUpdatedEvent,
@@ -21,6 +22,7 @@ import {
   StoppedEarning as StoppedEarningEvent,
   Transfer as TransferEvent,
 } from '../generated/MToken/MToken';
+import { YieldClaimed as YieldClaimedEvent } from '../generated/mUSD/mUSD';
 
 const M_TOKEN_ADDRESS = '0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b';
 
@@ -107,6 +109,23 @@ export function handleTransfer(event: TransferEvent): void {
   transfer.transactionHash = event.transaction.hash.toHexString();
 
   transfer.save();
+}
+
+export function handleYieldClaimed(event: YieldClaimedEvent): void {
+  const logIndex = event.logIndex;
+  const transactionHash = event.transaction.hash;
+  const holder = getHolder(event.address);
+
+  let entity = new YieldClaimedSnapshot(`yieldClaimed-${transactionHash.toHexString()}-${logIndex.toString()}`);
+
+  entity.account = holder.id;
+  entity.timestamp = event.block.timestamp.toI32();
+  entity.value = event.params.yield_;
+  entity.blockNumber = event.block.number;
+  entity.transactionHash = transactionHash.toHexString();
+  entity.logIndex = logIndex;
+
+  entity.save();
 }
 
 /* ============ Entity Helpers ============ */
