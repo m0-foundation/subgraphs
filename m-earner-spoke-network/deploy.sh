@@ -28,4 +28,7 @@ yarn graph deploy m-token-linea \
   --deploy-key "$ALCHEMY_DEPLOY_KEY" \
   --ipfs https://ipfs.satsuma.xyz
 
+## Goldsky
+# goldsky subgraph deploy "m-earner-hyperliquid/$VERSION" --path .
+
 echo "✅ Deployment complete"
