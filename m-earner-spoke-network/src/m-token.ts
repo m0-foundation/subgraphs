@@ -22,7 +22,7 @@ import {
   StoppedEarning as StoppedEarningEvent,
   Transfer as TransferEvent,
 } from '../generated/MToken/MToken';
-import { YieldClaimed as YieldClaimedEvent } from '../generated/mUSD/mUSD';
+import { YieldClaimed as YieldClaimedEvent } from '../generated/Stablecoin/Stablecoin';
 
 const M_TOKEN_ADDRESS = '0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b';
 

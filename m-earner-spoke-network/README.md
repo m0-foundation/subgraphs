@@ -16,7 +16,7 @@ On `subgraph.yml`,
 
 1. Set `network` to the right chain. E.g., `arbitrum`.
 1. Set `startBlock` to the block height at which the $M contract was created.
-1. Set the right stablecoin you want to track: set `network`, `address`, `abi`, and `startBlock` on the second `dataSource` item.
+1. Set the right stablecoin you want to track: set `network`, `address`, and `startBlock` on the second `dataSource` item.
 
 On `deploy.sh`,
 
