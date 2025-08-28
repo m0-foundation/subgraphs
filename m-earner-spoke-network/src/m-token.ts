@@ -14,6 +14,7 @@ import {
   TotalBurnedSnapshot,
   ReceivedSnapshot,
   SentSnapshot,
+  YieldClaimedSnapshot,
 } from '../generated/schema';
 import {
   IndexUpdated as IndexUpdatedEvent,
@@ -21,14 +22,15 @@ import {
   StoppedEarning as StoppedEarningEvent,
   Transfer as TransferEvent,
 } from '../generated/MToken/MToken';
+import { YieldClaimed as YieldClaimedEvent } from '../generated/Stablecoin/Stablecoin';
 
 const M_TOKEN_ADDRESS = '0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b';
 
 const EXP_SCALED_ONE = BigInt.fromI32(10).pow(12);
 const BPS_SCALED_ONE = BigInt.fromI32(10).pow(4);
 const SECONDS_PER_YEAR = BigInt.fromI32(31_536_000);
-// @fixme(FS-223): This is a hardcoded value for the latest rate in basis points (4.15%).
-const LATEST_RATE_BPS = BigInt.fromI32(415);
+// @fixme(FS-223): This is a hardcoded value for the latest rate in basis points (4.08%).
+const LATEST_RATE_BPS = BigInt.fromI32(408);
 
 /* ============ Handlers ============ */
 
@@ -109,6 +111,30 @@ export function handleTransfer(event: TransferEvent): void {
   transfer.save();
 }
 
+export function handleYieldClaimed(event: YieldClaimedEvent): void {
+  const logIndex = event.logIndex;
+  const transactionHash = event.transaction.hash;
+  const holder = getHolder(event.address);
+  const amount = event.params.yield_;
+  const timestamp = event.block.timestamp.toI32();
+
+  let entity = new YieldClaimedSnapshot(`yieldClaimed-${transactionHash.toHexString()}-${logIndex.toString()}`);
+
+  entity.account = holder.id;
+  entity.timestamp = timestamp;
+  entity.value = amount;
+  entity.blockNumber = event.block.number;
+  entity.transactionHash = transactionHash.toHexString();
+  entity.logIndex = logIndex;
+
+  entity.save();
+
+  // update holder
+  holder.claimed = holder.claimed.plus(amount);
+  holder.lastUpdate = timestamp;
+  holder.save();
+}
+
 /* ============ Entity Helpers ============ */
 
 function getMToken(): MToken {
@@ -145,6 +171,7 @@ function getHolder(address: Address): Holder {
   holder.nonEarningBalance = BigInt.zero();
   holder.received = BigInt.zero();
   holder.sent = BigInt.zero();
+  holder.claimed = BigInt.zero();
   holder.isEarning = false;
   holder.lastUpdate = 0;
 

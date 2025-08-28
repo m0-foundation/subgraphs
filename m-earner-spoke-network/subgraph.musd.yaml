@@ -13,7 +13,7 @@ dataSources:
       startBlock: 21511394
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.7
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - Holder
@@ -43,4 +43,24 @@ dataSources:
           handler: handleStoppedEarning
         - event: IndexUpdated(indexed uint128)
           handler: handleIndexUpdated
+      file: ./src/m-token.ts
+  - kind: ethereum
+    name: Stablecoin
+    network: linea
+    source:
+      address: '0xacA92E438df0B2401fF60dA7E4337B687a2435DA' # mUSD
+      startBlock: 21952038
+      abi: Stablecoin
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - YieldClaimedSnapshot
+      abis:
+        - name: Stablecoin
+          file: ./abis/Stablecoin.json
+      eventHandlers:
+        - event: YieldClaimed(uint256)
+          handler: handleYieldClaimed
       file: ./src/m-token.ts
