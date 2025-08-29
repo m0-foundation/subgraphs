@@ -14,7 +14,7 @@ import {
   QuorumNumeratorUpdated,
   ResetExecuted,
   ThresholdRatioSet,
-  VoteCast,
+  ZeroGovernorVoteCast as VoteCast,
 } from "../generated/schema"
 import {
   createProposalParticipationEntity,

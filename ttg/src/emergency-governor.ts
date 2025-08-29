@@ -10,7 +10,7 @@ import {
   ProposalExecuted,
   QuorumNumeratorUpdated,
   ThresholdRatioSet,
-  VoteCast,
+  EmergencyGovernorVoteCast as VoteCast,
 } from "../generated/schema"
 import {
   createProposalParticipationEntity,
