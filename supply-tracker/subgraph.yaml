@@ -1,0 +1,77 @@
+specVersion: 1.3.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: USDZ
+    network: arbitrum-one
+    source:
+      address: "0xD87c75a92db19Fe334FE7812890f893449Ff1bdA"
+      abi: USDZ
+      startBlock: 388153723
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - AuthorizationCanceled
+        - AuthorizationUsed
+        - EIP712DomainChanged
+        - EarningDisabled
+        - EarningEnabled
+        - ForcedTransfer
+        - Frozen
+        - Initialized
+        - Paused
+        - RoleAdminChanged
+        - RoleGranted
+        - RoleRevoked
+        - Transfer
+        - Unfrozen
+        - Unpaused
+        - YieldClaimed
+        - YieldRecipientSet
+      abis:
+        - name: USDZ
+          file: ./abis/USDZ.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: AuthorizationCanceled(indexed address,indexed bytes32)
+          handler: handleAuthorizationCanceled
+        - event: AuthorizationUsed(indexed address,indexed bytes32)
+          handler: handleAuthorizationUsed
+        - event: EIP712DomainChanged()
+          handler: handleEIP712DomainChanged
+        - event: EarningDisabled(uint128)
+          handler: handleEarningDisabled
+        - event: EarningEnabled(uint128)
+          handler: handleEarningEnabled
+        - event: ForcedTransfer(indexed address,indexed address,indexed address,uint256)
+          handler: handleForcedTransfer
+        - event: Frozen(indexed address,uint256)
+          handler: handleFrozen
+        - event: Initialized(uint64)
+          handler: handleInitialized
+        - event: Paused(address)
+          handler: handlePaused
+        - event: RoleAdminChanged(indexed bytes32,indexed bytes32,indexed bytes32)
+          handler: handleRoleAdminChanged
+        - event: RoleGranted(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleGranted
+        - event: RoleRevoked(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleRevoked
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Unfrozen(indexed address,uint256)
+          handler: handleUnfrozen
+        - event: Unpaused(address)
+          handler: handleUnpaused
+        - event: YieldClaimed(uint256)
+          handler: handleYieldClaimed
+        - event: YieldRecipientSet(indexed address)
+          handler: handleYieldRecipientSet
+      file: ./src/usdz.ts
