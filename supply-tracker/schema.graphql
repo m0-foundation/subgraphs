@@ -1,16 +1,72 @@
-type Transfer @entity(immutable: true) {
-  id: Bytes!
-  sender: Bytes! # address
-  recipient: Bytes! # address
-  amount: BigInt! # uint256
+type YieldClaimedSnapshot @entity(timeseries: true) {
+  id: Int8!
+  timestamp: Timestamp!
+  amount: BigInt!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type YieldClaimed @entity(immutable: true) {
+type ReceivedSnapshot @entity(immutable: true) {
+  id: ID! @unique
+  timestamp: Timestamp!
+  account: Holder!
+  amount: BigInt!
+}
+
+type SentSnapshot @entity(immutable: true) {
+  id: ID! @unique
+  timestamp: Timestamp!
+  account: Holder!
+  amount: BigInt!
+}
+
+type Holder @entity(immutable: false) {
+  id: Bytes! @unique
+  received: BigInt!
+  receivedSnapshots: [ReceivedSnapshot!] @derivedFrom(field: "account")
+  sent: BigInt!
+  sentSnapshots: [SentSnapshot!] @derivedFrom(field: "account")
+  lastUpdate: Timestamp!
+}
+
+type MintedSnapshot @entity(timeseries: true) {
+  id: Int8!
+  timestamp: Timestamp!
+  amount: BigInt!
+}
+
+type BurnedSnapshot @entity(timeseries: true) {
+  id: Int8!
+  timestamp: Timestamp!
+  amount: BigInt!
+}
+
+type StablecoinSupply @entity(timeseries: true) {
+  id: Int8!
+  timestamp: Timestamp!
+  amount: BigInt!
+  stablecoin: Stablecoin!
+}
+
+type Stablecoin @entity(immutable: false) {
+  id: Bytes! @unique # address
+  holders: [Holder!]
+  transfers: [Transfer!]
+  yieldClaimed: BigInt!
+  yieldClaimedSnapshots: [YieldClaimedSnapshot!]
+  minted: BigInt!
+  mintedSnapshots: [MintedSnapshot!]
+  burned: BigInt!
+  burnedSnapshots: [BurnedSnapshot!]
+  lastUpdate: Timestamp!
+}
+
+type Transfer @entity(immutable: true) {
   id: Bytes!
-  yield: BigInt! # uint256
+  sender: Bytes! # address
+  recipient: Bytes! # address
+  amount: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
