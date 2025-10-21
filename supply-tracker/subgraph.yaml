@@ -8,7 +8,7 @@ dataSources:
     name: USDZ
     network: arbitrum-one
     source:
-      address: "0xD87c75a92db19Fe334FE7812890f893449Ff1bdA"
+      address: "0xA4B6DF229AEe22b4252dc578FEB2720E8A2C4A56"
       abi: USDZ
       startBlock: 388153723
     mapping:
