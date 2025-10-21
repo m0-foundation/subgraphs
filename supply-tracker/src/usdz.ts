@@ -92,6 +92,10 @@ export function handleTransfer(event: TransferEvent): void {
       sentSnap.timestamp = timestamp;
       sentSnap.account = sender.id;
       sentSnap.amount = amount;
+      sentSnap.blockNumber = event.block.number;
+      sentSnap.blockTimestamp = event.block.timestamp;
+      sentSnap.transactionHash = event.transaction.hash;
+      sentSnap.logIndex = event.logIndex;
       sentSnap.save();
 
       const receivedId = `${event.transaction.hash.toHexString()}-${event.logIndex.toI32().toString()}`;
@@ -99,6 +103,10 @@ export function handleTransfer(event: TransferEvent): void {
       receivedSnap.timestamp = timestamp;
       receivedSnap.account = recipient.id;
       receivedSnap.amount = amount;
+      receivedSnap.blockNumber = event.block.number;
+      receivedSnap.blockTimestamp = event.block.timestamp;
+      receivedSnap.transactionHash = event.transaction.hash;
+      receivedSnap.logIndex = event.logIndex;
       receivedSnap.save();
     }
   }
