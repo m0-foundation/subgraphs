@@ -53,6 +53,20 @@ export function handleTransfer(event: TransferEvent): void {
       mintedSnap.transactionHash = event.transaction.hash;
       mintedSnap.logIndex = event.logIndex;
       mintedSnap.save();
+
+      // Stablecoin supply snapshot for mint
+      const supplyAfterMint = stablecoin.minted.minus(stablecoin.burned);
+      const supplySnapMint = new StablecoinSupply(1); // overridden by subgraph
+      supplySnapMint.timestamp = timestamp;
+      supplySnapMint.amount = supplyAfterMint;
+      supplySnapMint.stablecoin = stablecoin.id;
+      supplySnapMint.blockNumber = event.block.number;
+      supplySnapMint.blockTimestamp = event.block.timestamp;
+      supplySnapMint.transactionHash = event.transaction.hash;
+      supplySnapMint.logIndex = event.logIndex;
+      supplySnapMint.delta = amount;
+      supplySnapMint.operation = "MINT";
+      supplySnapMint.save();
     }
   } else if (event.params.recipient.equals(ZERO_ADDRESS)) {
     // Burn from sender
@@ -80,6 +94,20 @@ export function handleTransfer(event: TransferEvent): void {
       burnedSnap.transactionHash = event.transaction.hash;
       burnedSnap.logIndex = event.logIndex;
       burnedSnap.save();
+
+      // Stablecoin supply snapshot for burn
+      const supplyAfterBurn = stablecoin.minted.minus(stablecoin.burned);
+      const supplySnapBurn = new StablecoinSupply(1); // overridden by subgraph
+      supplySnapBurn.timestamp = timestamp;
+      supplySnapBurn.amount = supplyAfterBurn;
+      supplySnapBurn.stablecoin = stablecoin.id;
+      supplySnapBurn.blockNumber = event.block.number;
+      supplySnapBurn.blockTimestamp = event.block.timestamp;
+      supplySnapBurn.transactionHash = event.transaction.hash;
+      supplySnapBurn.logIndex = event.logIndex;
+      supplySnapBurn.delta = amount;
+      supplySnapBurn.operation = "BURN";
+      supplySnapBurn.save();
     }
   } else {
     // Regular transfer between holders
@@ -110,18 +138,6 @@ export function handleTransfer(event: TransferEvent): void {
       receivedSnap.save();
     }
   }
-
-  // Update supply snapshot each transfer (mint/burn affect net supply)
-  const supply = stablecoin.minted.minus(stablecoin.burned);
-  const supplySnap = new StablecoinSupply(1); // overridden by subgraph
-  supplySnap.timestamp = timestamp;
-  supplySnap.amount = supply;
-  supplySnap.stablecoin = stablecoin.id;
-  supplySnap.blockNumber = event.block.number;
-  supplySnap.blockTimestamp = event.block.timestamp;
-  supplySnap.transactionHash = event.transaction.hash;
-  supplySnap.logIndex = event.logIndex;
-  supplySnap.save();
 
   // Update lastUpdate markers
   stablecoin.lastUpdate = timestamp;

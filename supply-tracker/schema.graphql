@@ -68,6 +68,13 @@ type StablecoinSupply @entity(timeseries: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
   logIndex: BigInt!
+  delta: BigInt!
+  operation: Operation!
+}
+
+enum Operation {
+  MINT
+  BURN
 }
 
 type Stablecoin @entity(immutable: false) {
