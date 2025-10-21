@@ -61,7 +61,7 @@ type StablecoinSupplyStats
   @aggregation(intervals: ["day"], source: "StablecoinSupply") {
   id: Int8!
   timestamp: Timestamp!
-  totalSupply: BigDecimal! @aggregate(fn: "sum", arg: "delta")
+  totalSupply: BigDecimal! @aggregate(fn: "last", arg: "amount")
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
