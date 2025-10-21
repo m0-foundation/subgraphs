@@ -59,6 +59,11 @@ type BurnedSnapshot @entity(timeseries: true) {
   logIndex: BigInt!
 }
 
+enum Operation {
+  MINT
+  BURN
+}
+
 type StablecoinSupply @entity(timeseries: true) {
   id: Int8!
   timestamp: Timestamp!
@@ -72,9 +77,14 @@ type StablecoinSupply @entity(timeseries: true) {
   operation: Operation!
 }
 
-enum Operation {
-  MINT
-  BURN
+type StablecoinSupplyStats
+  @aggregation(intervals: ["day"], source: "StablecoinSupply") {
+  id: Int8!
+  timestamp: Timestamp!
+  totalSupply: BigDecimal! @aggregate(fn: "last", arg: "amount")
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
 }
 
 type Stablecoin @entity(immutable: false) {
