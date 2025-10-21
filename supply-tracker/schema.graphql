@@ -39,26 +39,6 @@ type Holder @entity(immutable: false) {
   lastUpdate: Timestamp!
 }
 
-type MintedSnapshot @entity(timeseries: true) {
-  id: Int8!
-  timestamp: Timestamp!
-  amount: BigInt!
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-  logIndex: BigInt!
-}
-
-type BurnedSnapshot @entity(timeseries: true) {
-  id: Int8!
-  timestamp: Timestamp!
-  amount: BigInt!
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-  logIndex: BigInt!
-}
-
 enum Operation {
   MINT
   BURN
@@ -73,7 +53,7 @@ type StablecoinSupply @entity(timeseries: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
   logIndex: BigInt!
-  delta: BigInt!
+  delta: BigDecimal!
   operation: Operation!
 }
 
@@ -81,7 +61,7 @@ type StablecoinSupplyStats
   @aggregation(intervals: ["day"], source: "StablecoinSupply") {
   id: Int8!
   timestamp: Timestamp!
-  totalSupply: BigDecimal! @aggregate(fn: "last", arg: "amount")
+  totalSupply: BigDecimal! @aggregate(fn: "sum", arg: "delta")
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
@@ -94,9 +74,7 @@ type Stablecoin @entity(immutable: false) {
   yieldClaimed: BigInt!
   yieldClaimedSnapshots: [YieldClaimedSnapshot!]
   minted: BigInt!
-  mintedSnapshots: [MintedSnapshot!]
   burned: BigInt!
-  burnedSnapshots: [BurnedSnapshot!]
   lastUpdate: Timestamp!
 }
 

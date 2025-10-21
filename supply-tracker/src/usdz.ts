@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   Transfer as TransferEvent,
   YieldClaimed as YieldClaimedEvent,
@@ -8,8 +8,6 @@ import {
   YieldClaimedSnapshot,
   ReceivedSnapshot,
   SentSnapshot,
-  MintedSnapshot,
-  BurnedSnapshot,
   StablecoinSupply,
 } from "../generated/schema";
 import { getStablecoin } from "./token";
@@ -45,15 +43,6 @@ export function handleTransfer(event: TransferEvent): void {
 
       stablecoin.minted = stablecoin.minted.plus(amount);
 
-      const mintedSnap = new MintedSnapshot(1); // overridden by subgraph
-      mintedSnap.timestamp = timestamp;
-      mintedSnap.amount = amount;
-      mintedSnap.blockNumber = event.block.number;
-      mintedSnap.blockTimestamp = event.block.timestamp;
-      mintedSnap.transactionHash = event.transaction.hash;
-      mintedSnap.logIndex = event.logIndex;
-      mintedSnap.save();
-
       // Stablecoin supply snapshot for mint
       const supplyAfterMint = stablecoin.minted.minus(stablecoin.burned);
       const supplySnapMint = new StablecoinSupply(1); // overridden by subgraph
@@ -64,7 +53,7 @@ export function handleTransfer(event: TransferEvent): void {
       supplySnapMint.blockTimestamp = event.block.timestamp;
       supplySnapMint.transactionHash = event.transaction.hash;
       supplySnapMint.logIndex = event.logIndex;
-      supplySnapMint.delta = amount;
+      supplySnapMint.delta = amount.toBigDecimal();
       supplySnapMint.operation = "MINT";
       supplySnapMint.save();
     }
@@ -86,15 +75,6 @@ export function handleTransfer(event: TransferEvent): void {
 
       stablecoin.burned = stablecoin.burned.plus(amount);
 
-      const burnedSnap = new BurnedSnapshot(1); // overridden by subgraph
-      burnedSnap.timestamp = timestamp;
-      burnedSnap.amount = amount;
-      burnedSnap.blockNumber = event.block.number;
-      burnedSnap.blockTimestamp = event.block.timestamp;
-      burnedSnap.transactionHash = event.transaction.hash;
-      burnedSnap.logIndex = event.logIndex;
-      burnedSnap.save();
-
       // Stablecoin supply snapshot for burn
       const supplyAfterBurn = stablecoin.minted.minus(stablecoin.burned);
       const supplySnapBurn = new StablecoinSupply(1); // overridden by subgraph
@@ -105,7 +85,9 @@ export function handleTransfer(event: TransferEvent): void {
       supplySnapBurn.blockTimestamp = event.block.timestamp;
       supplySnapBurn.transactionHash = event.transaction.hash;
       supplySnapBurn.logIndex = event.logIndex;
-      supplySnapBurn.delta = amount;
+      supplySnapBurn.delta = amount
+        .toBigDecimal()
+        .times(BigDecimal.fromString("-1"));
       supplySnapBurn.operation = "BURN";
       supplySnapBurn.save();
     }
