@@ -37,6 +37,10 @@ export function handleTransfer(event: TransferEvent): void {
       receivedSnap.timestamp = timestamp;
       receivedSnap.account = recipient.id;
       receivedSnap.amount = amount;
+      receivedSnap.blockNumber = event.block.number;
+      receivedSnap.blockTimestamp = event.block.timestamp;
+      receivedSnap.transactionHash = event.transaction.hash;
+      receivedSnap.logIndex = event.logIndex;
       receivedSnap.save();
 
       stablecoin.minted = stablecoin.minted.plus(amount);
@@ -44,6 +48,10 @@ export function handleTransfer(event: TransferEvent): void {
       const mintedSnap = new MintedSnapshot(1); // overridden by subgraph
       mintedSnap.timestamp = timestamp;
       mintedSnap.amount = amount;
+      mintedSnap.blockNumber = event.block.number;
+      mintedSnap.blockTimestamp = event.block.timestamp;
+      mintedSnap.transactionHash = event.transaction.hash;
+      mintedSnap.logIndex = event.logIndex;
       mintedSnap.save();
     }
   } else if (event.params.recipient.equals(ZERO_ADDRESS)) {
@@ -56,6 +64,10 @@ export function handleTransfer(event: TransferEvent): void {
       sentSnap.timestamp = timestamp;
       sentSnap.account = sender.id;
       sentSnap.amount = amount;
+      sentSnap.blockNumber = event.block.number;
+      sentSnap.blockTimestamp = event.block.timestamp;
+      sentSnap.transactionHash = event.transaction.hash;
+      sentSnap.logIndex = event.logIndex;
       sentSnap.save();
 
       stablecoin.burned = stablecoin.burned.plus(amount);
@@ -63,6 +75,10 @@ export function handleTransfer(event: TransferEvent): void {
       const burnedSnap = new BurnedSnapshot(1); // overridden by subgraph
       burnedSnap.timestamp = timestamp;
       burnedSnap.amount = amount;
+      burnedSnap.blockNumber = event.block.number;
+      burnedSnap.blockTimestamp = event.block.timestamp;
+      burnedSnap.transactionHash = event.transaction.hash;
+      burnedSnap.logIndex = event.logIndex;
       burnedSnap.save();
     }
   } else {
@@ -93,6 +109,10 @@ export function handleTransfer(event: TransferEvent): void {
   supplySnap.timestamp = timestamp;
   supplySnap.amount = supply;
   supplySnap.stablecoin = stablecoin.id;
+  supplySnap.blockNumber = event.block.number;
+  supplySnap.blockTimestamp = event.block.timestamp;
+  supplySnap.transactionHash = event.transaction.hash;
+  supplySnap.logIndex = event.logIndex;
   supplySnap.save();
 
   // Update lastUpdate markers
@@ -127,6 +147,7 @@ export function handleYieldClaimed(event: YieldClaimedEvent): void {
   entity.blockNumber = event.block.number;
   entity.blockTimestamp = event.block.timestamp;
   entity.transactionHash = event.transaction.hash;
+  entity.logIndex = event.logIndex;
 
   entity.save();
 }

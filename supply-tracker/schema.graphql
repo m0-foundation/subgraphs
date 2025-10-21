@@ -5,6 +5,7 @@ type YieldClaimedSnapshot @entity(timeseries: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  logIndex: BigInt!
 }
 
 type ReceivedSnapshot @entity(immutable: true) {
@@ -12,6 +13,10 @@ type ReceivedSnapshot @entity(immutable: true) {
   timestamp: Timestamp!
   account: Holder!
   amount: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
 }
 
 type SentSnapshot @entity(immutable: true) {
@@ -19,6 +24,10 @@ type SentSnapshot @entity(immutable: true) {
   timestamp: Timestamp!
   account: Holder!
   amount: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
 }
 
 type Holder @entity(immutable: false) {
@@ -34,12 +43,20 @@ type MintedSnapshot @entity(timeseries: true) {
   id: Int8!
   timestamp: Timestamp!
   amount: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
 }
 
 type BurnedSnapshot @entity(timeseries: true) {
   id: Int8!
   timestamp: Timestamp!
   amount: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
 }
 
 type StablecoinSupply @entity(timeseries: true) {
@@ -47,6 +64,10 @@ type StablecoinSupply @entity(timeseries: true) {
   timestamp: Timestamp!
   amount: BigInt!
   stablecoin: Stablecoin!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
 }
 
 type Stablecoin @entity(immutable: false) {
