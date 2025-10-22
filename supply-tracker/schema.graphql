@@ -92,3 +92,9 @@ type Stablecoin @entity(immutable: false) {
   burned: BigInt!
   lastUpdate: Timestamp!
 }
+
+# We use this entity to track hourly yield snapshots
+type YieldMeta @entity(immutable: false) {
+  id: String! @unique # always singleton
+  lastHour: Int! # last processed hour bucket
+}

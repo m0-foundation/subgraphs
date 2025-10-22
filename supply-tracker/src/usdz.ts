@@ -16,6 +16,7 @@ import {
   SentSnapshot,
   SupplySnapshot,
   YieldSnapshot,
+  YieldMeta,
 } from "../generated/schema";
 import { getStablecoin } from "./token";
 import { getHolder } from "./holder";
@@ -160,12 +161,17 @@ export function handleYieldClaimed(event: YieldClaimedEvent): void {
   yieldSnap.save();
 }
 
-// Runs on every block; snapshot unclaimed yield once per day (first minute)
+// Runs on every block; snapshot unclaimed yield once per hour
 export function handleBlock(block: ethereum.Block): void {
-  // Only run in the first minute of the UTC day
-  const SECONDS_PER_DAY = 86400;
-  const secondsIntoDay = block.timestamp.mod(BigInt.fromI32(SECONDS_PER_DAY));
-  if (secondsIntoDay.gt(BigInt.fromI32(60))) {
+  let currentHour = hourBucket(block.timestamp);
+
+  // Run only if new hour detected
+  let meta = YieldMeta.load("singleton");
+  if (meta == null) {
+    meta = new YieldMeta("singleton");
+    meta.lastHour = 0;
+  }
+  if (meta.lastHour == currentHour) {
     return;
   }
 
@@ -186,6 +192,15 @@ export function handleBlock(block: ethereum.Block): void {
   yieldSnap.unclaimed = unclaimed;
   yieldSnap.blockNumber = block.number;
   yieldSnap.save();
+
+  // Update tracker
+  meta.lastHour = currentHour as i32;
+  meta.save();
+}
+
+function hourBucket(timestamp: BigInt): i64 {
+  let startOfHour = timestamp.toI64();
+  return startOfHour - (startOfHour % 3600); // floor to start of the hour
 }
 
 function getUnclaimedYield(): BigInt {

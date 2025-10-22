@@ -19,6 +19,7 @@ dataSources:
         - TransferSnapshot
         - VolumeStats
         - YieldSnapshot
+        - YieldMeta
         - Stablecoin
         - SupplySnapshot
         - SupplyStats
