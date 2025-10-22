@@ -73,6 +73,12 @@ type VolumeStats
   count: Int8! @aggregate(fn: "count", cumulative: true)
 }
 
+# We use this entity to track hourly yield snapshots
+type YieldMeta @entity(immutable: false) {
+  id: String! @unique # always singleton
+  lastHour: Int! # last processed hour bucket
+}
+
 # Yield accrued/claimed tracking
 type YieldSnapshot @entity(timeseries: true) {
   id: Int8!
@@ -84,6 +90,16 @@ type YieldSnapshot @entity(timeseries: true) {
   blockNumber: BigInt!
 }
 
+type YieldStats
+  @aggregation(intervals: ["hour", "day"], source: "YieldSnapshot") {
+  id: Int8!
+  timestamp: Timestamp!
+  amount: BigInt! @aggregate(fn: "last", arg: "amount")
+  claimed: BigInt!
+  unclaimed: BigInt!
+  count: Int8! @aggregate(fn: "count", cumulative: true)
+}
+
 type Stablecoin @entity(immutable: false) {
   id: Bytes! @unique # address
   claimed: BigInt!
@@ -92,10 +108,4 @@ type Stablecoin @entity(immutable: false) {
   burned: BigInt!
   supply: BigInt!
   lastUpdate: Timestamp!
-}
-
-# We use this entity to track hourly yield snapshots
-type YieldMeta @entity(immutable: false) {
-  id: String! @unique # always singleton
-  lastHour: Int! # last processed hour bucket
 }

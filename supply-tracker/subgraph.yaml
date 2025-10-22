@@ -18,8 +18,9 @@ dataSources:
       entities:
         - TransferSnapshot
         - VolumeStats
-        - YieldSnapshot
         - YieldMeta
+        - YieldSnapshot
+        - YieldStats
         - Stablecoin
         - SupplySnapshot
         - SupplyStats
