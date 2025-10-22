@@ -65,6 +65,7 @@ type StablecoinSupplyStats
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  count: Int8! @aggregate(fn: "count", cumulative: true)
 }
 
 type Stablecoin @entity(immutable: false) {
