@@ -21,6 +21,10 @@ import {
 import { getStablecoin } from "./token";
 import { getHolder } from "./holder";
 
+// timeseries entities' id and timestamp is set automatically by subgraph
+// @see https://thegraph.com/docs/en/subgraphs/best-practices/timeseries/
+const TIMESERIES_ID = 1;
+
 export function handleTransfer(event: TransferEvent): void {
   const ZERO_ADDRESS = Address.fromString(
     "0x0000000000000000000000000000000000000000",
@@ -37,8 +41,7 @@ export function handleTransfer(event: TransferEvent): void {
     if (!amount.equals(BigInt.fromI32(0))) {
       recipient.received = recipient.received.plus(amount);
 
-      const receivedSnap = new ReceivedSnapshot(1); // overridden by subgraph
-      receivedSnap.timestamp = event.block.timestamp.toI32();
+      const receivedSnap = new ReceivedSnapshot(TIMESERIES_ID);
       receivedSnap.account = recipient.id;
       receivedSnap.amount = amount;
       receivedSnap.blockNumber = event.block.number;
@@ -50,8 +53,7 @@ export function handleTransfer(event: TransferEvent): void {
 
       // Stablecoin supply snapshot for mint
       const supplyAfterMint = stablecoin.minted.minus(stablecoin.burned);
-      const supplySnapMint = new SupplySnapshot(1); // overridden by subgraph
-      supplySnapMint.timestamp = event.block.timestamp.toI32();
+      const supplySnapMint = new SupplySnapshot(TIMESERIES_ID);
       supplySnapMint.amount = supplyAfterMint;
       supplySnapMint.stablecoin = stablecoin.id;
       supplySnapMint.blockNumber = event.block.number;
@@ -66,8 +68,7 @@ export function handleTransfer(event: TransferEvent): void {
     if (!amount.equals(BigInt.fromI32(0))) {
       sender.sent = sender.sent.plus(amount);
 
-      const sentSnap = new SentSnapshot(1); // overridden by subgraph
-      sentSnap.timestamp = event.block.timestamp.toI32();
+      const sentSnap = new SentSnapshot(TIMESERIES_ID);
       sentSnap.account = sender.id;
       sentSnap.amount = amount;
       sentSnap.blockNumber = event.block.number;
@@ -79,8 +80,7 @@ export function handleTransfer(event: TransferEvent): void {
 
       // Stablecoin supply snapshot for burn
       const supplyAfterBurn = stablecoin.minted.minus(stablecoin.burned);
-      const supplySnapBurn = new SupplySnapshot(1); // overridden by subgraph
-      supplySnapBurn.timestamp = event.block.timestamp.toI32();
+      const supplySnapBurn = new SupplySnapshot(TIMESERIES_ID);
       supplySnapBurn.amount = supplyAfterBurn;
       supplySnapBurn.stablecoin = stablecoin.id;
       supplySnapBurn.blockNumber = event.block.number;
@@ -98,8 +98,7 @@ export function handleTransfer(event: TransferEvent): void {
       sender.sent = sender.sent.plus(amount);
       recipient.received = recipient.received.plus(amount);
 
-      const sentSnap = new SentSnapshot(1); // overridden by subgraph
-      sentSnap.timestamp = event.block.timestamp.toI32();
+      const sentSnap = new SentSnapshot(TIMESERIES_ID);
       sentSnap.account = sender.id;
       sentSnap.amount = amount;
       sentSnap.blockNumber = event.block.number;
@@ -107,8 +106,7 @@ export function handleTransfer(event: TransferEvent): void {
       sentSnap.logIndex = event.logIndex;
       sentSnap.save();
 
-      const receivedSnap = new ReceivedSnapshot(1); // overridden by subgraph
-      receivedSnap.timestamp = event.block.timestamp.toI32();
+      const receivedSnap = new ReceivedSnapshot(TIMESERIES_ID);
       receivedSnap.account = recipient.id;
       receivedSnap.amount = amount;
       receivedSnap.blockNumber = event.block.number;
@@ -129,8 +127,7 @@ export function handleTransfer(event: TransferEvent): void {
   recipient.save();
 
   // Persist the TransferSnapshot timeseries
-  const transferSnap = new TransferSnapshot(1); // overridden by subgraph
-  transferSnap.timestamp = event.block.timestamp.toI32();
+  const transferSnap = new TransferSnapshot(TIMESERIES_ID);
   transferSnap.sender = event.params.sender;
   transferSnap.recipient = event.params.recipient;
   transferSnap.amount = event.params.amount;
@@ -152,8 +149,7 @@ export function handleYieldClaimed(event: YieldClaimedEvent): void {
   stablecoin.save();
 
   // Emit YieldSnapshot reflecting the claim
-  const yieldSnap = new YieldSnapshot(1); // overridden by subgraph
-  yieldSnap.timestamp = event.block.timestamp.toI32();
+  const yieldSnap = new YieldSnapshot(TIMESERIES_ID);
   yieldSnap.amount = newAccruedYield;
   yieldSnap.claimed = stablecoin.claimed;
   yieldSnap.unclaimed = unclaimed;
@@ -185,8 +181,7 @@ export function handleBlock(block: ethereum.Block): void {
   stablecoin.save();
 
   // Emit YieldSnapshot for the day's unclaimed yield
-  const yieldSnap = new YieldSnapshot(1); // overridden by subgraph
-  yieldSnap.timestamp = block.timestamp.toI32();
+  const yieldSnap = new YieldSnapshot(TIMESERIES_ID);
   yieldSnap.amount = newAccruedYield;
   yieldSnap.claimed = stablecoin.claimed;
   yieldSnap.unclaimed = unclaimed;
