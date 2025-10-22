@@ -53,6 +53,7 @@ export function handleTransfer(event: TransferEvent): void {
 
       // Stablecoin supply snapshot for mint
       const supplyAfterMint = stablecoin.minted.minus(stablecoin.burned);
+      stablecoin.supply = supplyAfterMint;
       const supplySnapMint = new SupplySnapshot(TIMESERIES_ID);
       supplySnapMint.amount = supplyAfterMint;
       supplySnapMint.stablecoin = stablecoin.id;
@@ -80,6 +81,7 @@ export function handleTransfer(event: TransferEvent): void {
 
       // Stablecoin supply snapshot for burn
       const supplyAfterBurn = stablecoin.minted.minus(stablecoin.burned);
+      stablecoin.supply = supplyAfterBurn;
       const supplySnapBurn = new SupplySnapshot(TIMESERIES_ID);
       supplySnapBurn.amount = supplyAfterBurn;
       supplySnapBurn.stablecoin = stablecoin.id;

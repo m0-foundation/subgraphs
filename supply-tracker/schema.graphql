@@ -90,6 +90,7 @@ type Stablecoin @entity(immutable: false) {
   accruedYield: BigInt!
   minted: BigInt!
   burned: BigInt!
+  supply: BigInt!
   lastUpdate: Timestamp!
 }
 
