@@ -7,8 +7,8 @@ type YieldClaimedSnapshot @entity(timeseries: true) {
   logIndex: BigInt!
 }
 
-type ReceivedSnapshot @entity(immutable: true) {
-  id: ID! @unique
+type ReceivedSnapshot @entity(timeseries: true) {
+  id: Int8!
   timestamp: Timestamp!
   account: Holder!
   amount: BigInt!
@@ -17,8 +17,8 @@ type ReceivedSnapshot @entity(immutable: true) {
   logIndex: BigInt!
 }
 
-type SentSnapshot @entity(immutable: true) {
-  id: ID! @unique
+type SentSnapshot @entity(timeseries: true) {
+  id: Int8!
   timestamp: Timestamp!
   account: Holder!
   amount: BigInt!
@@ -41,7 +41,7 @@ enum Operation {
   BURN
 }
 
-type StablecoinSupply @entity(timeseries: true) {
+type SupplySnapshot @entity(timeseries: true) {
   id: Int8!
   timestamp: Timestamp!
   amount: BigInt!
@@ -53,33 +53,39 @@ type StablecoinSupply @entity(timeseries: true) {
   operation: Operation!
 }
 
-type StablecoinSupplyStats
-  @aggregation(intervals: ["day"], source: "StablecoinSupply") {
+type SupplyStats
+  @aggregation(intervals: ["hour", "day"], source: "SupplySnapshot") {
   id: Int8!
   timestamp: Timestamp!
-  totalSupply: BigDecimal! @aggregate(fn: "last", arg: "amount")
+  amount: BigDecimal! @aggregate(fn: "last", arg: "amount")
   blockNumber: BigInt!
   transactionHash: Bytes!
   count: Int8! @aggregate(fn: "count", cumulative: true)
 }
 
+type TransferSnapshot @entity(timeseries: true) {
+  id: Int8!
+  timestamp: Timestamp!
+  sender: Bytes!
+  recipient: Bytes!
+  amount: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type VolumeStats
+  @aggregation(intervals: ["hour", "day"], source: "TransferSnapshot") {
+  id: Int8!
+  timestamp: Timestamp!
+  amount: BigDecimal! @aggregate(fn: "sum", arg: "amount")
+  count: Int8! @aggregate(fn: "count", cumulative: true)
+}
+
 type Stablecoin @entity(immutable: false) {
   id: Bytes! @unique # address
-  holders: [Holder!]
-  transfers: [Transfer!]
   yieldClaimed: BigInt!
-  yieldClaimedSnapshots: [YieldClaimedSnapshot!]
   minted: BigInt!
   burned: BigInt!
   lastUpdate: Timestamp!
-}
-
-type Transfer @entity(immutable: true) {
-  id: Bytes!
-  sender: Bytes! # address
-  recipient: Bytes! # address
-  amount: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
 }

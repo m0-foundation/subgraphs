@@ -16,11 +16,12 @@ dataSources:
       apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
-        - Transfer
-        - YieldClaimed
+        - TransferSnapshot
+        - VolumeStats
+        - YieldClaimedSnapshot
         - Stablecoin
-        - StablecoinSupply
-        - StablecoinSupplyStats
+        - SupplySnapshot
+        - SupplyStats
         - Holder
       abis:
         - name: USDZ

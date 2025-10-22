@@ -4,11 +4,11 @@ import {
   YieldClaimed as YieldClaimedEvent,
 } from "../generated/USDZ/USDZ";
 import {
-  Transfer,
+  TransferSnapshot,
   YieldClaimedSnapshot,
   ReceivedSnapshot,
   SentSnapshot,
-  StablecoinSupply,
+  SupplySnapshot,
 } from "../generated/schema";
 import { getStablecoin } from "./token";
 import { getHolder } from "./holder";
@@ -29,8 +29,7 @@ export function handleTransfer(event: TransferEvent): void {
     if (!amount.equals(BigInt.fromI32(0))) {
       recipient.received = recipient.received.plus(amount);
 
-      const receivedId = `${event.transaction.hash.toHexString()}-${event.logIndex.toI32().toString()}`;
-      const receivedSnap = new ReceivedSnapshot(receivedId);
+      const receivedSnap = new ReceivedSnapshot(1); // overridden by subgraph
       receivedSnap.timestamp = event.block.timestamp.toI32();
       receivedSnap.account = recipient.id;
       receivedSnap.amount = amount;
@@ -43,7 +42,7 @@ export function handleTransfer(event: TransferEvent): void {
 
       // Stablecoin supply snapshot for mint
       const supplyAfterMint = stablecoin.minted.minus(stablecoin.burned);
-      const supplySnapMint = new StablecoinSupply(1); // overridden by subgraph
+      const supplySnapMint = new SupplySnapshot(1); // overridden by subgraph
       supplySnapMint.timestamp = event.block.timestamp.toI32();
       supplySnapMint.amount = supplyAfterMint;
       supplySnapMint.stablecoin = stablecoin.id;
@@ -59,8 +58,7 @@ export function handleTransfer(event: TransferEvent): void {
     if (!amount.equals(BigInt.fromI32(0))) {
       sender.sent = sender.sent.plus(amount);
 
-      const sentId = `${event.transaction.hash.toHexString()}-${event.logIndex.toI32().toString()}`;
-      const sentSnap = new SentSnapshot(sentId);
+      const sentSnap = new SentSnapshot(1); // overridden by subgraph
       sentSnap.timestamp = event.block.timestamp.toI32();
       sentSnap.account = sender.id;
       sentSnap.amount = amount;
@@ -73,7 +71,7 @@ export function handleTransfer(event: TransferEvent): void {
 
       // Stablecoin supply snapshot for burn
       const supplyAfterBurn = stablecoin.minted.minus(stablecoin.burned);
-      const supplySnapBurn = new StablecoinSupply(1); // overridden by subgraph
+      const supplySnapBurn = new SupplySnapshot(1); // overridden by subgraph
       supplySnapBurn.timestamp = event.block.timestamp.toI32();
       supplySnapBurn.amount = supplyAfterBurn;
       supplySnapBurn.stablecoin = stablecoin.id;
@@ -92,8 +90,7 @@ export function handleTransfer(event: TransferEvent): void {
       sender.sent = sender.sent.plus(amount);
       recipient.received = recipient.received.plus(amount);
 
-      const sentId = `${event.transaction.hash.toHexString()}-${event.logIndex.toI32().toString()}`;
-      const sentSnap = new SentSnapshot(sentId);
+      const sentSnap = new SentSnapshot(1); // overridden by subgraph
       sentSnap.timestamp = event.block.timestamp.toI32();
       sentSnap.account = sender.id;
       sentSnap.amount = amount;
@@ -102,8 +99,7 @@ export function handleTransfer(event: TransferEvent): void {
       sentSnap.logIndex = event.logIndex;
       sentSnap.save();
 
-      const receivedId = `${event.transaction.hash.toHexString()}-${event.logIndex.toI32().toString()}`;
-      const receivedSnap = new ReceivedSnapshot(receivedId);
+      const receivedSnap = new ReceivedSnapshot(1); // overridden by subgraph
       receivedSnap.timestamp = event.block.timestamp.toI32();
       receivedSnap.account = recipient.id;
       receivedSnap.amount = amount;
@@ -124,19 +120,16 @@ export function handleTransfer(event: TransferEvent): void {
   recipient.lastUpdate = event.block.timestamp.toI32();
   recipient.save();
 
-  // Persist the Transfer entity
-  let entity = new Transfer(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
-  );
-  entity.sender = event.params.sender;
-  entity.recipient = event.params.recipient;
-  entity.amount = event.params.amount;
-
-  entity.blockNumber = event.block.number;
-  entity.blockTimestamp = event.block.timestamp;
-  entity.transactionHash = event.transaction.hash;
-
-  entity.save();
+  // Persist the TransferSnapshot timeseries
+  const transferSnap = new TransferSnapshot(1); // overridden by subgraph
+  transferSnap.timestamp = event.block.timestamp.toI32();
+  transferSnap.sender = event.params.sender;
+  transferSnap.recipient = event.params.recipient;
+  transferSnap.amount = event.params.amount;
+  transferSnap.blockNumber = event.block.number;
+  transferSnap.transactionHash = event.transaction.hash;
+  transferSnap.logIndex = event.logIndex;
+  transferSnap.save();
 }
 
 export function handleYieldClaimed(event: YieldClaimedEvent): void {
