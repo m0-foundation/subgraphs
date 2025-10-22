@@ -18,7 +18,8 @@ dataSources:
       entities:
         - TransferSnapshot
         - VolumeStats
-        - YieldClaimedSnapshot
+        - ClaimedSnapshot
+        - YieldSnapshot
         - Stablecoin
         - SupplySnapshot
         - SupplyStats
@@ -31,4 +32,8 @@ dataSources:
           handler: handleTransfer
         - event: YieldClaimed(uint256)
           handler: handleYieldClaimed
+          calls:
+            - yield: USDZ[event.address].yield()
+      blockHandlers:
+        - handler: handleBlock
       file: ./src/usdz.ts

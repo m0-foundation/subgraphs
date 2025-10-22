@@ -1,7 +1,14 @@
-import { Address, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigInt,
+  BigDecimal,
+  ethereum,
+  dataSource,
+} from "@graphprotocol/graph-ts";
 import {
   Transfer as TransferEvent,
   YieldClaimed as YieldClaimedEvent,
+  USDZ as USDZContract,
 } from "../generated/USDZ/USDZ";
 import {
   TransferSnapshot,
@@ -9,6 +16,7 @@ import {
   ReceivedSnapshot,
   SentSnapshot,
   SupplySnapshot,
+  YieldSnapshot,
 } from "../generated/schema";
 import { getStablecoin } from "./token";
 import { getHolder } from "./holder";
@@ -136,6 +144,10 @@ export function handleYieldClaimed(event: YieldClaimedEvent): void {
   // Update aggregate on Stablecoin
   const stablecoin = getStablecoin(event.address);
   stablecoin.claimed = stablecoin.claimed.plus(event.params.yield_);
+
+  const unclaimed = getUnclaimedYield();
+  const newAccruedYield = calculateAccruedYield(stablecoin.claimed, unclaimed);
+  stablecoin.accruedYield = newAccruedYield;
   stablecoin.lastUpdate = event.block.timestamp.toI32();
   stablecoin.save();
 
@@ -147,4 +159,56 @@ export function handleYieldClaimed(event: YieldClaimedEvent): void {
   snap.transactionHash = event.transaction.hash;
   snap.logIndex = event.logIndex;
   snap.save();
+
+  // Emit YieldSnapshot reflecting the claim
+  const yieldSnap = new YieldSnapshot(1); // overridden by subgraph
+  yieldSnap.timestamp = event.block.timestamp.toI32();
+  yieldSnap.amount = newAccruedYield;
+  yieldSnap.claimed = stablecoin.claimed;
+  yieldSnap.unclaimed = unclaimed;
+  yieldSnap.blockNumber = event.block.number;
+  yieldSnap.save();
+}
+
+// Runs on every block; snapshot unclaimed yield once per day (first minute)
+export function handleBlock(block: ethereum.Block): void {
+  // Only run in the first minute of the UTC day
+  const SECONDS_PER_DAY = 86400;
+  const secondsIntoDay = block.timestamp.mod(BigInt.fromI32(SECONDS_PER_DAY));
+  if (secondsIntoDay.gt(BigInt.fromI32(60))) {
+    return;
+  }
+
+  // Update stablecoin aggregates
+  const unclaimed = getUnclaimedYield();
+  const stablecoin = getStablecoin(dataSource.address());
+  const newAccruedYield = calculateAccruedYield(stablecoin.claimed, unclaimed);
+
+  stablecoin.accruedYield = newAccruedYield;
+  stablecoin.lastUpdate = block.timestamp.toI32();
+  stablecoin.save();
+
+  // Emit YieldSnapshot for the day's unclaimed yield
+  const yieldSnap = new YieldSnapshot(1); // overridden by subgraph
+  yieldSnap.timestamp = block.timestamp.toI32();
+  yieldSnap.amount = newAccruedYield;
+  yieldSnap.claimed = stablecoin.claimed;
+  yieldSnap.unclaimed = unclaimed;
+  yieldSnap.blockNumber = block.number;
+  yieldSnap.save();
+}
+
+function getUnclaimedYield(): BigInt {
+  const contract = USDZContract.bind(dataSource.address());
+  let unclaimed = BigInt.fromI32(0);
+  const res = contract.try_yield_();
+  if (!res.reverted) {
+    unclaimed = res.value;
+  }
+
+  return unclaimed;
+}
+
+function calculateAccruedYield(claimed: BigInt, unclaimed: BigInt): BigInt {
+  return claimed.plus(unclaimed);
 }

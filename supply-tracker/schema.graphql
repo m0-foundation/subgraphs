@@ -82,9 +82,21 @@ type VolumeStats
   count: Int8! @aggregate(fn: "count", cumulative: true)
 }
 
+# Yield accrued/claimed tracking
+type YieldSnapshot @entity(timeseries: true) {
+  id: Int8!
+  timestamp: Timestamp!
+  # amount represents the total accrued yield
+  amount: BigInt!
+  claimed: BigInt!
+  unclaimed: BigInt!
+  blockNumber: BigInt!
+}
+
 type Stablecoin @entity(immutable: false) {
   id: Bytes! @unique # address
   claimed: BigInt!
+  accruedYield: BigInt!
   minted: BigInt!
   burned: BigInt!
   lastUpdate: Timestamp!
