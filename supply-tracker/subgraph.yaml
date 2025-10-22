@@ -32,7 +32,7 @@ dataSources:
         - event: YieldClaimed(uint256)
           handler: handleYieldClaimed
           calls:
-            - yield: USDZ[event.address].yield()
+            USDZ.yield: USDZ[event.address].yield()
       blockHandlers:
         - handler: handleBlock
       file: ./src/usdz.ts
