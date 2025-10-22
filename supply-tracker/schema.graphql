@@ -3,7 +3,6 @@ type YieldClaimedSnapshot @entity(timeseries: true) {
   timestamp: Timestamp!
   amount: BigInt!
   blockNumber: BigInt!
-  blockTimestamp: BigInt!
   transactionHash: Bytes!
   logIndex: BigInt!
 }
@@ -14,7 +13,6 @@ type ReceivedSnapshot @entity(immutable: true) {
   account: Holder!
   amount: BigInt!
   blockNumber: BigInt!
-  blockTimestamp: BigInt!
   transactionHash: Bytes!
   logIndex: BigInt!
 }
@@ -25,7 +23,6 @@ type SentSnapshot @entity(immutable: true) {
   account: Holder!
   amount: BigInt!
   blockNumber: BigInt!
-  blockTimestamp: BigInt!
   transactionHash: Bytes!
   logIndex: BigInt!
 }
@@ -50,7 +47,6 @@ type StablecoinSupply @entity(timeseries: true) {
   amount: BigInt!
   stablecoin: Stablecoin!
   blockNumber: BigInt!
-  blockTimestamp: BigInt!
   transactionHash: Bytes!
   logIndex: BigInt!
   delta: BigDecimal!
@@ -63,7 +59,6 @@ type StablecoinSupplyStats
   timestamp: Timestamp!
   totalSupply: BigDecimal! @aggregate(fn: "last", arg: "amount")
   blockNumber: BigInt!
-  blockTimestamp: BigInt!
   transactionHash: Bytes!
   count: Int8! @aggregate(fn: "count", cumulative: true)
 }
