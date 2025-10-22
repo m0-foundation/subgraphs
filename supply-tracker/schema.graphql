@@ -1,4 +1,4 @@
-type YieldClaimedSnapshot @entity(timeseries: true) {
+type ClaimedSnapshot @entity(timeseries: true) {
   id: Int8!
   timestamp: Timestamp!
   amount: BigInt!
@@ -84,7 +84,7 @@ type VolumeStats
 
 type Stablecoin @entity(immutable: false) {
   id: Bytes! @unique # address
-  yieldClaimed: BigInt!
+  claimed: BigInt!
   minted: BigInt!
   burned: BigInt!
   lastUpdate: Timestamp!

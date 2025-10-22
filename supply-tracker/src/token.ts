@@ -10,7 +10,7 @@ export function getStablecoin(address: Address): Stablecoin {
 
   token.minted = BigInt.fromI32(0);
   token.burned = BigInt.fromI32(0);
-  token.yieldClaimed = BigInt.fromI32(0);
+  token.claimed = BigInt.fromI32(0);
   token.lastUpdate = 0;
 
   return token;

@@ -5,7 +5,7 @@ import {
 } from "../generated/USDZ/USDZ";
 import {
   TransferSnapshot,
-  YieldClaimedSnapshot,
+  ClaimedSnapshot,
   ReceivedSnapshot,
   SentSnapshot,
   SupplySnapshot,
@@ -133,12 +133,18 @@ export function handleTransfer(event: TransferEvent): void {
 }
 
 export function handleYieldClaimed(event: YieldClaimedEvent): void {
-  let entity = new YieldClaimedSnapshot(1); // overriden by subgraph
-  entity.amount = event.params.yield_;
+  // Update aggregate on Stablecoin
+  const stablecoin = getStablecoin(event.address);
+  stablecoin.claimed = stablecoin.claimed.plus(event.params.yield_);
+  stablecoin.lastUpdate = event.block.timestamp.toI32();
+  stablecoin.save();
 
-  entity.blockNumber = event.block.number;
-  entity.transactionHash = event.transaction.hash;
-  entity.logIndex = event.logIndex;
-
-  entity.save();
+  // Timeseries snapshot
+  const snap = new ClaimedSnapshot(1); // overridden by subgraph
+  snap.timestamp = event.block.timestamp.toI32();
+  snap.amount = event.params.yield_;
+  snap.blockNumber = event.block.number;
+  snap.transactionHash = event.transaction.hash;
+  snap.logIndex = event.logIndex;
+  snap.save();
 }
