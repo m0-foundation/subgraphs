@@ -8,6 +8,7 @@ export function getHolder(address: Address): Holder {
 
   holder = new Holder(address);
   holder.received = BigInt.fromI32(0);
+  holder.balance = BigInt.fromI32(0);
   holder.sent = BigInt.fromI32(0);
   holder.lastUpdate = 0;
 
