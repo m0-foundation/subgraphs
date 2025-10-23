@@ -21,6 +21,8 @@ dataSources:
         - YieldMeta
         - YieldSnapshot
         - YieldStats
+        - HoldersSnapshot
+        - HoldersStats
         - Stablecoin
         - SupplySnapshot
         - SupplyStats

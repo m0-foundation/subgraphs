@@ -10,16 +10,17 @@ import {
   YieldClaimed as YieldClaimedEvent,
   USDZ as USDZContract,
 } from "../generated/USDZ/USDZ";
-import {
-  TransferSnapshot,
-  ReceivedSnapshot,
-  SentSnapshot,
-  SupplySnapshot,
-  YieldSnapshot,
-  YieldMeta,
-} from "../generated/schema";
-import { getStablecoin } from "./token";
+import { YieldMeta } from "../generated/schema";
+import { getStablecoin } from "./stablecoin";
 import { getHolder } from "./holder";
+import {
+  createReceivedSnapshot,
+  createSentSnapshot,
+  createSupplySnapshot,
+  createTransferSnapshot,
+  createYieldSnapshot,
+  createHoldersSnapshot,
+} from "./creators";
 
 // timeseries entities' id and timestamp is set automatically by subgraph
 // @see https://thegraph.com/docs/en/subgraphs/best-practices/timeseries/
@@ -34,87 +35,145 @@ export function handleTransfer(event: TransferEvent): void {
   const sender = getHolder(event.params.sender);
   const recipient = getHolder(event.params.recipient);
   const amount = event.params.amount;
+  const ZERO = BigInt.fromI32(0);
 
   // Mint, Burn, or Transfer
   if (event.params.sender.equals(ZERO_ADDRESS)) {
     // Mint to recipient
-    if (!amount.equals(BigInt.fromI32(0))) {
+    if (!amount.equals(ZERO)) {
       recipient.received = recipient.received.plus(amount);
 
-      const receivedSnap = new ReceivedSnapshot(TIMESERIES_ID);
-      receivedSnap.account = recipient.id;
-      receivedSnap.amount = amount;
-      receivedSnap.blockNumber = event.block.number;
-      receivedSnap.transactionHash = event.transaction.hash;
-      receivedSnap.logIndex = event.logIndex;
-      receivedSnap.save();
+      const recipientPrev = recipient.balance;
+      recipient.balance = recipient.balance.plus(amount);
+      createReceivedSnapshot({
+        account: recipient.id,
+        amount,
+        blockNumber: event.block.number,
+        transactionHash: event.transaction.hash,
+        logIndex: event.logIndex,
+      });
 
       stablecoin.minted = stablecoin.minted.plus(amount);
 
       // Stablecoin supply snapshot for mint
       const supplyAfterMint = stablecoin.minted.minus(stablecoin.burned);
       stablecoin.supply = supplyAfterMint;
-      const supplySnapMint = new SupplySnapshot(TIMESERIES_ID);
-      supplySnapMint.amount = supplyAfterMint;
-      supplySnapMint.stablecoin = stablecoin.id;
-      supplySnapMint.blockNumber = event.block.number;
-      supplySnapMint.transactionHash = event.transaction.hash;
-      supplySnapMint.logIndex = event.logIndex;
-      supplySnapMint.delta = amount.toBigDecimal();
-      supplySnapMint.operation = "MINT";
-      supplySnapMint.save();
+      createSupplySnapshot({
+        amount: supplyAfterMint,
+        stablecoin: stablecoin.id,
+        blockNumber: event.block.number,
+        transactionHash: event.transaction.hash,
+        logIndex: event.logIndex,
+        delta: amount.toBigDecimal(),
+        operation: "MINT",
+      });
+
+      // holdersCount join detection
+      let holdersChanged = false;
+      if (recipientPrev.equals(ZERO) && recipient.balance.gt(ZERO)) {
+        stablecoin.holdersCount = (stablecoin.holdersCount as i32) + 1;
+        holdersChanged = true;
+      }
+      if (holdersChanged) {
+        createHoldersSnapshot({
+          amount: stablecoin.holdersCount as i32,
+          blockNumber: event.block.number,
+          transactionHash: event.transaction.hash,
+          logIndex: event.logIndex,
+        });
+      }
     }
   } else if (event.params.recipient.equals(ZERO_ADDRESS)) {
     // Burn from sender
-    if (!amount.equals(BigInt.fromI32(0))) {
+    if (!amount.equals(ZERO)) {
       sender.sent = sender.sent.plus(amount);
 
-      const sentSnap = new SentSnapshot(TIMESERIES_ID);
-      sentSnap.account = sender.id;
-      sentSnap.amount = amount;
-      sentSnap.blockNumber = event.block.number;
-      sentSnap.transactionHash = event.transaction.hash;
-      sentSnap.logIndex = event.logIndex;
-      sentSnap.save();
+      const senderPrev = sender.balance;
+      sender.balance = sender.balance.minus(amount);
+      createSentSnapshot({
+        account: sender.id,
+        amount,
+        blockNumber: event.block.number,
+        transactionHash: event.transaction.hash,
+        logIndex: event.logIndex,
+      });
 
       stablecoin.burned = stablecoin.burned.plus(amount);
 
       // Stablecoin supply snapshot for burn
       const supplyAfterBurn = stablecoin.minted.minus(stablecoin.burned);
       stablecoin.supply = supplyAfterBurn;
-      const supplySnapBurn = new SupplySnapshot(TIMESERIES_ID);
-      supplySnapBurn.amount = supplyAfterBurn;
-      supplySnapBurn.stablecoin = stablecoin.id;
-      supplySnapBurn.blockNumber = event.block.number;
-      supplySnapBurn.transactionHash = event.transaction.hash;
-      supplySnapBurn.logIndex = event.logIndex;
-      supplySnapBurn.delta = amount
-        .toBigDecimal()
-        .times(BigDecimal.fromString("-1"));
-      supplySnapBurn.operation = "BURN";
-      supplySnapBurn.save();
+      createSupplySnapshot({
+        amount: supplyAfterBurn,
+        stablecoin: stablecoin.id,
+        blockNumber: event.block.number,
+        transactionHash: event.transaction.hash,
+        logIndex: event.logIndex,
+        delta: amount.toBigDecimal().times(BigDecimal.fromString("-1")),
+        operation: "BURN",
+      });
+
+      // holdersCount leave detection
+      let holdersChanged = false;
+      if (senderPrev.gt(ZERO) && sender.balance.equals(ZERO)) {
+        stablecoin.holdersCount = (stablecoin.holdersCount as i32) - 1;
+        holdersChanged = true;
+      }
+      if (holdersChanged) {
+        createHoldersSnapshot({
+          amount: stablecoin.holdersCount as i32,
+          blockNumber: event.block.number,
+          transactionHash: event.transaction.hash,
+          logIndex: event.logIndex,
+        });
+      }
     }
   } else {
     // Regular transfer between holders
-    if (!amount.equals(BigInt.fromI32(0))) {
+    if (!amount.equals(ZERO)) {
       sender.sent = sender.sent.plus(amount);
       recipient.received = recipient.received.plus(amount);
 
-      const sentSnap = new SentSnapshot(TIMESERIES_ID);
-      sentSnap.account = sender.id;
-      sentSnap.amount = amount;
-      sentSnap.blockNumber = event.block.number;
-      sentSnap.transactionHash = event.transaction.hash;
-      sentSnap.logIndex = event.logIndex;
-      sentSnap.save();
+      const senderPrev = sender.balance;
+      const recipientPrev = recipient.balance;
+      sender.balance = sender.balance.minus(amount);
+      recipient.balance = recipient.balance.plus(amount);
 
-      const receivedSnap = new ReceivedSnapshot(TIMESERIES_ID);
-      receivedSnap.account = recipient.id;
-      receivedSnap.amount = amount;
-      receivedSnap.blockNumber = event.block.number;
-      receivedSnap.transactionHash = event.transaction.hash;
-      receivedSnap.logIndex = event.logIndex;
-      receivedSnap.save();
+      createSentSnapshot({
+        account: sender.id,
+        amount,
+        blockNumber: event.block.number,
+        transactionHash: event.transaction.hash,
+        logIndex: event.logIndex,
+      });
+
+      createReceivedSnapshot({
+        account: recipient.id,
+        amount,
+        blockNumber: event.block.number,
+        transactionHash: event.transaction.hash,
+        logIndex: event.logIndex,
+      });
+
+      // holdersCount join/leave detection for both sides
+      let delta = 0;
+      if (senderPrev.gt(ZERO) && sender.balance.equals(ZERO)) {
+        delta -= 1;
+      }
+      if (recipientPrev.equals(ZERO) && recipient.balance.gt(ZERO)) {
+        delta += 1;
+      }
+      if (delta != 0) {
+        stablecoin.holdersCount =
+          (stablecoin.holdersCount as i32) + (delta as i32);
+
+        createHoldersSnapshot({
+          amount: stablecoin.holdersCount as i32,
+          blockNumber: event.block.number,
+          transactionHash: event.transaction.hash,
+          logIndex: event.logIndex,
+        });
+      }
     }
   }
 
@@ -129,14 +188,14 @@ export function handleTransfer(event: TransferEvent): void {
   recipient.save();
 
   // Persist the TransferSnapshot timeseries
-  const transferSnap = new TransferSnapshot(TIMESERIES_ID);
-  transferSnap.sender = event.params.sender;
-  transferSnap.recipient = event.params.recipient;
-  transferSnap.amount = event.params.amount;
-  transferSnap.blockNumber = event.block.number;
-  transferSnap.transactionHash = event.transaction.hash;
-  transferSnap.logIndex = event.logIndex;
-  transferSnap.save();
+  createTransferSnapshot({
+    sender: event.params.sender,
+    recipient: event.params.recipient,
+    amount: event.params.amount,
+    blockNumber: event.block.number,
+    transactionHash: event.transaction.hash,
+    logIndex: event.logIndex,
+  });
 }
 
 export function handleYieldClaimed(event: YieldClaimedEvent): void {
@@ -151,12 +210,12 @@ export function handleYieldClaimed(event: YieldClaimedEvent): void {
   stablecoin.save();
 
   // Emit YieldSnapshot reflecting the claim
-  const yieldSnap = new YieldSnapshot(TIMESERIES_ID);
-  yieldSnap.amount = newAccruedYield;
-  yieldSnap.claimed = stablecoin.claimed;
-  yieldSnap.unclaimed = unclaimed;
-  yieldSnap.blockNumber = event.block.number;
-  yieldSnap.save();
+  createYieldSnapshot({
+    amount: newAccruedYield,
+    claimed: stablecoin.claimed,
+    unclaimed: unclaimed,
+    blockNumber: event.block.number,
+  });
 }
 
 // Runs on every block; snapshot unclaimed yield once per hour
@@ -183,12 +242,12 @@ export function handleBlock(block: ethereum.Block): void {
   stablecoin.save();
 
   // Emit YieldSnapshot for the day's unclaimed yield
-  const yieldSnap = new YieldSnapshot(TIMESERIES_ID);
-  yieldSnap.amount = newAccruedYield;
-  yieldSnap.claimed = stablecoin.claimed;
-  yieldSnap.unclaimed = unclaimed;
-  yieldSnap.blockNumber = block.number;
-  yieldSnap.save();
+  createYieldSnapshot({
+    amount: newAccruedYield,
+    claimed: stablecoin.claimed,
+    unclaimed: unclaimed,
+    blockNumber: block.number,
+  });
 
   // Update tracker
   meta.lastHour = currentHour as i32;

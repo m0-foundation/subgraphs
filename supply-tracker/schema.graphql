@@ -8,6 +8,24 @@ type ReceivedSnapshot @entity(timeseries: true) {
   logIndex: BigInt!
 }
 
+# Number of holders (non-zero balance) over time
+type HoldersSnapshot @entity(timeseries: true) {
+  id: Int8!
+  timestamp: Timestamp!
+  amount: Int!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type HoldersStats
+  @aggregation(intervals: ["hour", "day"], source: "HoldersSnapshot") {
+  id: Int8!
+  timestamp: Timestamp!
+  amount: Int! @aggregate(fn: "last", arg: "amount")
+  count: Int8! @aggregate(fn: "count", cumulative: true)
+}
+
 type SentSnapshot @entity(timeseries: true) {
   id: Int8!
   timestamp: Timestamp!
@@ -24,6 +42,7 @@ type Holder @entity(immutable: false) {
   receivedSnapshots: [ReceivedSnapshot!] @derivedFrom(field: "account")
   sent: BigInt!
   sentSnapshots: [SentSnapshot!] @derivedFrom(field: "account")
+  balance: BigInt!
   lastUpdate: Timestamp!
 }
 
@@ -107,5 +126,6 @@ type Stablecoin @entity(immutable: false) {
   minted: BigInt!
   burned: BigInt!
   supply: BigInt!
+  holdersCount: Int!
   lastUpdate: Timestamp!
 }
