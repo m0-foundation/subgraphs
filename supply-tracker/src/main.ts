@@ -8,8 +8,8 @@ import {
 import {
   Transfer as TransferEvent,
   YieldClaimed as YieldClaimedEvent,
-  USDZ as USDZContract,
-} from "../generated/USDZ/USDZ";
+  Stablecoin as Contract,
+} from "../generated/M0/Stablecoin";
 import { YieldMeta } from "../generated/schema";
 import { getStablecoin } from "./stablecoin";
 import { getHolder } from "./holder";
@@ -254,7 +254,7 @@ function hourBucket(timestamp: BigInt): i64 {
 }
 
 function getUnclaimedYield(): BigInt {
-  const contract = USDZContract.bind(dataSource.address());
+  const contract = Contract.bind(dataSource.address());
   let unclaimed = BigInt.fromI32(0);
   const res = contract.try_yield_();
   if (!res.reverted) {

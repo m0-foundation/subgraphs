@@ -5,11 +5,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: USDZ
+    name: M0
     network: arbitrum-one
     source:
       address: "0xA4B6DF229AEe22b4252dc578FEB2720E8A2C4A56"
-      abi: USDZ
+      abi: Stablecoin
       startBlock: 388153723
     mapping:
       kind: ethereum/events
@@ -28,15 +28,15 @@ dataSources:
         - SupplyStats
         - Holder
       abis:
-        - name: USDZ
-          file: ./abis/USDZ.json
+        - name: Stablecoin
+          file: ./abis/Stablecoin.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
         - event: YieldClaimed(uint256)
           handler: handleYieldClaimed
           calls:
-            USDZ.yield: USDZ[event.address].yield()
+            Stablecoin.yield: Stablecoin[event.address].yield()
       blockHandlers:
         - handler: handleBlock
-      file: ./src/usdz.ts
+      file: ./src/main.ts
