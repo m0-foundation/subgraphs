@@ -116,6 +116,7 @@ type YieldStats
   amount: BigInt! @aggregate(fn: "last", arg: "amount")
   claimed: BigInt!
   unclaimed: BigInt!
+  blockNumber: BigInt!
   count: Int8! @aggregate(fn: "count", cumulative: true)
 }
 
