@@ -69,12 +69,9 @@ export function handleTransfer(event: TransferEvent): void {
       });
 
       // holdersCount join detection
-      let holdersChanged = false;
       if (recipientPrev.equals(ZERO) && recipient.balance.gt(ZERO)) {
         stablecoin.holdersCount = (stablecoin.holdersCount as i32) + 1;
-        holdersChanged = true;
-      }
-      if (holdersChanged) {
+
         createHoldersSnapshot({
           amount: stablecoin.holdersCount as i32,
           blockNumber: event.block.number,
@@ -114,12 +111,9 @@ export function handleTransfer(event: TransferEvent): void {
       });
 
       // holdersCount leave detection
-      let holdersChanged = false;
       if (senderPrev.gt(ZERO) && sender.balance.equals(ZERO)) {
         stablecoin.holdersCount = (stablecoin.holdersCount as i32) - 1;
-        holdersChanged = true;
-      }
-      if (holdersChanged) {
+
         createHoldersSnapshot({
           amount: stablecoin.holdersCount as i32,
           blockNumber: event.block.number,
