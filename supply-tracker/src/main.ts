@@ -27,6 +27,13 @@ import {
   createHoldersSnapshot,
 } from "./creators";
 
+/**
+ * Handle Transfer Event
+ *
+ * - Identify mint, burn, or transfer events.
+ * - Update the balance of the sender and recipient.
+ * - Identify new holders or leaving holders.
+ */
 export function handleTransfer(event: TransferEvent): void {
   const ZERO_ADDRESS = Address.fromString(
     "0x0000000000000000000000000000000000000000",
