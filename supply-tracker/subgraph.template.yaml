@@ -6,11 +6,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: M0
-    network: arbitrum-one
+    network: {{network}}
     source:
-      address: "0xA4B6DF229AEe22b4252dc578FEB2720E8A2C4A56"
+      address: "{{address}}"
       abi: Stablecoin
-      startBlock: 388153723
+      startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9

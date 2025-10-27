@@ -1,8 +1,16 @@
 {
-  "arbitrum-one": {
-    "USDZ": {
-      "address": "0xD87c75a92db19Fe334FE7812890f893449Ff1bdA",
-      "startBlock": 388153723
-    }
+  "musd-mainnet": {
+    "name": "Metamask mUSD",
+    "network": "mainnet",
+    "address": "0xacA92E438df0B2401fF60dA7E4337B687a2435DA",
+    "startBlock": 23126158,
+    "version": "0.1.0"
+  },
+  "musd-linea": {
+    "name": "Metamask mUSD",
+    "network": "linea",
+    "address": "0xacA92E438df0B2401fF60dA7E4337B687a2435DA",
+    "startBlock": 21952038,
+    "version": "0.1.0"
   }
 }
