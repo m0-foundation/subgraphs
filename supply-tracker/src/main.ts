@@ -8,11 +8,16 @@ import {
 import {
   Transfer as TransferEvent,
   YieldClaimed as YieldClaimedEvent,
-  Stablecoin as Contract,
 } from "../generated/M0/Stablecoin";
 import { YieldMeta } from "../generated/schema";
 import { getStablecoin } from "./stablecoin";
 import { getHolder } from "./holder";
+import {
+  toMicroseconds,
+  hourBucket,
+  getUnclaimedYield,
+  calculateAccruedYield,
+} from "./utils";
 import {
   createReceivedSnapshot,
   createSentSnapshot,
@@ -21,10 +26,6 @@ import {
   createYieldSnapshot,
   createHoldersSnapshot,
 } from "./creators";
-
-// timeseries entities' id and timestamp is set automatically by subgraph
-// @see https://thegraph.com/docs/en/subgraphs/best-practices/timeseries/
-const TIMESERIES_ID = 1;
 
 export function handleTransfer(event: TransferEvent): void {
   const ZERO_ADDRESS = Address.fromString(
@@ -172,13 +173,13 @@ export function handleTransfer(event: TransferEvent): void {
   }
 
   // Update lastUpdate markers
-  stablecoin.lastUpdate = event.block.timestamp.toI32();
+  stablecoin.lastUpdate = toMicroseconds(event.block.timestamp);
   stablecoin.save();
 
-  sender.lastUpdate = event.block.timestamp.toI32();
+  sender.lastUpdate = toMicroseconds(event.block.timestamp);
   sender.save();
 
-  recipient.lastUpdate = event.block.timestamp.toI32();
+  recipient.lastUpdate = toMicroseconds(event.block.timestamp);
   recipient.save();
 
   // Persist the TransferSnapshot timeseries
@@ -200,7 +201,7 @@ export function handleYieldClaimed(event: YieldClaimedEvent): void {
   const unclaimed = getUnclaimedYield();
   const newAccruedYield = calculateAccruedYield(stablecoin.claimed, unclaimed);
   stablecoin.accruedYield = newAccruedYield;
-  stablecoin.lastUpdate = event.block.timestamp.toI32();
+  stablecoin.lastUpdate = toMicroseconds(event.block.timestamp);
   stablecoin.save();
 
   // Emit YieldSnapshot reflecting the claim
@@ -232,7 +233,7 @@ export function handleBlock(block: ethereum.Block): void {
   const newAccruedYield = calculateAccruedYield(stablecoin.claimed, unclaimed);
 
   stablecoin.accruedYield = newAccruedYield;
-  stablecoin.lastUpdate = block.timestamp.toI32();
+  stablecoin.lastUpdate = toMicroseconds(block.timestamp);
   stablecoin.save();
 
   // Emit YieldSnapshot for the day's unclaimed yield
@@ -246,24 +247,4 @@ export function handleBlock(block: ethereum.Block): void {
   // Update tracker
   meta.lastHour = currentHour as i32;
   meta.save();
-}
-
-function hourBucket(timestamp: BigInt): i64 {
-  let startOfHour = timestamp.toI64();
-  return startOfHour - (startOfHour % 3600); // floor to start of the hour
-}
-
-function getUnclaimedYield(): BigInt {
-  const contract = Contract.bind(dataSource.address());
-  let unclaimed = BigInt.fromI32(0);
-  const res = contract.try_yield_();
-  if (!res.reverted) {
-    unclaimed = res.value;
-  }
-
-  return unclaimed;
-}
-
-function calculateAccruedYield(claimed: BigInt, unclaimed: BigInt): BigInt {
-  return claimed.plus(unclaimed);
 }
