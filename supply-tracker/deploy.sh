@@ -13,13 +13,14 @@ if ! command -v jq &> /dev/null; then
   exit 1
 fi
 
-if [ -z "$1" ]; then
-  echo "Usage: $0 <deploy-id>"
+if [ -z "$2" ]; then
+  echo "Usage: $0 <deploy-id> <version>"
   echo "  <deploy-id> is a key from networks.json (e.g., musd-mainnet)"
   exit 1
 fi
 
 DEPLOY_ID="$1"
+VERSION="$2"
 
 # Read config from networks.json using jq
 CONFIG=$(jq -r ".[\"$DEPLOY_ID\"]" networks.json)
@@ -31,7 +32,6 @@ fi
 NETWORK=$(echo "$CONFIG" | jq -r '.network')
 ADDRESS=$(echo "$CONFIG" | jq -r '.address')
 START_BLOCK=$(echo "$CONFIG" | jq -r '.startBlock')
-VERSION=$(echo "$CONFIG" | jq -r '.version')
 NAME=$(echo "$CONFIG" | jq -r '.name')
 
 echo "🧼 Cleaning up..."
@@ -57,5 +57,9 @@ yarn graph deploy "$DEPLOY_ID" \
   --node https://subgraphs.alchemy.com/api/subgraphs/deploy \
   --deploy-key "$ALCHEMY_DEPLOY_KEY" \
   --ipfs https://ipfs.satsuma.xyz
+
+# Sync version in package.json and networks.json
+npm version "$VERSION" --no-git-tag-version --allow-same-version > /dev/null
+jq --arg deploy_id "$DEPLOY_ID" --arg version "$VERSION" '.[$deploy_id].version = $version' networks.json > tmp.$$.json && mv tmp.$$.json networks.json
 
 echo "✅ Deployment complete"

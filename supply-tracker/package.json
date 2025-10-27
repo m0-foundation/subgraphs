@@ -1,6 +1,6 @@
 {
-  "name": "usdz",
-  "license": "UNLICENSED",
+  "name": "subgraph-stablecoin",
+  "license": "MIT",
   "version": "0.1.0",
   "scripts": {
     "codegen": "graph codegen",
