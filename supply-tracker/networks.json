@@ -12,5 +12,19 @@
     "address": "0xacA92E438df0B2401fF60dA7E4337B687a2435DA",
     "startBlock": 21952038,
     "version": "0.1.0"
+  },
+  "usdz-mainnet": {
+    "name": "Braid, USDZ",
+    "network": "mainnet",
+    "address": "0xA4B6DF229AEe22b4252dc578FEB2720E8A2C4A56",
+    "startBlock": 23549213,
+    "version": "0.1.0"
+  },
+  "usdz-arbitrum": {
+    "name": "Braid, USDZ",
+    "network": "arbitrum-one",
+    "address": "0xA4B6DF229AEe22b4252dc578FEB2720E8A2C4A56",
+    "startBlock": 388153727,
+    "version": "0.1.0"
   }
 }
