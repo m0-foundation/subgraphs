@@ -26,5 +26,12 @@
     "address": "0xA4B6DF229AEe22b4252dc578FEB2720E8A2C4A56",
     "startBlock": 388153727,
     "version": "0.1.0"
+  },
+  "0fns-mainnet": {
+    "name": "DFNS, 0fns",
+    "network": "mainnet",
+    "address": "0x64df20A1814a6DD0F3d6f0A14073c47214c53f58",
+    "startBlock": 23598828,
+    "version": "0.1.0"
   }
 }
