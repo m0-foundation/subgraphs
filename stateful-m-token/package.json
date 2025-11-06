@@ -4,7 +4,7 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ mzero/m-token",
+    "deploy": "./deploy.sh",
     "deploy:mainnet": "graph deploy m-token-mainnet --network mainnet --version-label $(grep VERSION_LABEL .env | cut -d '=' -f2) --node https://subgraphs.alchemy.com/api/subgraphs/deploy --deploy-key $(grep DEPLOY_KEY .env | cut -d '=' -f2)",
     "create-local": "graph create --node http://localhost:8020/ mzero/m-token",
     "remove-local": "graph remove --node http://localhost:8020/ mzero/m-token",
