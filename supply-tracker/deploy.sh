@@ -6,15 +6,20 @@ if [ -z "$ALCHEMY_DEPLOY_KEY" ]; then
   exit 1
 fi
 
-# Check for dependencies: jq and mustache
+# Check for dependencies: jq and goldsky
 if ! command -v jq &> /dev/null; then
   echo "jq is required. Please install it."
   echo "e.g., 'brew install jq'"
   exit 1
 fi
+if ! command -v goldsky &> /dev/null; then
+  echo "goldsky is required. Please install it."
+  echo "e.g., 'npm install -g @goldskycom/cli'"
+  exit 1
+fi
 
 if [ -z "$2" ]; then
-  echo "Usage: $0 <deploy-id> <version>"
+  echo "Missing arguments. Usage: $0 <deploy-id> <version>"
   echo "  <deploy-id> is a key from networks.json (e.g., musd-mainnet)"
   exit 1
 fi
@@ -45,18 +50,14 @@ MUSTACHE_JSON=$(jq -n \
   --arg startBlock "$START_BLOCK" \
   '{network: $network, address: $address, startBlock: $startBlock}')
 
-echo "$MUSTACHE_JSON" | mustache - subgraph.template.yaml > subgraph.yaml
+echo "$MUSTACHE_JSON" | ./node_modules/.bin/mustache - subgraph.template.yaml > subgraph.yaml
 
 echo "👷‍♀️ Building..."
 yarn codegen
 yarn build
 
 echo "🚀 Deploying subgraph..."
-yarn graph deploy "$DEPLOY_ID" \
-  --version-label "$VERSION" \
-  --node https://subgraphs.alchemy.com/api/subgraphs/deploy \
-  --deploy-key "$ALCHEMY_DEPLOY_KEY" \
-  --ipfs https://ipfs.satsuma.xyz
+goldsky subgraph deploy "$DEPLOY_ID"/"$VERSION" --path .
 
 # Sync version in package.json and networks.json
 npm version "$VERSION" --no-git-tag-version --allow-same-version > /dev/null

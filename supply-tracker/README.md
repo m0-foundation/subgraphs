@@ -14,15 +14,20 @@ This subgraph can be deployed to different networks for various contracts by usi
 
 Before deploying, you must have the following tools installed:
 
+- `goldsky`: The Goldsky CLI for deploying subgraphs. Check the [Goldsky documentation](https://docs.goldsky.com/) for installation instructions.
 - `jq`: A command-line JSON processor.
 
-You can typically install them with Homebrew (macOS) or another package manager:
+`goldsky` can be installed via npm:
+
+```bash
+npm install -g @goldskycom/cli
+```
+
+For `jq`, You can typically install it with Homebrew (macOS) or another package manager:
 
 ```bash
 brew install jq
 ```
-
-Mustache is already included in the `package.json` file.
 
 ### Process
 
