@@ -27,7 +27,7 @@
     "startBlock": 388153727,
     "version": "0.1.0"
   },
-  "0fns-mainnet": {
+  "dfns-mainnet": {
     "name": "DFNS, 0fns",
     "network": "mainnet",
     "address": "0x64df20A1814a6DD0F3d6f0A14073c47214c53f58",
