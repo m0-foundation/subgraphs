@@ -1,12 +1,21 @@
-# Token Supply Tracker
+# Stablecoin
 
-## Methodology
+This subgraph provides the following information for a given $M stablecoin contract:
 
-### Total supply
-
-The total supply is calculated by summing the amount of tokens minted and subtracting the amount of tokens burned.
+- Token supply
+- Transfers
+- Holders
+- Yield accrual
+- Yield claims
+- Transaction volume
 
 ## Deployment
+
+Subgraphs are deployed like so:
+
+```bash
+./deploy.sh <deploy-id> <version>
+```
 
 This subgraph can be deployed to different networks for various contracts by using a templating system. The deployment process is managed by the `deploy.sh` script, which uses `jq` and `mustache` to generate the final `subgraph.yaml` from a template.
 
@@ -64,5 +73,5 @@ Add a new entry to the `networks.json` file. E.g.:
 And deploy it with:
 
 ```bash
-./deploy.sh deploy-id
+./deploy.sh deploy-id new-version
 ```
