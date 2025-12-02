@@ -38,10 +38,12 @@ The `deploy.sh` script reads a deployment configuration from `networks.json` bas
 To deploy the `musd-mainnet` configuration, run the following command:
 
 ```bash
-./deploy.sh musd-mainnet
+./deploy.sh musd-mainnet 0.1.0
 ```
 
 This will generate a `subgraph.yaml` file tailored for the specific contract and network, build the subgraph, and deploy it to the specified network.
+
+Please bump the version number as needed.
 
 ### Supporting a new contract or chain
 
