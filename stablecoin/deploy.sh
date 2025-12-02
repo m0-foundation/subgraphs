@@ -1,10 +1,18 @@
 #!/bin/bash
 set -e
 
-if [ -z "$ALCHEMY_DEPLOY_KEY" ]; then
-  echo "Error: ALCHEMY_DEPLOY_KEY environment variable not set."
-  exit 1
-fi
+#
+# This script deploys a Goldsky subgraph for a stablecoin project.
+# It requires two arguments: deploy-id and version.
+#
+# ```bash
+# ./deploy.sh deploy-id new-version
+# ```
+#
+# The information for the deployment (network, address, startBlock) is read from networks.json based
+# on the deploy-id.
+#
+
 
 # Check for dependencies: jq and goldsky
 if ! command -v jq &> /dev/null; then
