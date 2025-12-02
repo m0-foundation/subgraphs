@@ -1,0 +1,42 @@
+specVersion: 1.2.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: M0
+    network: {{network}}
+    source:
+      address: "{{address}}"
+      abi: Stablecoin
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - TransferSnapshot
+        - VolumeStats
+        - YieldMeta
+        - YieldSnapshot
+        - YieldStats
+        - HoldersSnapshot
+        - HoldersStats
+        - Stablecoin
+        - SupplySnapshot
+        - SupplyStats
+        - Holder
+      abis:
+        - name: Stablecoin
+          file: ./abis/Stablecoin.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: YieldClaimed(uint256)
+          handler: handleYieldClaimed
+          calls:
+            Stablecoin.yield: Stablecoin[event.address].yield()
+      blockHandlers:
+        - handler: handleBlock
+      file: ./src/main.ts

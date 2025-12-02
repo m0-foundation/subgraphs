@@ -1,0 +1,58 @@
+{
+  "musd-mainnet": {
+    "name": "Metamask mUSD",
+    "network": "mainnet",
+    "address": "0xacA92E438df0B2401fF60dA7E4337B687a2435DA",
+    "startBlock": 23126158,
+    "version": "0.1.0"
+  },
+  "musd-linea": {
+    "name": "Metamask mUSD",
+    "network": "linea",
+    "address": "0xacA92E438df0B2401fF60dA7E4337B687a2435DA",
+    "startBlock": 21952038,
+    "version": "0.1.0"
+  },
+  "usdz-mainnet": {
+    "name": "Braid, USDZ",
+    "network": "mainnet",
+    "address": "0xA4B6DF229AEe22b4252dc578FEB2720E8A2C4A56",
+    "startBlock": 23549213,
+    "version": "0.1.0"
+  },
+  "usdz-arbitrum": {
+    "name": "Braid, USDZ",
+    "network": "arbitrum-one",
+    "address": "0xA4B6DF229AEe22b4252dc578FEB2720E8A2C4A56",
+    "startBlock": 388153727,
+    "version": "0.1.0"
+  },
+  "dfns-mainnet": {
+    "name": "DFNS, 0fns",
+    "network": "mainnet",
+    "address": "0x64df20A1814a6DD0F3d6f0A14073c47214c53f58",
+    "startBlock": 23598828,
+    "version": "0.1.0"
+  },
+  "usdhl-hyperevm": {
+    "name": "USDhl, USDHL",
+    "network": "hyperevm",
+    "address": "0xb50A96253aBDF803D85efcDce07Ad8becBc52BD5",
+    "startBlock": 4714837,
+    "version": "0.1.0"
+  },
+  "usdsc-soneium": {
+    "name": "Startale USD, USDSC",
+    "network": "soneium",
+    "address": "0x3f99231dD03a9F0E7e3421c92B7b90fbe012985a",
+    "startBlock": 15215620,
+    "version": "0.1.0"
+  },
+  "mantrausd-mantra": {
+    "name": "Mantra USD, mantraUSD",
+    "network": "mantra",
+    "address": "0xd2b95283011E47257917770D28Bb3EE44c849f6F",
+    "startBlock": 9668419,
+    "version": "0.1.0"
+  }
+}

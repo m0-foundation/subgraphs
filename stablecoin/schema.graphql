@@ -1,0 +1,132 @@
+type ReceivedSnapshot @entity(timeseries: true) {
+  id: Int8!
+  timestamp: Timestamp!
+  account: Holder!
+  amount: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+# Number of holders (non-zero balance) over time
+type HoldersSnapshot @entity(timeseries: true) {
+  id: Int8!
+  timestamp: Timestamp!
+  amount: Int!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type HoldersStats
+  @aggregation(intervals: ["hour", "day"], source: "HoldersSnapshot") {
+  id: Int8!
+  timestamp: Timestamp!
+  amount: Int! @aggregate(fn: "last", arg: "amount")
+  count: Int8! @aggregate(fn: "count", cumulative: true)
+}
+
+type SentSnapshot @entity(timeseries: true) {
+  id: Int8!
+  timestamp: Timestamp!
+  account: Holder!
+  amount: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type Holder @entity(immutable: false) {
+  id: Bytes! @unique
+  received: BigInt!
+  receivedSnapshots: [ReceivedSnapshot!] @derivedFrom(field: "account")
+  sent: BigInt!
+  sentSnapshots: [SentSnapshot!] @derivedFrom(field: "account")
+  balance: BigInt!
+  lastUpdate: Timestamp!
+}
+
+enum Operation {
+  MINT
+  BURN
+}
+
+type SupplySnapshot @entity(timeseries: true) {
+  id: Int8!
+  timestamp: Timestamp!
+  amount: BigInt!
+  stablecoin: Stablecoin!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+  delta: BigDecimal!
+  operation: Operation!
+}
+
+type SupplyStats
+  @aggregation(intervals: ["hour", "day"], source: "SupplySnapshot") {
+  id: Int8!
+  timestamp: Timestamp!
+  amount: BigDecimal! @aggregate(fn: "last", arg: "amount")
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+  count: Int8! @aggregate(fn: "count", cumulative: true)
+}
+
+type TransferSnapshot @entity(timeseries: true) {
+  id: Int8!
+  timestamp: Timestamp!
+  sender: Bytes!
+  recipient: Bytes!
+  amount: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type VolumeStats
+  @aggregation(intervals: ["hour", "day"], source: "TransferSnapshot") {
+  id: Int8!
+  timestamp: Timestamp!
+  amount: BigDecimal! @aggregate(fn: "sum", arg: "amount")
+  count: Int8! @aggregate(fn: "count", cumulative: true)
+}
+
+# We use this entity to track hourly yield snapshots
+type YieldMeta @entity(immutable: false) {
+  id: String! @unique # always singleton
+  lastHour: Int! # last processed hour bucket
+}
+
+# Yield accrued/claimed tracking
+type YieldSnapshot @entity(timeseries: true) {
+  id: Int8!
+  timestamp: Timestamp!
+  # amount represents the total accrued yield
+  amount: BigInt!
+  claimed: BigInt!
+  unclaimed: BigInt!
+  blockNumber: BigInt!
+}
+
+type YieldStats
+  @aggregation(intervals: ["hour", "day"], source: "YieldSnapshot") {
+  id: Int8!
+  timestamp: Timestamp!
+  amount: BigInt! @aggregate(fn: "last", arg: "amount")
+  claimed: BigInt!
+  unclaimed: BigInt!
+  blockNumber: BigInt!
+  count: Int8! @aggregate(fn: "count", cumulative: true)
+}
+
+type Stablecoin @entity(immutable: false) {
+  id: Bytes! @unique # address
+  claimed: BigInt!
+  accruedYield: BigInt!
+  minted: BigInt!
+  burned: BigInt!
+  supply: BigInt!
+  holdersCount: Int!
+  lastUpdate: Timestamp!
+}
