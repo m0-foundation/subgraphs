@@ -4,8 +4,8 @@ import { dataSource } from "@graphprotocol/graph-ts";
 
 /**
  * Returns the start of the hour for a given timestamp
-
-* @example
+ *
+ * @example
  * ```ts
  *  hourBucket(BigInt.fromI32(1698412800));
  *  // returns 1698412800
