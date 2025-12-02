@@ -26,7 +26,7 @@ if ! command -v goldsky &> /dev/null; then
   exit 1
 fi
 
-if [ -z "$2" ]; then
+if [ -z "$1" ] || [ -z "$2" ]; then
   echo "Missing arguments. Usage: $0 <deploy-id> <version>"
   echo "  <deploy-id> is a key from networks.json (e.g., musd-mainnet)"
   exit 1
