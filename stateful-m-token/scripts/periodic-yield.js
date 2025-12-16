@@ -113,7 +113,7 @@ const findIndexOfLatest = (snapshots, startingIndex, timestamp) =>
             ? startingIndex - 1
             : findIndexOfLatest(snapshots, startingIndex + 1, timestamp);
 
-const safeEarlyTimestamp = mostRecentPeriodEndTimestamp - (historicalPeriods * period) - (3 * 86400);
+const safeEarlyTimestamp = mostRecentPeriodEndTimestamp - historicalPeriods * period - 3 * 86400;
 
 // console.log(`Safe Early Timestamp: ${safeEarlyTimestamp}\n`);
 
@@ -202,10 +202,12 @@ const req = https.request(options, (res) => {
             periodYields
                 .map(
                     ({ timestamp, yield }) =>
-                        `${timestamp},${yield / 1_000_000n}.${(yield % 1_000_000n).toString().padStart(6, '0')}`
+                        `${timestamp},${new Date(Number(timestamp) * 1000).toISOString()},${yield.toString()},${yield / 1_000_000n}.${(yield % 1_000_000n).toString().padStart(6, '0')}`
                 )
                 .join('\n')
         );
+
+        console.log(`Total Yield: ${periodYields.reduce((acc, { yield }) => acc + yield, 0n)}`);
     });
 });
 
