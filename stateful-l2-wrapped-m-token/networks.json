@@ -1,12 +1,72 @@
 {
-  "mainnet": {
-    "WrappedMToken": {
-      "address": "0x437cc33344a0b27a429f795ff6b469c72698b291",
-      "startBlock": 20527882
-    },
-    "MToken": {
-      "address": "0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b",
-      "startBlock": 19818438
-    }
+  "arbitrum": {
+    "name": "Wrapped M Token Arbitrum",
+    "network": "arbitrum-one",
+    "wrappedMTokenStartBlock": 307758620,
+    "mTokenStartBlock": 307758493,
+    "version": "0.1.0"
+  },
+  "bsc": {
+    "name": "Wrapped M Token Bsc",
+    "network": "bsc",
+    "wrappedMTokenStartBlock": 63832984,
+    "mTokenStartBlock": 63828958,
+    "version": "0.1.0"
+  },
+  "base": {
+    "name": "Wrapped M Token Base",
+    "network": "base",
+    "wrappedMTokenStartBlock": 37549750,
+    "mTokenStartBlock": 37549703,
+    "version": "0.1.0"
+  },
+  "hyperevm": {
+    "name": "Wrapped M Token Hyper EVM",
+    "network": "hyperevm",
+    "wrappedMTokenStartBlock": 4598878,
+    "mTokenStartBlock": 4107927,
+    "version": "0.1.0"
+  },
+  "linea": {
+    "name": "Wrapped M Token Linea",
+    "network": "linea",
+    "wrappedMTokenStartBlock": 21961611,
+    "mTokenStartBlock": 21511394,
+    "version": "0.1.0"
+  },
+  "mantra": {
+    "name": "Wrapped M Token Mantra",
+    "network": "mantra",
+    "wrappedMTokenStartBlock": 9595587,
+    "mTokenStartBlock": 9594993,
+    "version": "0.1.0"
+  },
+  "optimism": {
+    "name": "Wrapped M Token Optimism",
+    "network": "optimism",
+    "wrappedMTokenStartBlock": 132194461,
+    "mTokenStartBlock": 132194407,
+    "version": "0.1.0"
+  },
+  "plasma": {
+    "name": "Wrapped M Token Plasma",
+    "network": "plasma-mainnet",
+    "wrappedMTokenStartBlock": 7269581,
+    "mTokenStartBlock": 7266174,
+    "version": "0.1.0"
+  },
+  "plume": {
+    "name": "Wrapped M Token Plume",
+    "network": "plume-mainnet",
+    "wrappedMTokenStartBlock": 3471212,
+    "mTokenStartBlock": 3469673,
+    "version": "0.1.0"
+  },
+  "soneium": {
+    "name": "Wrapped M Token Soneium",
+    "network": "soneium",
+    "wrappedMTokenStartBlock": 14698998,
+    "mTokenStartBlock": 14698785,
+    "version": "0.1.0"
   }
 }
