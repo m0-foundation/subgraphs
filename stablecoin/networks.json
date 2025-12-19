@@ -1,4 +1,5 @@
 {
+  "//": "Check supported networks in https://docs.goldsky.com/subgraphs/blocks-subgraphs#supported-networks",
   "musd-mainnet": {
     "name": "Metamask mUSD",
     "network": "mainnet",
@@ -60,6 +61,13 @@
     "network": "mantra",
     "address": "0xd2b95283011E47257917770D28Bb3EE44c849f6F",
     "startBlock": 9668419,
+    "version": "0.1.0"
+  },
+  "grid-plasma": {
+    "name": "Daylight GRID",
+    "network": "plasma-mainnet",
+    "address": "0x43324fA4842829dB99e25713F81da2d0e7eB21c3",
+    "startBlock": 9054514,
     "version": "0.1.0"
   }
 }
