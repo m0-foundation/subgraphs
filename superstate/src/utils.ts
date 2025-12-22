@@ -37,6 +37,20 @@ export function hourBucket(timestamp: BigInt): i64 {
 }
 
 /**
+ * Returns the start of the day for a given timestamp
+ *
+ * @example
+ * ```ts
+ *  dayBucket(BigInt.fromI32(1698412800));
+ *  // returns 1698364800
+ * ```
+ */
+export function dayBucket(timestamp: BigInt): i64 {
+  let startOfDay = timestamp.toI64();
+  return startOfDay - (startOfDay % 86400); // floor to start of the day
+}
+
+/**
  * ETH Call to return the unclaimed balanceOf for the holder
  * Calls `balanceOf()` on the contract.
  */
