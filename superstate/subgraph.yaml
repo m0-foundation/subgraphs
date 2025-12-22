@@ -21,6 +21,9 @@ dataSources:
         - Mint
         - OffchainRedeem
         - Transfer
+        - BalanceMeta
+        - BalanceStats
+        - BalanceSnapshot
       abis:
         - name: Superstate
           file: ./abis/Superstate.json
@@ -32,7 +35,9 @@ dataSources:
         - event: Mint(indexed address,indexed address,uint256)
           handler: handleMint
         - event: OffchainRedeem(indexed address,indexed address,uint256)
-          handler: handleOffchainRedeemy
+          handler: handleOffchainRedeem
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
+      blockHandlers:
+        - handler: handleBlock
       file: ./src/superstate.ts

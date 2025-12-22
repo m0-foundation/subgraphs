@@ -50,3 +50,36 @@ type Transfer @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+# We use this entity to track hourly balance snapshots
+type BalanceMeta @entity(immutable: false) {
+  id: String! @unique # always singleton
+  lastHour: Int! # last processed hour bucket
+}
+
+# Balance accrued/claimed tracking
+type BalanceSnapshot @entity(timeseries: true) {
+  id: Int8!
+  timestamp: Timestamp!
+  address: Bytes! # address
+  # amount represents aggregated balance
+  amount: BigInt!
+  blockNumber: BigInt!
+}
+
+type BalanceStats
+  @aggregation(intervals: ["hour", "day"], source: "BalanceSnapshot") {
+  id: Int8!
+  timestamp: Timestamp!
+  address: Bytes! # address
+  amount: BigInt! @aggregate(fn: "last", arg: "amount")
+  blockNumber: BigInt!
+  count: Int8! @aggregate(fn: "count", cumulative: true)
+}
+
+type Holder @entity(immutable: false) {
+  id: Bytes! @unique # address
+  address: Bytes! # address
+  balance: BigInt!
+  lastUpdate: Timestamp!
+}
