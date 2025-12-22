@@ -4,10 +4,10 @@ import { dataSource } from "@graphprotocol/graph-ts";
 import { Holder } from "../generated/schema";
 
 export const MINTERS = [
-  { name: "Bridge", address: "0x235Adf84139701024eDbA844EbF76FA7eeD98A0c" },
-  { name: "Bridge2", address: "0xA2A23E2B9c0ec3F5919Ca786E12a524d65CA8C26" },
-  { name: "Bridge3", address: "0x1575B5B8C4624FE0072626b7EbDc137aEf66247a" },
-  { name: "Minter One", address: "0x802E28E166C3f19983E0Cf7688dCA0C2e70176A6" },
+  "0x235Adf84139701024eDbA844EbF76FA7eeD98A0c", // Bridge
+  "0xA2A23E2B9c0ec3F5919Ca786E12a524d65CA8C26", // Bridge2
+  "0x1575B5B8C4624FE0072626b7EbDc137aEf66247a", // Bridge3
+  "0x802E28E166C3f19983E0Cf7688dCA0C2e70176A6", // Minter One
 ];
 
 export function getHolder(address: Address): Holder {

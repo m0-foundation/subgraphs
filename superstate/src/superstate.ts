@@ -133,8 +133,9 @@ export function handleBlock(block: ethereum.Block): void {
   }
 
   // Update Minters balance
-  for (let i = 0; i < MINTERS.length; i++) {
-    const minterAddress = Address.fromString(MINTERS[i].address);
+  const length = MINTERS.length;
+  for (let i = 0; i < length; i++) {
+    const minterAddress = Address.fromString(MINTERS[i]);
     const holder = getHolder(minterAddress);
     const balance = getBalanceOf(minterAddress);
 
