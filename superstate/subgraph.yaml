@@ -8,73 +8,31 @@ dataSources:
     name: Superstate
     network: mainnet
     source:
-      address: "0x1f50a1ee0ec8275d0c83b7bb08896b4b47d6e8c4"
+      address: "0x43415eB6ff9DB7E26A15b704e7A3eDCe97d31C4e"
       abi: Superstate
-      startBlock: 22933808
+      startBlock: 22027068 # From March 12, 2025. First MXON USTB mint on March 13, 2025
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
-        - AccountingPaused
-        - AccountingUnpaused
         - AdminBurn
-        - Approval
         - Bridge
-        - Initialized
         - Mint
         - OffchainRedeem
-        - OwnershipTransferStarted
-        - OwnershipTransferred
-        - Paused
-        - SetChainIdSupport
-        - SetMaximumOracleDelay
-        - SetOracle
-        - SetRedemptionContract
-        - SetStablecoinConfig
-        - SubscribeV2
         - Transfer
-        - Unpaused
       abis:
         - name: Superstate
           file: ./abis/Superstate.json
       eventHandlers:
-        - event: AccountingPaused(address)
-          handler: handleAccountingPaused
-        - event: AccountingUnpaused(address)
-          handler: handleAccountingUnpaused
         - event: AdminBurn(indexed address,indexed address,uint256)
           handler: handleAdminBurn
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
         - event: Bridge(address,indexed address,uint256,indexed address,string,uint256)
           handler: handleBridge
-        - event: Initialized(uint8)
-          handler: handleInitialized
         - event: Mint(indexed address,indexed address,uint256)
           handler: handleMint
         - event: OffchainRedeem(indexed address,indexed address,uint256)
-          handler: handleOffchainRedeem
-        - event: OwnershipTransferStarted(indexed address,indexed address)
-          handler: handleOwnershipTransferStarted
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-        - event: Paused(address)
-          handler: handlePaused
-        - event: SetChainIdSupport(indexed uint256,bool,bool)
-          handler: handleSetChainIdSupport
-        - event: SetMaximumOracleDelay(uint256,uint256)
-          handler: handleSetMaximumOracleDelay
-        - event: SetOracle(address,address)
-          handler: handleSetOracle
-        - event: SetRedemptionContract(address,address)
-          handler: handleSetRedemptionContract
-        - event: SetStablecoinConfig(indexed address,address,address,uint96,uint96)
-          handler: handleSetStablecoinConfig
-        - event: SubscribeV2(indexed address,indexed address,address,uint256,uint256,uint256)
-          handler: handleSubscribeV2
+          handler: handleOffchainRedeemy
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-        - event: Unpaused(address)
-          handler: handleUnpaused
       file: ./src/superstate.ts
