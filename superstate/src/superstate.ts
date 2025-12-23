@@ -1,13 +1,13 @@
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { Transfer as TransferEvent } from "../generated/Superstate/Superstate";
 import { BalanceMeta, Transfer } from "../generated/schema";
 import {
   createBalanceSnapshot,
   getHolder,
   hourBucket,
-  MINTERS,
   toMicroseconds,
 } from "./utils";
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { USTB_WALLETS } from "./ustbWallets";
 
 export function handleTransfer(event: TransferEvent): void {
   const entity = new Transfer(
@@ -60,9 +60,9 @@ export function handleBlock(block: ethereum.Block): void {
   }
 
   // Update Minters balance
-  const length = MINTERS.length;
+  const length = USTB_WALLETS.length;
   for (let i = 0; i < length; i++) {
-    const minterAddress = Address.fromString(MINTERS[i]);
+    const minterAddress = Address.fromString(USTB_WALLETS[i]);
     const holder = getHolder(minterAddress);
 
     // Emit BalanceSnapshot for the hour's balance
