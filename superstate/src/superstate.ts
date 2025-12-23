@@ -46,16 +46,16 @@ export function handleTransfer(event: TransferEvent): void {
   });
 }
 
-// Create hourly snapshots of the holders of ours interested addresses (MINTERS)
+// Runs on every block; snapshot unclaimed balance at 00:00, 08:00, 16:00 UTC
 export function handleBlock(block: ethereum.Block): void {
-  const currentHour = hourBucket(block.timestamp);
+  const currentSnapshotTime = hourBucket(block.timestamp);
 
-  // Run only if new hour detected
+  // Run only if new snapshot time detected
   let meta = BalanceMeta.load("singleton");
   if (meta == null) {
     meta = new BalanceMeta("singleton");
     meta.lastHour = 0;
-  } else if (meta.lastHour == currentHour) {
+  } else if (meta.lastHour == currentSnapshotTime) {
     return;
   }
 
@@ -74,6 +74,6 @@ export function handleBlock(block: ethereum.Block): void {
   }
 
   // Update tracker
-  meta.lastHour = currentHour as i32;
+  meta.lastHour = currentSnapshotTime as i32;
   meta.save();
 }

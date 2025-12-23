@@ -21,17 +21,28 @@ export function getHolder(address: Address): Holder {
 }
 
 /**
- * Returns the start of the hour for a given timestamp
- *
- * @example
- * ```ts
- *  hourBucket(BigInt.fromI32(1698412800));
- *  // returns 1698412800
- * ```
+ * Returns the closest of three daily snapshot times (0, 8, 16 hours UTC) for a given timestamp.
+ * Rounds up if the timestamp is exactly halfway between two snapshot times.
  */
 export function hourBucket(timestamp: BigInt): i64 {
-  let startOfHour = timestamp.toI64();
-  return startOfHour - (startOfHour % 3600); // floor to start of the hour
+  let ts = timestamp.toI64();
+  let day = dayBucket(timestamp);
+
+  let snap0 = day; // 00:00 UTC
+  let snap8 = day + 8 * 3600; // 08:00 UTC
+  let snap16 = day + 16 * 3600; // 16:00 UTC
+
+  // Find the closest snapshot time
+  if (ts < snap8 - 4 * 3600) {
+    // Closer to 00:00 (before 04:00)
+    return snap0;
+  } else if (ts < snap16 - 4 * 3600) {
+    // Closer to 08:00 (between 04:00 and 12:00)
+    return snap8;
+  } else {
+    // Closer to 16:00 (after 12:00)
+    return snap16;
+  }
 }
 
 /**
