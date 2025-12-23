@@ -1,46 +1,3 @@
-type AdminBurn @entity(immutable: true) {
-  id: Bytes!
-  burner: Bytes! # address
-  src: Bytes! # address
-  amount: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type Bridge @entity(immutable: true) {
-  id: Bytes!
-  caller: Bytes! # address
-  src: Bytes! # address
-  amount: BigInt! # uint256
-  ethDestinationAddress: Bytes! # address
-  otherDestinationAddress: String! # string
-  chainId: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type Mint @entity(immutable: true) {
-  id: Bytes!
-  minter: Bytes! # address
-  to: Bytes! # address
-  amount: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type OffchainRedeem @entity(immutable: true) {
-  id: Bytes!
-  burner: Bytes! # address
-  src: Bytes! # address
-  amount: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
 type Transfer @entity(immutable: true) {
   id: Bytes!
   from: Bytes! # address
@@ -57,7 +14,7 @@ type BalanceMeta @entity(immutable: false) {
   lastHour: Int! # last processed hour bucket
 }
 
-# Balance accrued/claimed tracking
+# Balance tracking
 type BalanceSnapshot @entity(timeseries: true) {
   id: Int8!
   timestamp: Timestamp!

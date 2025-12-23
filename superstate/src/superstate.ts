@@ -1,93 +1,16 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Transfer as TransferEvent } from "../generated/Superstate/Superstate";
+import { BalanceMeta, Transfer } from "../generated/schema";
 import {
-  AdminBurn as AdminBurnEvent,
-  Bridge as BridgeEvent,
-  Mint as MintEvent,
-  OffchainRedeem as OffchainRedeemEvent,
-  Transfer as TransferEvent,
-} from "../generated/Superstate/Superstate";
-import {
-  AdminBurn,
-  BalanceMeta,
-  BalanceSnapshot,
-  Bridge,
-  Mint,
-  OffchainRedeem,
-  Transfer,
-} from "../generated/schema";
-import {
-  getBalanceOf,
+  createBalanceSnapshot,
   getHolder,
   hourBucket,
   MINTERS,
   toMicroseconds,
 } from "./utils";
-
-export function handleAdminBurn(event: AdminBurnEvent): void {
-  let entity = new AdminBurn(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
-  );
-  entity.burner = event.params.burner;
-  entity.src = event.params.src;
-  entity.amount = event.params.amount;
-
-  entity.blockNumber = event.block.number;
-  entity.blockTimestamp = event.block.timestamp;
-  entity.transactionHash = event.transaction.hash;
-
-  entity.save();
-}
-
-export function handleBridge(event: BridgeEvent): void {
-  let entity = new Bridge(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
-  );
-  entity.caller = event.params.caller;
-  entity.src = event.params.src;
-  entity.amount = event.params.amount;
-  entity.ethDestinationAddress = event.params.ethDestinationAddress;
-  entity.otherDestinationAddress = event.params.otherDestinationAddress;
-  entity.chainId = event.params.chainId;
-
-  entity.blockNumber = event.block.number;
-  entity.blockTimestamp = event.block.timestamp;
-  entity.transactionHash = event.transaction.hash;
-
-  entity.save();
-}
-
-export function handleMint(event: MintEvent): void {
-  let entity = new Mint(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
-  );
-  entity.minter = event.params.minter;
-  entity.to = event.params.to;
-  entity.amount = event.params.amount;
-
-  entity.blockNumber = event.block.number;
-  entity.blockTimestamp = event.block.timestamp;
-  entity.transactionHash = event.transaction.hash;
-
-  entity.save();
-}
-
-export function handleOffchainRedeem(event: OffchainRedeemEvent): void {
-  let entity = new OffchainRedeem(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
-  );
-  entity.burner = event.params.burner;
-  entity.src = event.params.src;
-  entity.amount = event.params.amount;
-
-  entity.blockNumber = event.block.number;
-  entity.blockTimestamp = event.block.timestamp;
-  entity.transactionHash = event.transaction.hash;
-
-  entity.save();
-}
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 
 export function handleTransfer(event: TransferEvent): void {
-  let entity = new Transfer(
+  const entity = new Transfer(
     event.transaction.hash.concatI32(event.logIndex.toI32()),
   );
   entity.from = event.params.from;
@@ -99,36 +22,40 @@ export function handleTransfer(event: TransferEvent): void {
   entity.transactionHash = event.transaction.hash;
 
   entity.save();
+
+  const fromHolder = getHolder(event.params.from);
+  fromHolder.balance = fromHolder.balance.minus(event.params.value);
+  fromHolder.lastUpdate = toMicroseconds(event.block.timestamp);
+  fromHolder.save();
+
+  createBalanceSnapshot({
+    address: event.params.from,
+    amount: fromHolder.balance,
+    blockNumber: event.block.number,
+  });
+
+  const toHolder = getHolder(event.params.to);
+  toHolder.balance = toHolder.balance.plus(event.params.value);
+  toHolder.lastUpdate = toMicroseconds(event.block.timestamp);
+  toHolder.save();
+
+  createBalanceSnapshot({
+    address: event.params.to,
+    amount: toHolder.balance,
+    blockNumber: event.block.number,
+  });
 }
 
-class CreateBalanceSnapshotArgs {
-  address: Address;
-  amount: BigInt;
-  blockNumber: BigInt;
-}
-export function createBalanceSnapshot(
-  args: CreateBalanceSnapshotArgs,
-): BalanceSnapshot {
-  const snap = new BalanceSnapshot(1); // automatically handled
-  snap.address = args.address;
-  snap.amount = args.amount;
-  snap.blockNumber = args.blockNumber;
-  snap.save();
-
-  return snap;
-}
-
-// Runs on every block; snapshot unclaimed balance once per hour
+// Create hourly snapshots of the holders of ours interested addresses (MINTERS)
 export function handleBlock(block: ethereum.Block): void {
-  let currentHour = hourBucket(block.timestamp);
+  const currentHour = hourBucket(block.timestamp);
 
   // Run only if new hour detected
   let meta = BalanceMeta.load("singleton");
   if (meta == null) {
     meta = new BalanceMeta("singleton");
     meta.lastHour = 0;
-  }
-  if (meta.lastHour == currentHour) {
+  } else if (meta.lastHour == currentHour) {
     return;
   }
 
@@ -137,16 +64,11 @@ export function handleBlock(block: ethereum.Block): void {
   for (let i = 0; i < length; i++) {
     const minterAddress = Address.fromString(MINTERS[i]);
     const holder = getHolder(minterAddress);
-    const balance = getBalanceOf(minterAddress);
 
-    holder.balance = balance;
-    holder.lastUpdate = toMicroseconds(block.timestamp);
-    holder.save();
-
-    // Emit BalanceSnapshot for the day's unclaimed balance
+    // Emit BalanceSnapshot for the hour's balance
     createBalanceSnapshot({
       address: minterAddress,
-      amount: balance,
+      amount: holder.balance,
       blockNumber: block.number,
     });
   }

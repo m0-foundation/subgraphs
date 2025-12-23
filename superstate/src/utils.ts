@@ -1,7 +1,5 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Superstate as Contract } from "../generated/Superstate/Superstate";
-import { dataSource } from "@graphprotocol/graph-ts";
-import { Holder } from "../generated/schema";
+import { BalanceSnapshot, Holder } from "../generated/schema";
 
 export const MINTERS = [
   "0x235Adf84139701024eDbA844EbF76FA7eeD98A0c", // Bridge
@@ -50,25 +48,27 @@ export function dayBucket(timestamp: BigInt): i64 {
   return startOfDay - (startOfDay % 86400); // floor to start of the day
 }
 
-/**
- * ETH Call to return the unclaimed balanceOf for the holder
- * Calls `balanceOf()` on the contract.
- */
-export function getBalanceOf(account: Address): BigInt {
-  const contract = Contract.bind(dataSource.address());
-  let balance = BigInt.fromI32(0);
-
-  const res = contract.try_balanceOf(account);
-  if (!res.reverted) {
-    balance = res.value;
-  }
-
-  return balance;
-}
-
 // Timeseries entities' id and timestamp are automatically set by subgraph in microseconds. e.g., 1698412800000000
 // However, event.block.timestamp is in seconds.
 // This function converts seconds to microseconds to normalize the data.
 export function toMicroseconds(timestamp: BigInt): i64 {
   return timestamp.times(BigInt.fromI32(1000000)).toI64();
+}
+
+class CreateBalanceSnapshotArgs {
+  address: Address;
+  amount: BigInt;
+  blockNumber: BigInt;
+}
+export function createBalanceSnapshot(
+  args: CreateBalanceSnapshotArgs,
+): BalanceSnapshot {
+  // id and timestamp are automatically handled in timeseries entities
+  const snap = new BalanceSnapshot(1);
+  snap.address = args.address;
+  snap.amount = args.amount;
+  snap.blockNumber = args.blockNumber;
+  snap.save();
+
+  return snap;
 }

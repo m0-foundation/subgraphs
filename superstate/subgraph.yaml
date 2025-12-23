@@ -16,26 +16,15 @@ dataSources:
       apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
-        - AdminBurn
-        - Bridge
-        - Mint
-        - OffchainRedeem
         - Transfer
         - BalanceMeta
         - BalanceStats
         - BalanceSnapshot
+        - Holder
       abis:
         - name: Superstate
           file: ./abis/Superstate.json
       eventHandlers:
-        - event: AdminBurn(indexed address,indexed address,uint256)
-          handler: handleAdminBurn
-        - event: Bridge(address,indexed address,uint256,indexed address,string,uint256)
-          handler: handleBridge
-        - event: Mint(indexed address,indexed address,uint256)
-          handler: handleMint
-        - event: OffchainRedeem(indexed address,indexed address,uint256)
-          handler: handleOffchainRedeem
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
       blockHandlers:
