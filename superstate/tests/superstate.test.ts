@@ -4,43 +4,55 @@ import {
   test,
   clearStore,
   beforeAll,
-  afterAll
+  afterAll,
 } from "matchstick-as/assembly/index"
-import { Address, BigInt } from "@graphprotocol/graph-ts"
-import { AccountingPaused } from "../generated/schema"
-import { AccountingPaused as AccountingPausedEvent } from "../generated/Superstate/Superstate"
-import { handleAccountingPaused } from "../src/superstate"
-import { createAccountingPausedEvent } from "./superstate-utils"
-
-// Tests structure (matchstick-as >=0.5.0)
-// https://thegraph.com/docs/en/subgraphs/developing/creating/unit-testing-framework/#tests-structure
+import { Address, BigInt, ethereum, Bytes } from "@graphprotocol/graph-ts"
+import { handleBlock, handleTransfer } from "../src/superstate"
+import { createTransferEvent } from "./superstate-utils"
+import { MINTERS } from "../src/utils"
 
 describe("Describe entity assertions", () => {
   beforeAll(() => {
-    let admin = Address.fromString("0x0000000000000000000000000000000000000001")
-    let newAccountingPausedEvent = createAccountingPausedEvent(admin)
-    handleAccountingPaused(newAccountingPausedEvent)
-  })
+    const from = Address.fromString("0x0000000000000000000000000000000000000001");
+    const to = Address.fromString(MINTERS[0]);
+    const amount = BigInt.fromI32(100);
+    const newTransferEvent = createTransferEvent(from, to, amount);
+    handleTransfer(newTransferEvent);
+  });
 
   afterAll(() => {
     clearStore()
-  })
+  });
 
-  // For more test scenarios, see:
-  // https://thegraph.com/docs/en/subgraphs/developing/creating/unit-testing-framework/#write-a-unit-test
+  test("Holder balance updated after transfer", () => {
+    assert.entityCount("Holder", 2);
+    const to = Address.fromString(MINTERS[0]);
+    assert.fieldEquals("Holder", to.toHexString(), "balance", "100");
+    assert.entityCount("BalanceSnapshot", 2);
+  });
 
-  test("AccountingPaused created and stored", () => {
-    assert.entityCount("AccountingPaused", 1)
+  test("Balance snapshot created after block", () => {
+    const timestamp = BigInt.fromI32(3601);
+    // Mock a block
+    const block = new ethereum.Block(
+      Bytes.fromHexString("0x01"),
+      Bytes.fromHexString("0x01"),
+      Bytes.fromHexString("0x01"),
+      Address.fromString("0x0000000000000000000000000000000000000001"),
+      Bytes.fromHexString("0x01"),
+      Bytes.fromHexString("0x01"),
+      Bytes.fromHexString("0x01"),
+      timestamp,
+      BigInt.fromI32(1),
+      BigInt.fromI32(1),
+      BigInt.fromI32(1),
+      BigInt.fromI32(1),
+      BigInt.fromI32(1),
+      BigInt.fromI32(1),
+      BigInt.fromI32(1)
+    );
 
-    // 0xa16081f360e3847006db660bae1c6d1b2e17ec2a is the default address used in newMockEvent() function
-    assert.fieldEquals(
-      "AccountingPaused",
-      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
-      "admin",
-      "0x0000000000000000000000000000000000000001"
-    )
-
-    // More assert options:
-    // https://thegraph.com/docs/en/subgraphs/developing/creating/unit-testing-framework/#asserts
-  })
-})
+    handleBlock(block);
+    assert.entityCount("BalanceSnapshot", 2 + MINTERS.length);
+  });
+});
