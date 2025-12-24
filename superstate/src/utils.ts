@@ -2,15 +2,15 @@ import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { BalanceSnapshot, Holder } from "../generated/schema";
 
 export function getHolder(address: Address): Holder {
-  let token = Holder.load(address);
-  if (token) return token;
+  let holder = Holder.load(address);
+  if (holder) return holder;
 
-  token = new Holder(address);
-  token.address = address;
-  token.balance = BigInt.fromI32(0);
-  token.lastUpdate = 0;
+  holder = new Holder(address);
+  holder.address = address;
+  holder.balance = BigInt.fromI32(0);
+  holder.lastUpdate = 0;
 
-  return token;
+  return holder;
 }
 
 /**
