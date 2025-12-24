@@ -2,7 +2,7 @@
 
 This subgraph provides on-chain data for the USTB holdings from the Minters in the $M Protocol.
 
-You can find the wallets we track [here](
+You can find the wallets we track [here](./src//ustbWallets.ts).
 
 ## Deployment
 
