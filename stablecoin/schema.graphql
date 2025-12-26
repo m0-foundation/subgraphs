@@ -68,8 +68,8 @@ type SupplyStats
   id: Int8!
   timestamp: Timestamp!
   amount: BigDecimal! @aggregate(fn: "last", arg: "amount")
-  blockNumber: BigInt!
-  transactionHash: Bytes!
+  blockNumber: BigInt! @aggregate(fn: "last", arg: "blockNumber")
+  transactionHash: Bytes! @aggregate(fn: "last", arg: "transactionHash")
   count: Int8! @aggregate(fn: "count", cumulative: true)
 }
 
@@ -114,9 +114,9 @@ type YieldStats
   id: Int8!
   timestamp: Timestamp!
   amount: BigInt! @aggregate(fn: "last", arg: "amount")
-  claimed: BigInt!
-  unclaimed: BigInt!
-  blockNumber: BigInt!
+  claimed: BigInt! @aggregate(fn: "last", arg: "claimed")
+  unclaimed: BigInt! @aggregate(fn: "last", arg: "unclaimed")
+  blockNumber: BigInt! @aggregate(fn: "last", arg: "blockNumber")
   count: Int8! @aggregate(fn: "count", cumulative: true)
 }
 
