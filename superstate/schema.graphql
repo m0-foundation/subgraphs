@@ -30,7 +30,7 @@ type BalanceStats
   timestamp: Timestamp!
   address: Bytes! # address
   amount: BigInt! @aggregate(fn: "last", arg: "amount")
-  blockNumber: BigInt!
+  blockNumber: BigInt! @aggregate(fn: "last", arg: "blockNumber")
   count: Int8! @aggregate(fn: "count", cumulative: true)
 }
 
