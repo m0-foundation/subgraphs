@@ -1,0 +1,8 @@
+{
+    "network": "mainnet",
+    "minterGatewayAddress": "0xf7f9638cb444D65e5A40bF5ff98ebE4ff319F04E",
+    "minterGatewayStartBlock": "19818447",
+    "mTokenAddress": "0x866A2BF4E572CbcF37D5071A7a58503Bfb36be1b",
+    "mTokenStartBlock": "19818438"
+
+}

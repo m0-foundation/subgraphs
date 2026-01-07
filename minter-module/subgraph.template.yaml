@@ -6,11 +6,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: MinterGateway
-    network: mainnet
+    network: "{{ network }}"
     source:
       abi: MinterGateway
-      address: "0xf7f9638cb444D65e5A40bF5ff98ebE4ff319F04E"
-      startBlock: 19818438
+      address: "{{ minterGatewayAddress }}"
+      startBlock: {{ minterGatewayStartBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

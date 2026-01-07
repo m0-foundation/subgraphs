@@ -1,0 +1,5 @@
+{
+    "network": "sepolia",
+    "minterGatewayAddress": "0x4edfcfb5f9e55962ef1a2eef0b56a8fadbaba289",
+    "minterGatewayStartBlock": "5783467"
+}

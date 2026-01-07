@@ -6,17 +6,19 @@
     "build": "graph build",
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ mzero/minter-module",
     "deploy:mainnet": "graph deploy minter-module-mainnet --network mainnet --version-label $(grep VERSION_LABEL .env | cut -d '=' -f2) --node https://subgraphs.alchemy.com/api/subgraphs/deploy --deploy-key $(grep DEPLOY_KEY .env | cut -d '=' -f2)",
+    "prepare:ethereum-mainnet": "mustache config/ethereum-mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:ethereum-sepolia": "mustache config/ethereum-sepolia.json subgraph.template.yaml > subgraph.yaml",
     "create-local": "graph create --node http://graph-node:8020/ mzero/minter-module",
     "remove-local": "graph remove --node http://graph-node:8020/ mzero/minter-module",
     "deploy-local": "graph deploy --node http://graph-node:8020/ mzero/minter-module",
     "test": "graph test",
     "prettier": "prettier --write 'src/**/*.ts'"
   },
-  "dependencies": {},
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.88.0",
     "@graphprotocol/graph-ts": "^0.35.1",
     "dotenv": "^16.4.5",
+    "mustache": "^4.2.0",
     "prettier": "^3.3.3"
   },
   "engines": {
