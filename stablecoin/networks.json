@@ -69,5 +69,12 @@
     "address": "0x43324fA4842829dB99e25713F81da2d0e7eB21c3",
     "startBlock": 9054514,
     "version": "0.1.1"
+  },
+  "agentusd-base": {
+    "name": "Agent USD",
+    "network": "base",
+    "address": "0xf33CAC2bB6B26e7615B1873c84e4174Ae193A9aa",
+    "startBlock": 40721081,
+    "version": "0.1.1"
   }
 }
