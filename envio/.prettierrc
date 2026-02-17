@@ -1,0 +1,24 @@
+{
+  "plugins": ["@trivago/prettier-plugin-sort-imports"],
+  "trailingComma": "all",
+  "tabWidth": 2,
+  "semi": false,
+  "printWidth": 100,
+  "singleQuote": true,
+  "htmlWhitespaceSensitivity": "ignore",
+  "vueIndentScriptAndStyle": true,
+  "bracketSameLine": true,
+  "useTabs": false,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "importOrder": ["^@(.*)$", "^#src/(.*)$", "^./(.*)$", "^../(.*)$", "^[./]"],
+  "importOrderSeparation": false,
+  "importOrderSortSpecifiers": false,
+  "importOrderParserPlugins": [
+    "typescript",
+    "classProperties",
+    "decorators-legacy"
+  ]
+}
+
+

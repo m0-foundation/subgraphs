@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=./node_modules/envio/evm.schema.json
+name: stablecoin_indexer
+description: Stablecoins indexer
+contracts:
+  - name: StablecoinContract
+    handler: ./src/handler.ts
+    events:
+    - event: Transfer(address indexed sender, address indexed recipient, uint256 amount)
+      field_selection:
+        transaction_fields:
+          - "hash"
+    - event: YieldClaimed(uint256 yield)
+
+networks:
+  - id: 1 # Ethereum Mainnet
+    start_block: 23126158
+    contracts:
+      - name: StablecoinContract 
+        address: "0xacA92E438df0B2401fF60dA7E4337B687a2435DA" # Metamask mUSD
+  # - id: 59144 # Linea Mainnet
+  #   start_block: 21952038
+  #   contracts:
+  #     - name: StablecoinContract
+  #       address: "0xacA92E438df0B2401fF60dA7E4337B687a2435DA" # Metamask mUSD
+   
+# Unordered multichain mode allows you to index events from multiple chains
+# in realtime but doesn't guarentee ordering between chains
+# https://docs.envio.dev/docs/HyperIndex/multichain-indexing#unordered-multichain-mode
+unordered_multichain_mode: true
+# Preload optimisation makes your indexer much faster.
+# But be aware that your handlers will run twice,
+# so make sure to use Effect API for external calls.
+preload_handlers: true
+# Address format for Ethereum addresses: 'checksum' or 'lowercase'
+# using lowercase addresses is slightly faster
+address_format: lowercase
