@@ -105,7 +105,7 @@ type LatestIndexSnapshot @entity(timeseries: true) {
 }
 
 type LatestIndex
-  @aggregation(intervals: ["hour", "day"], source: "LatestIndexSnapshot") {
+    @aggregation(intervals: ["hour", "day"], source: "LatestIndexSnapshot") {
     id: Int8!
     timestamp: Timestamp!
     value: BigInt! @aggregate(fn: "last", arg: "value")
@@ -119,11 +119,11 @@ type LatestRateSnapshot @entity(timeseries: true) {
 }
 
 type LatestRate
-  @aggregation(intervals: ["hour", "day"], source: "LatestRateSnapshot") {
-  id: Int8!
-  timestamp: Timestamp!
-  value: BigInt! @aggregate(fn: "last", arg: "value")
-  count: Int8! @aggregate(fn: "count", cumulative: true)
+    @aggregation(intervals: ["hour", "day"], source: "LatestRateSnapshot") {
+    id: Int8!
+    timestamp: Timestamp!
+    value: BigInt! @aggregate(fn: "last", arg: "value")
+    count: Int8! @aggregate(fn: "count", cumulative: true)
 }
 
 type LatestUpdateTimestampSnapshot @entity(timeseries: true) {
@@ -133,11 +133,11 @@ type LatestUpdateTimestampSnapshot @entity(timeseries: true) {
 }
 
 type LatestUpdateTimestamp
-  @aggregation(intervals: ["hour", "day"], source: "LatestUpdateTimestampSnapshot") {
-  id: Int8!
-  timestamp: Timestamp!
-  value: Int! @aggregate(fn: "last", arg: "value")
-  count: Int8! @aggregate(fn: "count", cumulative: true)
+    @aggregation(intervals: ["hour", "day"], source: "LatestUpdateTimestampSnapshot") {
+    id: Int8!
+    timestamp: Timestamp!
+    value: Int! @aggregate(fn: "last", arg: "value")
+    count: Int8! @aggregate(fn: "count", cumulative: true)
 }
 
 type TotalMintedSnapshot implements BigIntSnapshotEntity & SnapshotEntity @entity(immutable: false) {
